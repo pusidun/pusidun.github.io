@@ -1,0 +1,105 @@
+html,
+body,
+div,
+span {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-weight: inherit;
+	font-style: inherit;
+	font-family: inherit;
+	font-size: 100%;
+	vertical-align: baseline;
+}
+
+body {
+	line-height: 1;
+	color: #000;
+	background: #fff;
+	font-family: Helvetica, Tahoma, Arial, 'Hiragino Sans GB', '\51AC\9752\9ED1\4F53', 'Microsoft YaHei', '\5FAE\8F6F\96C5\9ED1', STXihei, '\534E\6587\7EC6\9ED1', SimSun, '\5B8B\4F53', Heiti, '\9ED1\4F53', sans-serif;
+	font-size: 16px;
+}
+
+ol,
+ul {
+	list-style: none;
+}
+
+p {
+	margin: 15px 0;
+}
+
+.index-wrapper .title-desc {
+	color: #999;
+	font-size: 14px;
+	line-height: 1.6;
+}
+
+a img {
+	border: none;
+}
+
+.aside {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 30%;
+	height: 100%;
+	max-width: 500px;
+	background: -webkit-linear-gradient(left top, #5c3672, #38648c);
+	/* Safari 5.1 - 6.0 */
+	background: -o-linear-gradient(bottom right, #5c3672, #38648c);
+	/* Opera 11.1 - 12.0 */
+	background: -moz-linear-gradient(bottom right, #5c3672, #38648c);
+	/* Firefox 3.6 - 15 */
+	background: linear-gradient(to bottom right, #5c3672, #38648c);
+	/* 标准的语法 */
+}
+
+.index-wrapper {
+	position: fixed;
+	top: 0;
+	right: 0;
+	width: 70%;
+	height: 100%;
+	margin: 0px;
+	padding: 0px;
+}
+
+#name {
+	font-size: 40px;
+	color: #fff;
+	margin-bottom: 20px;
+	letter-spacing: .15em;
+	text-shadow: rgba(255, 255, 255, 0.5) 0 0 15px, rgba(255, 255, 255, 0.5) 0 0 10px;
+}
+
+.info-card {
+	position: absolute;
+	margin-top: 70%;
+	text-align: center;
+	width: 100%;
+}
+
+.index-content {
+	position: relative;
+	margin-left: 10%;
+	/*padding-top: 80px;*/
+	padding-right: 15%;
+	height: 100%;
+	overflow-y: auto;
+}
+
+.title {
+	display: block;
+	font-size: 22px;
+	font-weight: bold;
+	margin-bottom: 25px;
+	padding-bottom: 10px;
+	border-bottom: 2px solid #eee;
+}
+
+.artical-list .title:hover {
+	color: #e50053;
+	text-decoration: none;
+}
