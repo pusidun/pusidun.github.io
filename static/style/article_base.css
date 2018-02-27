@@ -84,8 +84,9 @@ a img {
 .index-content {
 	position: relative;
 	margin-left: 10%;
-	/*padding-top: 80px;*/
+	padding-top: 80px;
 	padding-right: 15%;
+	box-sizing: border-box;
 	height: 100%;
 	overflow-y: auto;
 }
