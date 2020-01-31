@@ -1,0 +1,20 @@
+<section class="post-comments">
+  
+  {% if site.comment.gitment %}
+    <div id="gitmentContainer"></div>
+    <link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+    <script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+    <script>
+    var gitment = new Gitment({
+        owner: '{{site.comment.gitment}}',
+        repo: '{{site.comment.repo}}',
+        oauth: {
+            client_id: '{{site.comment.clientId}}',
+            client_secret: '{{site.comment.clientSecret}}',
+        },
+    });
+    gitment.render('gitmentContainer');
+    </script>
+  {% endif %}
+
+</section>

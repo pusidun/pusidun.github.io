@@ -1,54 +1,34 @@
-<!DOCTYPE HTML>
-<html>
+---
+layout: default
+---
 
-	<head>
-		<meta charset="utf-8" />
-		<meta name="author" content="pusidun" />
-		<meta name="description" content="pusidun homepage" />
-		<meta name="renderer" content="webkit">
-		<title>pusidun homepage</title>
-		<link rel="stylesheet" href="static/style/article_base.css" />
-	</head>
+<div class="main-post-list hidden">
 
-	<body>
+  <ol class="post-list">
+    {% for post in paginator.posts %}
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="{{ post.url }}" title="访问 {{ post.title }}">{{ post.title }}</a></h2>
+      <p class="excerpt">{{ post.content | strip_html | strip_newlines | truncate: 250 }}&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="{{post.date | date: date_to_xmlschema}}" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          {{ post.date | date: "%F"}}</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">{{ post.tags }}</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href={{ post.url }}>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    {% endfor %}
+  </ol>
 
-		<div class="index_wrapper">
-			<div class="aside">
-				<div class="info-card">
-					<h1 id="name">pusidun</h1>
-					<a href="https://github.com/pusidun/" target="_blank"><img src="static/img/github.png" alt width="32" height="32" /></a>
-					<a href="mailto:pusidun@hotmail.com" target="_blank"><img src="static/img/mail.png" alt width="32" height="32" /></a>
-					<a href="static/img/wx.png" target="_blank"><img src="static/img/wx_icon.png" alt width="32" height="32" /></a>
-					<a href="http://www.cnblogs.com/pusidun/" target="_blank"><img src="static/img/blogger-botton.png" alt width="32" height="32" /></a>
-				</div>
-			</div>
-		</div>
+  {% include pagination.html %}
 
-		<div class="index-wrapper">
-			<div class="index-content">
-				<ul class="artical-list">
-					<li>
-						<a class="title">项目一</a>
-						<div class="title-desc">
-							<p>描述一</p>
-						</div>
-					</li>
-					<li>
-						<a class="title">项目二</a>
-						<div class="title-desc">
-							<p>描述二</p>
-						</div>
-					</li>
-					<li>
-						<a class="title">项目三</a>
-						<div class="title-desc">
-							<p>描述三</p>
-						</div>
-					</li>
-				</ul>
-			</div>
-		</div>
-	</body>
-	<script src="static/js/jquery-3.3.1.js"></script>
-
-</html>
+</div>
