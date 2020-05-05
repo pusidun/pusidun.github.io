@@ -1,4 +1,23 @@
+### Install 
 
+sudo npm install -g hexo
+
+### Deployment
+
+```
+hexo clean
+hexo generate
+hexo deploy
+```
+
+```
+hexo new "postName"
+hexo new page "postName"
+hexo generate
+hexo server
+hexo help
+hexo version
+```
 
 #### 感谢   
 
