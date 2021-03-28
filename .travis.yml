@@ -1,0 +1,27 @@
+language: ruby
+rvm:
+  - 2.3.3
+
+before_install:
+ 
+script:
+  - bundle install
+  - bundle exec jekyll build
+after_success:
+  - mv CNAME README.md -t _site/
+  - cd _site
+  - git init
+  - git config user.name "pusidun"
+  - git config user.email "pusidun@hotmail.com"
+  - git add --all .
+  - git commit -m "Travis-CI auto builder"
+  - git remote add origin https://$DEPLOY_TOKEN@github.com/pusidun/pusidun.github.io.git
+  - git remote show origin
+  - git push --force origin gh-pages
+
+branches:
+  only:
+  - master
+env:
+  global:
+  - NOKOGIRI_USE_SYSTEM_LIBRARIES=true
