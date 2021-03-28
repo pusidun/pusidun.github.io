@@ -3,25 +3,30 @@ rvm:
   - 2.3.3
 
 before_install:
- 
+
+install:
+- gem install jekyll bundle
+- bundle install
+
 script:
-  - bundle install
-  - bundle exec jekyll build
+  - jekyll build
+
 after_success:
-  - mv CNAME README.md -t _site/
+  - mkdir _site && mv README.md -t _site/
   - cd _site
   - git init
   - git config user.name "pusidun"
   - git config user.email "pusidun@hotmail.com"
   - git add --all .
+  - git status
   - git commit -m "Travis-CI auto builder"
-  - git remote add origin https://$DEPLOY_TOKEN@github.com/pusidun/pusidun.github.io.git
-  - git remote show origin
-  - git push --force origin gh-pages
+  - git push --force --quiet "https://${DEPLOY_TOKEN}@${GH_REF}" master:${P_BRANCH}
+  - git push --force --quiet "https://${GiteeToken}@${Gitee_REF}" master:${P_BRANCH}
 
 branches:
   only:
   - master
+
 env:
   global:
   - NOKOGIRI_USE_SYSTEM_LIBRARIES=true

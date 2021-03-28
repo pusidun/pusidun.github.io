@@ -1,5 +1,7 @@
 ### Introduce
 
+[![Build Status](https://travis-ci.org/pusidun/pusidun.github.io.svg?branch=master)](https://travis-ci.org/pusidun/pusidun.github.io)
+
 pusidun's blog. Rebuild by Jekyll in 2020.
 
 ### Install 
