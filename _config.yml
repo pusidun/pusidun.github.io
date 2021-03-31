@@ -10,10 +10,16 @@ url: "https://pusidun.github.io"
 
 # Comment
 comment:
-    gitment: pusidun
-    repo: https://github.com/pusidun/pusidun.github.io
-    clientId: aefb0f3dbc2fa7171b5c
-    clientSecret: c49685b0aeaba732ae777f0c18a83c1449aff39d
+    gitment:
+        enable: false
+        name: pusidun
+        repo: https://github.com/pusidun/pusidun.github.io
+        clientId: aefb0f3dbc2fa7171b5c
+        clientSecret: c49685b0aeaba732ae777f0c18a83c1449aff39d
+    valine:
+        enable: true
+        appId: XiYejJhYJ3U89yVy1tqxNYin-MdYXbMMI
+        appKey: Px5FNmnMui05vXUJNqlptSqk
 
 # Social
 social:
