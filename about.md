@@ -26,3 +26,5 @@ title: About me
 使用Golang开发。基于Gin网络框架开发的IM系统。目前完成了鉴权，数据库ORM，用户管理功能。[该项目未完成]
 
 ![公众号](/assets/images/GongZhongHao.jpg)
+
+友情链接： [wonder聚聚-奔跑的小石头](http://wonderxxf.gitee.io/coderfan/)
