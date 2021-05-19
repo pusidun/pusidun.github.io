@@ -4,7 +4,19 @@ title: Ubuntu16.06常见服务搭建
 date: 2018-04-05
 tags: 博客
 ---
- 
+<!-- TOC -->
+
+- [摘要](#摘要)
+- [ssh](#ssh)
+  - [安装](#安装)
+- [samba](#samba)
+  - [安装](#安装-1)
+  - [配置](#配置)
+  - [samba的用户权限](#samba的用户权限)
+  - [windows登陆samba](#windows登陆samba)
+- [vimrc](#vimrc)
+
+<!-- /TOC -->
 ## 摘要
 系统环境Ubuntu 16.04 amd64
 隔一段时间要配一次服务记不住，记录在这里方便以后安装。

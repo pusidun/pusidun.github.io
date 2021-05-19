@@ -6,7 +6,16 @@ tags: Linux
 ---
 
 >本篇总结自<<The Linux programming interface a Linux and UNIX system programming handbook by Michael Kerrisk>> ch4,ch5
+<!-- TOC -->
 
+- [四个基本IO系统调用](#四个基本io系统调用)
+  - [简介](#简介)
+  - [open](#open)
+  - [read](#read)
+  - [write](#write)
+  - [close](#close)
+
+<!-- /TOC -->
 ## 四个基本IO系统调用
 
 ### 简介
