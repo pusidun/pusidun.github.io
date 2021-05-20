@@ -27,4 +27,8 @@ title: About me
 
 ![公众号](/assets/images/GongZhongHao.jpg)
 
-友情链接： [wonder聚聚-奔跑的小石头](http://wonderxxf.gitee.io/coderfan/)
+友情链接：
+
+<a href="http://wonderxxf.gitee.io/coderfan/" target="_blank">wonder聚聚-奔跑的小石头</a>
+<a href="http://www.linya.pub/" target="_blank">大佬的书签</a>
+<a href="https://blog.csdn.net/qq_34863439" target="_blank">try1024</a>
