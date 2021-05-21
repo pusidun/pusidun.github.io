@@ -7,14 +7,17 @@ tags: 大并发服务器开发
 <!-- TOC -->
 
 - [select](#select)
-  - [API](#api)
-  - [socket何时可读写](#socket何时可读写)
+	- [API](#api)
+	- [socket何时可读写](#socket何时可读写)
 - [poll](#poll)
-  - [API](#api-1)
-  - [poll使用案例](#poll使用案例)
+	- [API](#api-1)
+	- [poll使用案例](#poll使用案例)
+		- [代码几点说明](#代码几点说明)
+		- [代码存在的缺陷](#代码存在的缺陷)
 - [epoll](#epoll)
-  - [API](#api-2)
-  - [epoll LT例子](#epoll-lt例子)
+	- [API](#api-2)
+	- [epoll LT例子](#epoll-lt例子)
+- [select poll epoll 比较](#select-poll-epoll-比较)
 
 <!-- /TOC -->
 ## select
@@ -116,6 +119,8 @@ events中请求的任何事件都可能在revents中返回。
 
 ### poll使用案例
 
+echoserv.cc
+
 ```
 #include <unistd.h>
 #include <sys/types.h>
@@ -126,144 +131,177 @@ events中请求的任何事件都可能在revents中返回。
 #include <signal.h>
 #include <sys/wait.h>
 #include <poll.h>
- 
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
- 
+
 #include <vector>
 #include <iostream>
- 
-#define ERR_EXIT(m) \
-        do \
-        { \
-                perror(m); \
-                exit(EXIT_FAILURE); \
-        } while(0)
- 
- 
+
+#define ERR_EXIT(m)         \
+	do                      \
+	{                       \
+		perror(m);          \
+		exit(EXIT_FAILURE); \
+	} while (0)
+
 typedef std::vector<struct pollfd> PollFdList;
- 
+
 int main(void)
 {
 	signal(SIGPIPE, SIG_IGN);
 	signal(SIGCHLD, SIG_IGN); //避免僵死进程
- 
-	
+
 	int listenfd;
- 
-    //监听套接字                                     //非阻塞
+
+	//监听套接字                                     //非阻塞
 	if ((listenfd = socket(PF_INET, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, IPPROTO_TCP)) < 0)
 		ERR_EXIT("socket");
- 
- 
-    //填充地址相关
+
+	//填充地址相关
 	struct sockaddr_in servaddr;
 	memset(&servaddr, 0, sizeof(servaddr));
 	servaddr.sin_family = AF_INET;
 	servaddr.sin_port = htons(5188);
 	servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
- 
+
 	int on = 1;
 	//设置地址的重复利用
 	if (setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)) < 0)
 		ERR_EXIT("setsockopt");
- 
-    //绑定
-	if (bind(listenfd, (struct sockaddr*)&servaddr, sizeof(servaddr)) < 0)
+
+	//绑定
+	if (bind(listenfd, (struct sockaddr *)&servaddr, sizeof(servaddr)) < 0)
 		ERR_EXIT("bind");
 	//监听
 	if (listen(listenfd, SOMAXCONN) < 0)
 		ERR_EXIT("listen");
- 
- 
-    //========================poll的使用=======================//
+
+	//========================poll的使用=======================//
 	struct pollfd pfd;
 	pfd.fd = listenfd;
-	pfd.events = POLLIN;  //关注POLLIN（读）事件
- 
-	PollFdList pollfds;   //pollfd队列
+	pfd.events = POLLIN; //关注POLLIN（读）事件
+
+	PollFdList pollfds; //pollfd队列
 	pollfds.push_back(pfd);
- 
-	int nready;  //待处理的事件数
- 
+
+	int nready; //待处理的事件数
+
 	struct sockaddr_in peeraddr;
 	socklen_t peerlen;
 	int connfd;
- 
+
 	while (1)
 	{
-		nready = poll(&*pollfds.begin(), pollfds.size(), -1); //无限超时等待
+		nready = poll(pollfds.data(), pollfds.size(), -1); //无限超时等待
 		if (nready == -1)
 		{
 			if (errno == EINTR)
 				continue;
-			
+
 			ERR_EXIT("poll");
 		}
-		if (nready == 0)	// nothing happended
+		if (nready == 0) // nothing happended
 			continue;
-		
+
 		if (pollfds[0].revents & POLLIN) //判断是否有POLLIN事件到来
 		{
 			peerlen = sizeof(peeraddr);
-			connfd = accept4(listenfd, (struct sockaddr*)&peeraddr,
-						&peerlen, SOCK_NONBLOCK | SOCK_CLOEXEC); //非阻塞的  CLOEXEC标记的
- 
+			connfd = accept4(listenfd, (struct sockaddr *)&peeraddr,
+							 &peerlen, SOCK_NONBLOCK | SOCK_CLOEXEC); //非阻塞的  CLOEXEC标记的
+
 			if (connfd == -1)
 				ERR_EXIT("accept4");
- 
- 
-		{
-					
-            //把得到的已连接的套接字加入监听队列
+
+			//把得到的已连接的套接字加入监听队列
 			pfd.fd = connfd;
 			pfd.events = POLLIN;
 			pfd.revents = 0;
 			pollfds.push_back(pfd);
 			--nready;
- 
+
 			//连接成功
-			std::cout<<"ip="<<inet_ntoa(peeraddr.sin_addr)<<
-				" port="<<ntohs(peeraddr.sin_port)<<std::endl;
-				
-			//说明事件都处理完了	
-			if (nready == 0) 
+			std::cout << "ip=" << inet_ntoa(peeraddr.sin_addr) << " port=" << ntohs(peeraddr.sin_port) << std::endl;
+
+			//说明事件都处理完了
+			if (nready == 0)
 				continue;
 		}
- 
-	    //遍历已连接字套接字子集
-		for (PollFdList::iterator it=pollfds.begin()+1; //第一个套接字总是监听套接字
-			it != pollfds.end() && nready >0; ++it)
+
+		//遍历已连接字套接字子集
+		for (PollFdList::iterator it = pollfds.begin() + 1; //第一个套接字总是监听套接字
+			 it != pollfds.end() && nready > 0; ++it)
 		{
-				if (it->revents & POLLIN) //具有可读事件
+			if (it->revents & POLLIN) //具有可读事件
+			{
+				--nready; //处理一个事件，待处理事件数减一
+
+				connfd = it->fd;
+				char buf[1024] = {0};
+				int ret = read(connfd, buf, 1024);
+				if (ret == -1)
+					ERR_EXIT("read");
+				if (ret == 0) //对方关闭了套接字
 				{
-					--nready; //处理一个事件，待处理事件数减一
- 
-					connfd = it->fd;
-					char buf[1024] = {0};
-					int ret = read(connfd, buf, 1024);
-					if (ret == -1)
-						ERR_EXIT("read");
-					if (ret == 0) //对方关闭了套接字
-					{
-						std::cout<<"client close"<<std::endl;
-						it = pollfds.erase(it); //移除
-						--it;
- 
-						close(connfd);
-						continue;
-					}
- 
-					std::cout<<buf;
-					write(connfd, buf, strlen(buf));
-					
+					std::cout << "client close" << std::endl;
+					it = pollfds.erase(it); //移除
+					--it;
+
+					close(connfd);
+					continue;
 				}
+
+				std::cout << buf;
+				write(connfd, buf, strlen(buf));
+			}
 		}
 	}
- 
 	return 0;
+}
+```
+
+#### 代码几点说明
+
+SIGPIPE: 客户端关闭了套接字close，服务端会收到RST segment。若服务端再次调用write，会产生SIGPIPE，默认是退出进程
+
+SIGCHLD: SIGCHLD避免僵死进程
+
+time_wait对服务器影响：应该避免服务器的time_wait状态。os会保留一定资源维护该状态，不适合大并发情况。在协议设计上，应该让客户端断开连接，同时服务器有机制去踢掉不活跃的连接。
+
+#### 代码存在的缺陷
+
+1、read可能并没有把connfd接收缓冲区的数据都读完，那么connfd仍然是活跃的。我们应该将读到的数据保存在connfd的应用层缓冲区。
+
+2、write时发送缓冲区满了，因为connfd是非阻塞的，数据可能丢失。我们应该有一个应用层的发送缓冲区。
+```
+ret = write(connfd, buf, strlen(buf));
+if(ret < 10000) {
+	//将未发送的数据添加到应用层缓冲区OutBuffer
+	//关注connfd的POLLOUT事件
+}
+//connfd POLLOUT事件到来
+//取出应用层缓冲区中的数据发送write(connfd,...);
+//如果应用层缓冲区中的数据发送完毕，取消关注POLLOUT事件
+```
+
+3、accept(2)返回EMFILE（太多的文件描述符）
+- 调高进程的文件描述符数目
+- 死等
+- 退出程序
+- 关闭监听套接字
+- 如果是epoll模型，可以用ET
+- 准备一个空闲的文件描述符。遇到这种情况先关闭该文件描述符，然后accept拿到文件描述符后立刻关闭，这样就优雅的断开了和客户端的连接，最后再打开空闲文件描述符。
+
+```
+if(errno == EMFILE)
+{
+	close(idlefd);
+	idlefd = accept(listenfd, NULL, NULL);
+	close(idlefd);
+	idlefd = open("/dev/null", O_RDONLY | O_CLOEXEC);
+	continue;
 }
 ```
 
@@ -407,7 +445,7 @@ int main(void)
  
 	int idlefd = open("/dev/null", O_RDONLY | O_CLOEXEC);
 	int listenfd;
-	//if ((listenfd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
+    
 	if ((listenfd = socket(PF_INET, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, IPPROTO_TCP)) < 0)
 		ERR_EXIT("socket");
  
@@ -425,10 +463,7 @@ int main(void)
 		ERR_EXIT("bind");
 	if (listen(listenfd, SOMAXCONN) < 0)
 		ERR_EXIT("listen");
- 
- 
- 
-    
+
 	//===========================================epoll用法==============================================//
 	std::vector<int> clients;
 	int epollfd;
@@ -436,7 +471,7 @@ int main(void)
  
 	struct epoll_event event;
 	event.data.fd = listenfd; //加入监听套接字
-	event.events = EPOLLIN    //关注它的可读事件，默认的触发模式是LT模式         /* | EPOLLET*/;
+	event.events = EPOLLIN;    //关注它的可读事件，默认的触发模式是LT模式         /* | EPOLLET*/;
  
 	//添加关注事件和监听套接字到epollfd
 	epoll_ctl(epollfd, EPOLL_CTL_ADD, listenfd, &event);
@@ -534,3 +569,7 @@ int main(void)
 	return 0;
 }
 ```
+
+## select poll epoll 比较
+
+![img](/assets/images/select_poll_epoll_01.jpg)
