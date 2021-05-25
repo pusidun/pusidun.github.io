@@ -1,0 +1,11 @@
+@startuml Exception
+std::exception<|--Exception
+class Exception{
+    -message_:string
+    -stack_:string
+    +Exception(string what)
+    +~Exception()
+    +const char* what() const noexcept override
+    +const char* stackTrace() const noexcept
+}
+@enduml

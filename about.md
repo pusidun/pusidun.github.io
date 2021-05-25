@@ -5,10 +5,12 @@ title: About me
 
 ### 如何联系我
 
-- Email：   pusidun@hotmail.com
-- QQ:       408051747
-- WeChat: pusden
-- cnblogs: https://www.cnblogs.com/pusidun/
+<table>
+<tr><th>Email</th><th>pusidun@hotmail.com</th></tr>
+<tr><th>QQ(base64编码)</th><th>NDA4MDUxNzQ3</th></tr>
+<tr><th>WeChat</th><th>pusden</th></tr>
+<tr><th>cnblogs</th><th><a href="https://www.cnblogs.com/pusidun/" target="_blank">pusidun's cnblogs</a></th></tr>
+</table>
 
 ### 开源项目及作品
 
@@ -17,6 +19,7 @@ title: About me
 <https://github.com/pusidun/swallow>
 
 基于C++14标准的开源库。目前包含日志模块，配置模块，协程模块。
+
 使用travis-ci自动化测试，gtest单元测试
 
 #### IM-Golang
@@ -27,7 +30,7 @@ title: About me
 
 ![公众号](/assets/images/GongZhongHao.jpg)
 
-友情链接：
+### 友情链接：
 
 <a href="http://wonderxxf.gitee.io/coderfan/" target="_blank">wonder聚聚-奔跑的小石头</a>
 <a href="http://www.linya.pub/" target="_blank">大佬的书签</a>
