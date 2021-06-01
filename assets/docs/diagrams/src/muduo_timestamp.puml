@@ -1,0 +1,18 @@
+@startuml Timestamp
+class Timestamp {
+    +Timestamp()
+    +explict Timestamp(int64_t)
+    +void swap(Timestamp& that)
+    +string toString() const
+    +string toFormattedString(bool showMicroseconds = true) const
+    +bool valid() const
+    +int64_t microSecondsSinceEpoch() const
+    +time_t secondsSinceEpoch() const
+    +static Timestamp now()
+    +static Timestamp invalid()
+    +static Timestamp fromUnixTime(time_t t)
+    +static Timestamp fromUnixTime(time_t t, int microseconds)
+    +static const int kMicroSecondsPerSecond = 1000 * 1000
+    -int64_t microSecondsSinceEpoch_
+}
+@enduml

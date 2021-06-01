@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <title>Redis源码阅读一:简单动态字符串SDS</title>
+  <meta name="description" content="">
+  <meta name="author" content="leopardpan">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Redis源码阅读一:简单动态字符串SDS">
+  <meta name="twitter:description" content="">
+  
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Redis源码阅读一:简单动态字符串SDS">
+  <meta property="og:description" content="">
+  
+  <link rel="icon" type="image/png" href="/images/favicon.png" />
+  <link href="/images/favicon.png" rel="shortcut icon" type="image/png">
+  
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+
+  <link rel="canonical" href="https://pusidun.github.io/2019/12/Redis01sds/">
+  <link rel="alternate" type="application/rss+xml" title="pusidun" href="https://pusidun.github.io/feed.xml">
+  
+  <meta name="google-site-verification" content="1-1ZlHoRvM0T2FqPbW2S-qLgYXN6rsn52kErlMPd_gw" />
+
+<!-- 站点统计 -->
+  <script 
+  async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+  </script>  
+
+<!-- 百度统计 -->
+  
+
+<!-- google 统计 -->
+  
+  <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', 'xxxx', 'auto');
+      ga('send', 'pageview');
+  </script>
+  
+
+  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<script>
+  (adsbygoogle = window.adsbygoogle || []).push({
+    google_ad_client: "ca-pub-9005224472374751",
+    enable_page_level_ads: true
+  });
+</script>
+
+<script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+
+</head>
+
+
+  <body>
+
+    <span class="mobile btn-mobile-menu">        
+      <div class="nav_container">
+         <nav class="nav-menu-item" style = "float:right">
+            <i class="nav-menu-item">
+              <a href="/#blog" title="" class="blog-button">  博客主页
+              </a>
+            </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/archive" title="archive" class="btn-mobile-menu__icon">
+                      所有文章
+                  </a>
+                </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/tags" title="tags" class="btn-mobile-menu__icon">
+                      标签
+                  </a>
+                </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/about" title="about" class="btn-mobile-menu__icon">
+                      关于我
+                  </a>
+                </i>
+            
+          </nav>
+      </div>
+    </span>
+    
+    <header class="panel-cover panel-cover--collapsed" style="background-image: url('/images/background-cover.jpg')">
+  <div class="panel-main">
+
+    <div class="panel-main__inner panel-inverted">
+    <div class="panel-main__content">
+        <!-- 头像效果-start -->
+        <div class="ih-item circle effect right_to_left">            
+            <a href="/#blog" title="前往 pusidun 的主页" class="blog-button">
+                <div class="img"><img src="/images/avatar.jpg" alt="img"></div>
+                <div class="info">
+                    <div class="info-back">
+                        <h2 id="avatarTitle"> 
+                            
+                                pusidun
+                            
+                        </h2>
+                        <p>
+                           
+                                Go / C++
+                            
+                        </p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <!-- 头像效果-end -->
+        <h1 class="panel-cover__title panel-title"><a href="/#blog" title="link to homepage for pusidun" class="blog-button">pusidun</a></h1>
+        
+        <span class="panel-cover__subtitle panel-subtitle">BLOG</span>
+        
+        <hr class="panel-cover__divider" />
+        <p class="panel-cover__description">Welcome to my blog~</p>
+        <hr class="panel-cover__divider panel-cover__divider--secondary" />
+        
+        
+        
+
+        <div class="navigation-wrapper">
+          <div>
+            <nav class="cover-navigation cover-navigation--primary">
+              <ul class="navigation">
+                <li class="navigation__item"><a href="/#blog" title="" class="blog-button">博客主页</a></li>
+                
+                  <li class="navigation__item"><a href="/archive" title="archive">所有文章</a></li>
+                
+                  <li class="navigation__item"><a href="/tags" title="tags">标签</a></li>
+                
+                  <li class="navigation__item"><a href="/about" title="about">关于我</a></li>
+                
+              </ul>
+            </nav>
+          </div>          
+        </div>
+
+
+        </div>
+      </div>
+    </div>
+    
+    
+    <div class="panel-cover--overlay cover-clear"></div>
+    
+  </div>
+</header>
+
+
+    <div class="content-wrapper">
+        <div class="content-wrapper__inner">
+            <article class="post-container post-container--single" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title">Redis源码阅读一:简单动态字符串SDS</h1>
+    <div class="post-meta">
+      <img src="/images/calendar.png" width="20px"/> 
+      <time datetime="2019-12-14 00:00:00 +0000" itemprop="datePublished" class="post-meta__date date">2019-12-14</time>  
+         
+      <span id="busuanzi_container_page_pv"> | 阅读：<span id="busuanzi_value_page_pv"></span>次</span>
+    </p>
+    </div>
+  </header>
+
+  <section class="post">
+    <!-- TOC -->
+
+<ul>
+  <li><a href="#c字符串缺点">C字符串缺点</a></li>
+  <li><a href="#sds结构体">SDS结构体</a>
+    <ul>
+      <li><a href="#30版本的sds">3.0版本的SDS</a></li>
+      <li><a href="#50版本的sds">5.0版本的SDS</a></li>
+    </ul>
+  </li>
+  <li><a href="#相关操作函数">相关操作函数</a>
+    <ul>
+      <li><a href="#创建">创建</a></li>
+      <li><a href="#释放">释放</a></li>
+      <li><a href="#拼接">拼接</a></li>
+    </ul>
+  </li>
+</ul>
+
+<!-- /TOC -->
+<p>源码阅读基于Redis5.0.9</p>
+
+<h1 id="c字符串缺点">C字符串缺点</h1>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>redis 127.0.0.1:6379&gt; SET dbname redis
+OK
+redis 127.0.0.1:6379&gt; GET dbname
+"redis"
+</code></pre></div></div>
+
+<p>从上面的例子可以看到，key为dbname的值是一个字符串“redis”
+Redis源码是用c写成，但并没有使用c的字符串。c的字符串有以下缺点：</p>
+<ol>
+  <li>没有储存字符串长度的变量，获取长度只能靠遍历字符串</li>
+  <li>扩容麻烦。没有相应保护，容易造成缓冲区溢出</li>
+  <li>更新字符串需要重新分配内存</li>
+</ol>
+
+<table>
+  <thead>
+    <tr>
+      <th>addr</th>
+      <th style="text-align: right">value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0x0</td>
+      <td style="text-align: right">s</td>
+    </tr>
+    <tr>
+      <td>0x1</td>
+      <td style="text-align: right">t</td>
+    </tr>
+    <tr>
+      <td>0x2</td>
+      <td style="text-align: right">r</td>
+    </tr>
+    <tr>
+      <td>0x3</td>
+      <td style="text-align: right">1</td>
+    </tr>
+    <tr>
+      <td>0x4</td>
+      <td style="text-align: right">‘\0’</td>
+    </tr>
+    <tr>
+      <td>0x5</td>
+      <td style="text-align: right"> </td>
+    </tr>
+    <tr>
+      <td>0x6</td>
+      <td style="text-align: right"> </td>
+    </tr>
+    <tr>
+      <td>0x7</td>
+      <td style="text-align: right"> </td>
+    </tr>
+    <tr>
+      <td>0x8</td>
+      <td style="text-align: right">a</td>
+    </tr>
+    <tr>
+      <td>0x9</td>
+      <td style="text-align: right">b</td>
+    </tr>
+    <tr>
+      <td>0xa</td>
+      <td style="text-align: right">‘\0’</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>解释下2,3点。上图是一段连续的内存，保存了字符串”str1”和“ab”。
+如果我们用strcat函数，拼接一个“append”在“str1”后面，就会对“ab”产生影响。造成内存的破坏。
+同样的道理，想要更新字符串，同时又不造成溢出，只能重新分配一段内存。
+普通的应用程序，上面的操作是可以接受的。但是redis作为数据库，经常增删改查，加上对速度有一定需求，所以没有使用C字符串。
+这里补充一个二进制安全的概念：C语言中’\0’表示字符串结束。如果字符串本身含有’\0’，那么读取的时候就会造成字符串截断，那么是非二进制安全。如果通过某些机制能保证读取字符串时不损害其中内容，则是二进制安全。</p>
+
+<h1 id="sds结构体">SDS结构体</h1>
+
+<p>SDS是Simple Dynamic String的缩写。我们先从redis3.0的实现看起。</p>
+
+<h2 id="30版本的sds">3.0版本的SDS</h2>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/*
+ * 指向 sdshdr 的 buf 成员
+ */
+typedef char *sds;
+
+/*
+ * 保存字符串对象的结构
+ */
+struct sdshdr {
+    
+    // buf 中已占用空间的长度
+    int len;
+
+    // buf 中剩余可用空间的长度
+    int free;
+
+    // 数据空间
+    char buf[];
+};
+</code></pre></div></div>
+
+<p>buf是柔性数组，属于C99标准，具体可参考https://gcc.gnu.org/onlinedocs/gcc/Zero-Length.html
+sds指向buf，通过偏移可以很容易得到sdshdr的地址，即s-(sizeof(struct sdshdr)),进而可以得到len和free的值
+3.2版本前的SDS是这样设计的。不仅通过len成员使字符串读取不依赖于’\0’终止，解决了二进制安全问题，而且sds指向的对象buf可以利用C的字符串函数处理。</p>
+
+<h2 id="50版本的sds">5.0版本的SDS</h2>
+
+<p>到了4.0版本，SDS进行了改进。
+我们可以看到，3.0版本的SDS，不管buf实际存了几个字节，在64位机器上len和free各占用了4字节。实际可能并不需要占用8字节去记录buf信息，我们可以利用位存储这些信息，实现压缩。
+例如，buf长度为14(0b1110)，那么我们用4个bit就能表示长度。一个char足够</p>
+
+<p>改进的SDS根据buf的可能最大长度，分成了下面几种类型</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#define SDS_TYPE_5  0
+#define SDS_TYPE_8  1
+#define SDS_TYPE_16 2
+#define SDS_TYPE_32 3
+#define SDS_TYPE_64 4
+
+/* Note: sdshdr5 is never used, we just access the flags byte directly.
+ * However is here to document the layout of type 5 SDS strings. */
+struct __attribute__ ((__packed__)) sdshdr5 {
+    unsigned char flags; /* 3 lsb of type, and 5 msb of string length */
+    char buf[];
+};
+struct __attribute__ ((__packed__)) sdshdr8 {
+    uint8_t len; /* used */
+    uint8_t alloc; /* excluding the header and null terminator */
+    unsigned char flags; /* 3 lsb of type, 5 unused bits */
+    char buf[];
+};
+struct __attribute__ ((__packed__)) sdshdr16 {
+    uint16_t len; /* used */
+    uint16_t alloc; /* excluding the header and null terminator */
+    unsigned char flags; /* 3 lsb of type, 5 unused bits */
+    char buf[];
+};
+struct __attribute__ ((__packed__)) sdshdr32 {
+    uint32_t len; /* used */
+    uint32_t alloc; /* excluding the header and null terminator */
+    unsigned char flags; /* 3 lsb of type, 5 unused bits */
+    char buf[];
+};
+struct __attribute__ ((__packed__)) sdshdr64 {
+    uint64_t len; /* used */
+    uint64_t alloc; /* excluding the header and null terminator */
+    unsigned char flags; /* 3 lsb of type, 5 unused bits */
+    char buf[];
+};
+</code></pre></div></div>
+
+<p>sdshdr5的flags成员低三位用来表示类型，值可以看宏定义。高5位用来表示buf的长度。所以sdshdr5最大可以表示2^5-1=31位字符(最后一个字符必定是’\0’)。
+对于超过31字符的buf，就参考了之前3.0SDS的设计,len定义一样，free改成了alloc表示最大容量。</p>
+
+<p>除了sdshdr5，剩下的定义只有长度的区别，成员是一样的。</p>
+<ul>
+  <li>buf[] 实际存储字符的数组</li>
+  <li>len 字符串长度</li>
+  <li>alloc  最大容量。等于sizeof(buf)-1,因为字符串最后一位固定是’\0’。比如sdsnewlen(“abc”,3),len和alloc都是3,而buf的大小是4</li>
+  <li>flags 低3位是类型，高5位保留</li>
+</ul>
+
+<p>关于该结构体，还需要注意2点：</p>
+<ol>
+  <li><code class="language-plaintext highlighter-rouge">__attribute__ ((packed))</code>是为了让编译器以紧凑的方式分配内存，否则编译器可能会对结构体的成员进行对齐。对这里不太明白的可以看看struct大小的计算</li>
+  <li>结构体的最后定义了char buf[]; 这个字段只能作为结构体的最后一个成员。上文提到过，C语言中被称为<strong>柔性数组</strong>，只是作为一个标记，不占用内存空间。
+如果明白了以上2点，应该能算出sizeof(sdshdr32)=4+4+1=9Byte</li>
+</ol>
+
+<h1 id="相关操作函数">相关操作函数</h1>
+
+<h2 id="创建">创建</h2>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sds sdsnewlen(const void *init, size_t initlen) {
+    void *sh;
+    sds s;
+    char type = sdsReqType(initlen);
+    /* Empty strings are usually created in order to append. Use type 8
+     * since type 5 is not good at this. */
+    if (type == SDS_TYPE_5 &amp;&amp; initlen == 0) type = SDS_TYPE_8;
+    int hdrlen = sdsHdrSize(type);
+    unsigned char *fp; /* flags pointer. */
+
+    sh = s_malloc(hdrlen+initlen+1);
+    if (init==SDS_NOINIT)
+        init = NULL;
+    else if (!init)
+        memset(sh, 0, hdrlen+initlen+1);
+    if (sh == NULL) return NULL;
+    s = (char*)sh+hdrlen;  //s指向buf
+    fp = ((unsigned char*)s)-1;  // buf[-1]，即flag
+    switch(type) {
+        case SDS_TYPE_5: {
+            *fp = type | (initlen &lt;&lt; SDS_TYPE_BITS);  // 左移3bit置位
+            break;
+        }
+        case SDS_TYPE_8: {
+            SDS_HDR_VAR(8,s);  // struct sdshdr8 *sh = (void*)((s)-(sizeof(struct sdshdr8)));
+            sh-&gt;len = initlen;
+            sh-&gt;alloc = initlen;
+            *fp = type;
+            break;
+        }
+        case SDS_TYPE_16: {
+            SDS_HDR_VAR(16,s);
+            sh-&gt;len = initlen;
+            sh-&gt;alloc = initlen;
+            *fp = type;
+            break;
+        }
+        case SDS_TYPE_32: {
+            SDS_HDR_VAR(32,s);
+            sh-&gt;len = initlen;
+            sh-&gt;alloc = initlen;
+            *fp = type;
+            break;
+        }
+        case SDS_TYPE_64: {
+            SDS_HDR_VAR(64,s);
+            sh-&gt;len = initlen;
+            sh-&gt;alloc = initlen;
+            *fp = type;
+            break;
+        }
+    }
+    if (initlen &amp;&amp; init)
+        memcpy(s, init, initlen);
+    s[initlen] = '\0';
+    return s;
+}
+</code></pre></div></div>
+
+<p>注意几点：</p>
+<ol>
+  <li>SDS_TYPE_5类型的空串会被转成SDS_TYPE_8</li>
+  <li>实际分配内存时，大小是hdrlen+initlen+1，那个1是因为要以’\0’结尾</li>
+  <li>返回的指针指向的是buf，而不是sdshdr</li>
+</ol>
+
+<h2 id="释放">释放</h2>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>void sdsfree(sds s) {
+    if (s == NULL) return;
+    s_free((char*)s-sdsHdrSize(s[-1]));
+}
+
+// 软删除，长度置0.方便追加不必再分配空间
+void sdsclear(sds s) {
+    sdssetlen(s, 0);
+    s[0] = '\0';
+}
+</code></pre></div></div>
+
+<h2 id="拼接">拼接</h2>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sds sdscatlen(sds s, const void *t, size_t len) {
+    size_t curlen = sdslen(s);
+
+    s = sdsMakeRoomFor(s,len);
+    if (s == NULL) return NULL;
+    memcpy(s+curlen, t, len);
+    sdssetlen(s, curlen+len);
+    s[curlen+len] = '\0';
+    return s;
+}
+
+sds sdscatsds(sds s, const sds t) {
+    return sdscatlen(s, t, sdslen(t));
+}
+</code></pre></div></div>
+
+<p>sdsMakeRoomFor确保s的buf能够追加进len长度的字符。如果buf剩余空间不够的话会进行扩容。
+扩容规则：原来字符长度加上追加字符长度如果小于1M，那么alloc翻倍；否则alloc+1M
+如果扩容后的type变了，那么需要一个新的sdshdr；否则更改下len和alloc即可</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sds sdsMakeRoomFor(sds s, size_t addlen) {
+    void *sh, *newsh;
+    size_t avail = sdsavail(s);  // alloc - len,即3.0sds的free
+    size_t len, newlen;
+    char type, oldtype = s[-1] &amp; SDS_TYPE_MASK;
+    int hdrlen;
+
+    /* Return ASAP if there is enough space left. */
+    if (avail &gt;= addlen) return s;
+
+    len = sdslen(s);
+    sh = (char*)s-sdsHdrSize(oldtype);
+    newlen = (len+addlen);  // 原来字符长度加上追加字符长度
+    if (newlen &lt; SDS_MAX_PREALLOC)  // 小于1M
+        newlen *= 2;
+    else
+        newlen += SDS_MAX_PREALLOC;
+
+    type = sdsReqType(newlen);
+
+    /* Don't use type 5: the user is appending to the string and type 5 is
+     * not able to remember empty space, so sdsMakeRoomFor() must be called
+     * at every appending operation. */
+    if (type == SDS_TYPE_5) type = SDS_TYPE_8;
+
+    hdrlen = sdsHdrSize(type);
+    if (oldtype==type) {
+        newsh = s_realloc(sh, hdrlen+newlen+1);
+        if (newsh == NULL) return NULL;
+        s = (char*)newsh+hdrlen;
+    } else {
+        /* Since the header size changes, need to move the string forward,
+         * and can't use realloc */
+        newsh = s_malloc(hdrlen+newlen+1);
+        if (newsh == NULL) return NULL;
+        memcpy((char*)newsh+hdrlen, s, len+1);
+        s_free(sh);
+        s = (char*)newsh+hdrlen;
+        s[-1] = type;
+        sdssetlen(s, len);
+    }
+    sdssetalloc(s, newlen);
+    return s;
+}
+</code></pre></div></div>
+
+
+  </section>
+</article>
+
+<section>
+            <div style="text-align:center;margin:50px 0; font:normal 14px/24px 'MicroSoft YaHei';"></div>
+
+            <style type="text/css">
+              .content-play{width:80%;margin-top: 20px;margin-bottom: 10px;height:40px;}
+              .hide_box-play{z-index:999;filter:alpha(opacity=50);background:#666;opacity: 0.5;-moz-opacity: 0.5;left:0;top:0;height:99%;width:100%;position:fixed;display:none;}
+              .shang_box-play{width:540px;height:540px;padding:10px;background-color:#fff;border-radius:10px;position:fixed;z-index:1000;left:50%;top:50%;margin-left:-280px;margin-top:-280px;border:1px dotted #dedede;display:none;}
+              .shang_box-play img{border:none;border-width:0;}
+              .dashang{display:block;width:100px;margin:5px auto;height:25px;line-height:25px;padding:10px;background-color:#E74851;color:#fff;text-align:center;text-decoration:none;border-radius:10px;font-weight:bold;font-size:16px;transition: all 0.3s;}
+              .dashang:hover{opacity:0.8;padding:15px;font-size:18px;}
+              .shang_close-play{float:right;display:inline-block;
+                margin-right: 10px;margin-top: 20px;
+              }
+              .shang_logo{display:block;text-align:center;margin:20px auto;}
+              .shang_tit-play{width: 100%;height: 75px;text-align: center;line-height: 66px;color: #a3a3a3;font-size: 16px;background: url('/images/payimg/cy-reward-title-bg.jpg');font-family: 'Microsoft YaHei';margin-top: 7px;margin-right:2px;}
+              .shang_tit-play p{color:#a3a3a3;text-align:center;font-size:16px;}
+              .shang_payimg{width:140px;padding:10px;padding-left: 80px; /*border:6px solid #EA5F00;**/margin:0 auto;border-radius:3px;height:140px;display:inline-block;}
+              .shang_payimg img{display:inline-block;margin-right:10px;float:left;text-align:center;width:140px;height:140px; }
+              .pay_explain{text-align:center;margin:10px auto;font-size:12px;color:#545454;}
+              .shang_payselect{text-align:center;margin:0 auto;margin-top:40px;cursor:pointer;height:60px;width:500px;margin-left:110px;}
+              .shang_payselect .pay_item{display:inline-block;margin-right:140px;float:left;}
+              .shang_info-play{clear:both;}
+              .shang_info-play p,.shang_info-play a{color:#C3C3C3;text-align:center;font-size:12px;text-decoration:none;line-height:2em;}
+            </style>
+
+       <ul class="pager">
+        
+        <li class="previous">
+            <a href="/2018/04/ubuntu-service/" data-toggle="tooltip" data-placement="top" title="Ubuntu16.06常见服务搭建">上一篇：  <span>Ubuntu16.06常见服务搭建</span>
+            </a>
+        </li>
+        
+        
+        <li class="next">
+            <a href="/2020/03/java-time/" data-toggle="tooltip" data-placement="top" title="Java中时间处理">下一篇：  <span>Java中时间处理</span>
+            </a>
+        </li>
+        
+    </ul>
+</section>
+
+<section class="post-comments">
+  
+  
+
+  
+    <div id="vcomments"></div>
+    <script>
+        new Valine({
+            el: '#vcomments',
+            appId: 'XiYejJhYJ3U89yVy1tqxNYin-MdYXbMMI',
+            appKey: 'Px5FNmnMui05vXUJNqlptSqk'
+        })
+    </script>
+  
+</section>
+
+
+            <section class="footer">
+    <footer>
+        <div class = "footer_div">  
+        <nav class="cover-navigation navigation--social">
+          <ul class="navigation">
+
+          
+          <!-- Github -->
+          <li class="navigation__item_social">
+            <a href="https://github.com/pusidun" title="@pusidun 的 Github" target="_blank">
+              <div class="footer-social-icon" style="background:url(/images/github.png);"></div>
+            </a>
+          </li>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+          <!-- Email -->
+          <li class="navigation__item_social">
+            <a href="mailto:pusidun@hotmail.com" title="Contact me">
+              <div class="footer-social-icon" style="background:url(/images/email.png);"></div>
+            </a>
+          </li>
+          
+          
+          <!-- RSS -->
+          <li class="navigation__item_social">
+            <a href="/feed.xml" rel="author" title="RSS" target="_blank">
+              <div class="footer-social-icon" style="background:url(/images/rss.png);"></div>
+              <span class="label">RSS</span>
+            </a>
+          </li>
+
+          </ul>
+        </nav>
+
+        </div>
+
+        <div class = "footer_div">  
+           <p class="copyright text-muted">
+            Copyright &copy; pusidun 2021
+            </p>
+        	<div align="right">
+    			<link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+          <!-- 访问统计 -->
+          <span id="busuanzi_container_site_pv">
+            本站总访问量
+            <span id="busuanzi_value_site_pv"></span>次
+          </span>
+
+        </div>
+        <div>
+    </footer>
+</section>
+
+        </div>
+    </div>
+    
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="/js/main.js"></script>
+
+<script type="text/javascript" src="/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+  </body>
+
+</html>

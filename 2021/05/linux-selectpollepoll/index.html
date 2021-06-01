@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <title>select/poll/epoll</title>
+  <meta name="description" content="">
+  <meta name="author" content="leopardpan">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="select/poll/epoll">
+  <meta name="twitter:description" content="">
+  
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="select/poll/epoll">
+  <meta property="og:description" content="">
+  
+  <link rel="icon" type="image/png" href="/images/favicon.png" />
+  <link href="/images/favicon.png" rel="shortcut icon" type="image/png">
+  
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+
+  <link rel="canonical" href="https://pusidun.github.io/2021/05/linux-selectpollepoll/">
+  <link rel="alternate" type="application/rss+xml" title="pusidun" href="https://pusidun.github.io/feed.xml">
+  
+  <meta name="google-site-verification" content="1-1ZlHoRvM0T2FqPbW2S-qLgYXN6rsn52kErlMPd_gw" />
+
+<!-- 站点统计 -->
+  <script 
+  async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+  </script>  
+
+<!-- 百度统计 -->
+  
+
+<!-- google 统计 -->
+  
+  <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', 'xxxx', 'auto');
+      ga('send', 'pageview');
+  </script>
+  
+
+  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<script>
+  (adsbygoogle = window.adsbygoogle || []).push({
+    google_ad_client: "ca-pub-9005224472374751",
+    enable_page_level_ads: true
+  });
+</script>
+
+<script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+
+</head>
+
+
+  <body>
+
+    <span class="mobile btn-mobile-menu">        
+      <div class="nav_container">
+         <nav class="nav-menu-item" style = "float:right">
+            <i class="nav-menu-item">
+              <a href="/#blog" title="" class="blog-button">  博客主页
+              </a>
+            </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/archive" title="archive" class="btn-mobile-menu__icon">
+                      所有文章
+                  </a>
+                </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/tags" title="tags" class="btn-mobile-menu__icon">
+                      标签
+                  </a>
+                </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/about" title="about" class="btn-mobile-menu__icon">
+                      关于我
+                  </a>
+                </i>
+            
+          </nav>
+      </div>
+    </span>
+    
+    <header class="panel-cover panel-cover--collapsed" style="background-image: url('/images/background-cover.jpg')">
+  <div class="panel-main">
+
+    <div class="panel-main__inner panel-inverted">
+    <div class="panel-main__content">
+        <!-- 头像效果-start -->
+        <div class="ih-item circle effect right_to_left">            
+            <a href="/#blog" title="前往 pusidun 的主页" class="blog-button">
+                <div class="img"><img src="/images/avatar.jpg" alt="img"></div>
+                <div class="info">
+                    <div class="info-back">
+                        <h2 id="avatarTitle"> 
+                            
+                                pusidun
+                            
+                        </h2>
+                        <p>
+                           
+                                Go / C++
+                            
+                        </p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <!-- 头像效果-end -->
+        <h1 class="panel-cover__title panel-title"><a href="/#blog" title="link to homepage for pusidun" class="blog-button">pusidun</a></h1>
+        
+        <span class="panel-cover__subtitle panel-subtitle">BLOG</span>
+        
+        <hr class="panel-cover__divider" />
+        <p class="panel-cover__description">Welcome to my blog~</p>
+        <hr class="panel-cover__divider panel-cover__divider--secondary" />
+        
+        
+        
+
+        <div class="navigation-wrapper">
+          <div>
+            <nav class="cover-navigation cover-navigation--primary">
+              <ul class="navigation">
+                <li class="navigation__item"><a href="/#blog" title="" class="blog-button">博客主页</a></li>
+                
+                  <li class="navigation__item"><a href="/archive" title="archive">所有文章</a></li>
+                
+                  <li class="navigation__item"><a href="/tags" title="tags">标签</a></li>
+                
+                  <li class="navigation__item"><a href="/about" title="about">关于我</a></li>
+                
+              </ul>
+            </nav>
+          </div>          
+        </div>
+
+
+        </div>
+      </div>
+    </div>
+    
+    
+    <div class="panel-cover--overlay cover-clear"></div>
+    
+  </div>
+</header>
+
+
+    <div class="content-wrapper">
+        <div class="content-wrapper__inner">
+            <article class="post-container post-container--single" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title">select/poll/epoll</h1>
+    <div class="post-meta">
+      <img src="/images/calendar.png" width="20px"/> 
+      <time datetime="2021-05-20 00:00:00 +0000" itemprop="datePublished" class="post-meta__date date">2021-05-20</time>  
+         
+      <span id="busuanzi_container_page_pv"> | 阅读：<span id="busuanzi_value_page_pv"></span>次</span>
+    </p>
+    </div>
+  </header>
+
+  <section class="post">
+    <!-- TOC -->
+
+<ul>
+  <li><a href="#select">select</a>
+    <ul>
+      <li><a href="#api">API</a></li>
+      <li><a href="#socket何时可读写">socket何时可读写</a></li>
+    </ul>
+  </li>
+  <li><a href="#poll">poll</a>
+    <ul>
+      <li><a href="#api-1">API</a></li>
+      <li><a href="#poll使用案例">poll使用案例</a>
+        <ul>
+          <li><a href="#代码几点说明">代码几点说明</a></li>
+          <li><a href="#代码存在的缺陷">代码存在的缺陷</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#epoll">epoll</a>
+    <ul>
+      <li><a href="#api-2">API</a></li>
+      <li><a href="#epoll-lt例子">epoll LT例子</a></li>
+    </ul>
+  </li>
+  <li><a href="#select-poll-epoll-比较">select poll epoll 比较</a></li>
+</ul>
+
+<!-- /TOC -->
+<h2 id="select">select</h2>
+
+<h3 id="api">API</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/*
+@作用：在一定时间内，监听用户感兴趣的文件描述符上的可读可写和异常事件
+
+@返回值：
+
+成功时返回就绪文件描述符总数。
+
+失败时返回-1并设置errno。如果再select等待期间程序收到信号，select立即返回-1，并设置errno为EINTR
+
+@说明：
+
+nfds:监听的文件描述符总数，等于最大文件描述符值+1
+fd_set:结构体，操作
+    FD_ZERO(fd_set* fdset);
+    FD_SET(int fd, fd_set* fdset);
+    FD_CLR(int fd, fd_set* fdset);
+    int FD_ISSET(int fd, fd_set* fdset);
+timeout:
+    struct timeval{
+        long tv_sec;
+        long tv_usec;
+    };
+*/
+#include&lt;sys/select.h&gt;
+int select(int nfds, fd_set* readfds, fd_set* writefds, fd_set* exceptfds,
+            struct timeval* timeout);
+</code></pre></div></div>
+
+<h3 id="socket何时可读写">socket何时可读写</h3>
+
+<ul>
+  <li>以下情况socket可读</li>
+</ul>
+
+<ol>
+  <li>socket内核接受缓冲区中的字节数大于等于低水位标记SO_RCVLOWAT</li>
+  <li>socket通信对方关闭连接。此时读操作返回0</li>
+  <li>监听socket上有新的连接请求</li>
+  <li>socket上有未处理的错误。此时我们可以使用getsockopt来读取和清除错误</li>
+</ol>
+
+<ul>
+  <li>以下情况socket可写</li>
+</ul>
+
+<ol>
+  <li>socket内核发送缓冲区的可用字节数大于或等于低水位标记SO_SNDLOWAT</li>
+  <li>socket写操作被关闭。对写操作被关闭的socket执行写操作或触发SIGPIPE</li>
+  <li>socket使用非阻塞connect连接成功或者失败（超时）之后</li>
+  <li>socket上有未处理的错误。此时我们可以使用getsockopt来读取和清除错误</li>
+</ol>
+
+<h2 id="poll">poll</h2>
+
+<h3 id="api-1">API</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/*
+@作用：把当前的文件指针挂到等待队列 (多路检测可用套接字)
+
+@返回值：
+成功时，poll()返回结构体中revents域不为0的文件描述符个数；
+如果在超时前没有任何事件发生，poll()返回0；
+ 
+失败时，poll()返回-1，并设置errno为下列值之一：
+    EBADF：一个或多个结构体中指定的文件描述符无效。
+　　EFAULT：fds指针指向的地址超出进程的地址空间。
+　　EINTR：请求的事件之前产生一个信号，调用可以重新发起。
+　　EINVAL：nfds参数超出PLIMIT_NOFILE值。
+　　ENOMEM：可用内存不足，无法完成请求。
+*/
+#include&lt;poll.h&gt;
+int poll(struct pollfd fd[], nfds_t nfds, int timeout);
+
+/*
+struct pollfd的结构如下：
+ 
+struct pollfd{
+ 
+　int fd； // 文件描述符
+ 
+　short event；// 请求的事件
+ 
+　short revent；// 返回的事件
+ 
+}
+每个pollfd结构体指定了一个被监视的文件描述符。
+ 
+每个结构体的events是监视该文件描述符的事件掩码，由用户来设置。
+revents是文件描述符的操作结果事件，内核在调用返回时设置。
+events中请求的任何事件都可能在revents中返回。
+
+第一个参数是一个数组，即poll函数可以监视多个文件描述符。
+第二个参数nfds：要监视的描述符的数目。
+第三个参数timeout: 指定等待的毫秒数，无论I/O是否准备好，poll都会返回。
+                   timeout指定为负数值表示无限超时；
+                   timeout为0指示poll调用立即返回并列出准备好I/O的文件描述符，但并不等待其它的事件。这种情况下，poll()就像它的名字那样，一旦选举出来，立即返回。
+*/
+</code></pre></div></div>
+
+<h3 id="poll使用案例">poll使用案例</h3>
+
+<p>echoserv.cc</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#include &lt;unistd.h&gt;
+#include &lt;sys/types.h&gt;
+#include &lt;fcntl.h&gt;
+#include &lt;sys/socket.h&gt;
+#include &lt;netinet/in.h&gt;
+#include &lt;arpa/inet.h&gt;
+#include &lt;signal.h&gt;
+#include &lt;sys/wait.h&gt;
+#include &lt;poll.h&gt;
+
+#include &lt;stdlib.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;errno.h&gt;
+#include &lt;string.h&gt;
+
+#include &lt;vector&gt;
+#include &lt;iostream&gt;
+
+#define ERR_EXIT(m)         \
+	do                      \
+	{                       \
+		perror(m);          \
+		exit(EXIT_FAILURE); \
+	} while (0)
+
+typedef std::vector&lt;struct pollfd&gt; PollFdList;
+
+int main(void)
+{
+	signal(SIGPIPE, SIG_IGN);
+	signal(SIGCHLD, SIG_IGN); //避免僵死进程
+
+	int listenfd;
+
+	//监听套接字                                     //非阻塞
+	if ((listenfd = socket(PF_INET, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, IPPROTO_TCP)) &lt; 0)
+		ERR_EXIT("socket");
+
+	//填充地址相关
+	struct sockaddr_in servaddr;
+	memset(&amp;servaddr, 0, sizeof(servaddr));
+	servaddr.sin_family = AF_INET;
+	servaddr.sin_port = htons(5188);
+	servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+
+	int on = 1;
+	//设置地址的重复利用
+	if (setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &amp;on, sizeof(on)) &lt; 0)
+		ERR_EXIT("setsockopt");
+
+	//绑定
+	if (bind(listenfd, (struct sockaddr *)&amp;servaddr, sizeof(servaddr)) &lt; 0)
+		ERR_EXIT("bind");
+	//监听
+	if (listen(listenfd, SOMAXCONN) &lt; 0)
+		ERR_EXIT("listen");
+
+	//========================poll的使用=======================//
+	struct pollfd pfd;
+	pfd.fd = listenfd;
+	pfd.events = POLLIN; //关注POLLIN（读）事件
+
+	PollFdList pollfds; //pollfd队列
+	pollfds.push_back(pfd);
+
+	int nready; //待处理的事件数
+
+	struct sockaddr_in peeraddr;
+	socklen_t peerlen;
+	int connfd;
+
+	while (1)
+	{
+		nready = poll(pollfds.data(), pollfds.size(), -1); //无限超时等待
+		if (nready == -1)
+		{
+			if (errno == EINTR)
+				continue;
+
+			ERR_EXIT("poll");
+		}
+		if (nready == 0) // nothing happended
+			continue;
+
+		if (pollfds[0].revents &amp; POLLIN) //判断是否有POLLIN事件到来
+		{
+			peerlen = sizeof(peeraddr);
+			connfd = accept4(listenfd, (struct sockaddr *)&amp;peeraddr,
+							 &amp;peerlen, SOCK_NONBLOCK | SOCK_CLOEXEC); //非阻塞的  CLOEXEC标记的
+
+			if (connfd == -1)
+				ERR_EXIT("accept4");
+
+			//把得到的已连接的套接字加入监听队列
+			pfd.fd = connfd;
+			pfd.events = POLLIN;
+			pfd.revents = 0;
+			pollfds.push_back(pfd);
+			--nready;
+
+			//连接成功
+			std::cout &lt;&lt; "ip=" &lt;&lt; inet_ntoa(peeraddr.sin_addr) &lt;&lt; " port=" &lt;&lt; ntohs(peeraddr.sin_port) &lt;&lt; std::endl;
+
+			//说明事件都处理完了
+			if (nready == 0)
+				continue;
+		}
+
+		//遍历已连接字套接字子集
+		for (PollFdList::iterator it = pollfds.begin() + 1; //第一个套接字总是监听套接字
+			 it != pollfds.end() &amp;&amp; nready &gt; 0; ++it)
+		{
+			if (it-&gt;revents &amp; POLLIN) //具有可读事件
+			{
+				--nready; //处理一个事件，待处理事件数减一
+
+				connfd = it-&gt;fd;
+				char buf[1024] = {0};
+				int ret = read(connfd, buf, 1024);
+				if (ret == -1)
+					ERR_EXIT("read");
+				if (ret == 0) //对方关闭了套接字
+				{
+					std::cout &lt;&lt; "client close" &lt;&lt; std::endl;
+					it = pollfds.erase(it); //移除
+					--it;
+
+					close(connfd);
+					continue;
+				}
+
+				std::cout &lt;&lt; buf;
+				write(connfd, buf, strlen(buf));
+			}
+		}
+	}
+	return 0;
+}
+</code></pre></div></div>
+
+<h4 id="代码几点说明">代码几点说明</h4>
+
+<p>SIGPIPE: 客户端关闭了套接字close，服务端会收到RST segment。若服务端再次调用write，会产生SIGPIPE，默认是退出进程</p>
+
+<p>SIGCHLD: SIGCHLD避免僵死进程</p>
+
+<p>time_wait对服务器影响：应该避免服务器的time_wait状态。os会保留一定资源维护该状态，不适合大并发情况。在协议设计上，应该让客户端断开连接，同时服务器有机制去踢掉不活跃的连接。</p>
+
+<h4 id="代码存在的缺陷">代码存在的缺陷</h4>
+
+<p>1、read可能并没有把connfd接收缓冲区的数据都读完，那么connfd仍然是活跃的。我们应该将读到的数据保存在connfd的应用层缓冲区。</p>
+
+<p>2、write时发送缓冲区满了，因为connfd是非阻塞的，数据可能丢失。我们应该有一个应用层的发送缓冲区。</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ret = write(connfd, buf, strlen(buf));
+if(ret &lt; 10000) {
+	//将未发送的数据添加到应用层缓冲区OutBuffer
+	//关注connfd的POLLOUT事件
+}
+//connfd POLLOUT事件到来
+//取出应用层缓冲区中的数据发送write(connfd,...);
+//如果应用层缓冲区中的数据发送完毕，取消关注POLLOUT事件
+</code></pre></div></div>
+
+<p>3、accept(2)返回EMFILE（太多的文件描述符）</p>
+<ul>
+  <li>调高进程的文件描述符数目</li>
+  <li>死等</li>
+  <li>退出程序</li>
+  <li>关闭监听套接字</li>
+  <li>如果是epoll模型，可以用ET</li>
+  <li>准备一个空闲的文件描述符。遇到这种情况先关闭该文件描述符，然后accept拿到文件描述符后立刻关闭，这样就优雅的断开了和客户端的连接，最后再打开空闲文件描述符。</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>if(errno == EMFILE)
+{
+	close(idlefd);
+	idlefd = accept(listenfd, NULL, NULL);
+	close(idlefd);
+	idlefd = open("/dev/null", O_RDONLY | O_CLOEXEC);
+	continue;
+}
+</code></pre></div></div>
+
+<h2 id="epoll">epoll</h2>
+
+<h3 id="api-2">API</h3>
+
+<p>epoll_create</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/*
+@作用：创建一个epoll的句柄
+
+@返回：调用成功时返回一个epoll句柄描述符，失败时返回-1。
+
+@说明：
+size
+表明内核要监听的描述符数量 自从Linux 2.6.8开始，size参数被忽略，但是依然要大于0。
+ 
+ 
+flags：
+0:             如果这个参数是0，这个函数等价于poll_create（0）
+EPOLL_CLOEXEC：这是这个参数唯一的有效值，如果这个参数设置为这个。
+               那么当进程替换映像的时候会关闭这个文件描述符，
+               这样新的映像中就无法对这个文件描述符操作，适用于多进程编程+映像替换的环境里
+*/
+#include &lt;sys/epoll.h&gt;
+int epoll_create(int size);
+int epoll_create1(int flags);
+</code></pre></div></div>
+
+<p>epoll_ctl</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/*
+@作用：操作一个多路复用的文件描述符
+
+@返回：success：0   error：-1 errno被设置
+
+@说明：
+epfd：epoll_create1的返回值
+ 
+op：要执行的命令
+EPOLL_CTL_ADD：向多路复用实例加入一个连接socket的文件描述符
+EPOLL_CTL_MOD：改变多路复用实例中的一个socket的文件描述符的触发事件
+EPOLL_CTL_DEL：移除多路复用实例中的一个socket的文件描述符
+ 
+fd：要操作的socket的文件描述符
+ 
+event：
+typedef union epoll_data {
+               void        *ptr;
+               int          fd;
+               uint32_t     u32;
+               uint64_t     u64;
+           } epoll_data_t;
+ 
+struct epoll_event {
+               uint32_t     events;      /* Epoll events */
+               epoll_data_t data;        /* User data variable */
+};
+events可以是下列命令的任意按位与
+EPOLLIN： 对应的文件描述有可以读取的内容
+EPOLLOUT：对应的文件描述符有可以写入
+EPOLLRDHUP：写到一半的时候连接断开
+EPOLLPRI：发生异常情况，比如所tcp连接中收到了带外消息
+EPOLLET： 设置多路复用实例的文件描述符的事件触发机制为边沿触发，默认为水平触发
+1、当多路复用的实例中注册了一个管道，并且设置了触发事件EPOLLIN，
+2、管道对端的写入2kb的数据，
+3、epoll_wait收到了一个可读事件，并向上层抛出，这个文件描述符
+4、调用者调用read读取了1kb的数据，
+5、再次调用epoll_wait
+ 
+ 
+边沿触发：上面的调用结束后，在输入缓存区中还有1kb的数据没有读取，但是epoll_wait将不会再抛出文件描述符。这就导致接受数据不全，对端得不到回应，可能会阻塞或者自己关闭
+因为边沿触发的模式下，只有改变多路复用实例中某个文件描述符的状态，才会抛出事件。
+相当于，边沿触发方式，内核只会在第一次通知调用者，不管对这个文件描述符做了怎么样的操作
+ 
+水平触发：
+只要文件描述符处于可操作状态，每次调用epoll_wait，内核都会通知你
+ 
+EPOLLONESHOT：epoll_wait只会对该文件描述符第一个到达的事件有反应，之后的其他事件都不向调用者抛出。需要调用epoll_ctl函数，对它的事件掩码重新设置
+EPOLLWAKEUP
+EPOLLEXCLUSIVE
+*/
+#include &lt;sys/epoll.h&gt;
+int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event);
+</code></pre></div></div>
+
+<p>epoll_wait</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/*
+@作用：等待一个epoll队列中的文件描述符的I/O事件发生
+
+@返回：&gt;=0，表示准备就绪的文件描述符个数      -1：出错，errno被设置
+
+@说明：
+epfd：目标epoll队列的描述符
+events：用于放置epoll队列中准备就绪（被触发）的事件
+maxevents：最大事件？
+timeout：指定函数等待的时间。这个函数阻塞这么长一段时间之后接触阻塞。
+
+#include &lt;sys/epoll.h&gt;
+int epoll_wait(int epfd, struct epoll_event *events,int maxevents, int timeout);
+</code></pre></div></div>
+
+<h3 id="epoll-lt例子">epoll LT例子</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#include &lt;unistd.h&gt;
+#include &lt;sys/types.h&gt;
+#include &lt;fcntl.h&gt;
+#include &lt;sys/socket.h&gt;
+#include &lt;netinet/in.h&gt;
+#include &lt;arpa/inet.h&gt;
+#include &lt;signal.h&gt;
+#include &lt;fcntl.h&gt;
+#include &lt;sys/wait.h&gt;
+#include &lt;sys/epoll.h&gt;
+ 
+#include &lt;stdlib.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;errno.h&gt;
+#include &lt;string.h&gt;
+ 
+#include &lt;vector&gt;
+#include &lt;algorithm&gt;
+#include &lt;iostream&gt;
+ 
+typedef std::vector&lt;struct epoll_event&gt; EventList;
+ 
+#define ERR_EXIT(m) \
+        do \
+        { \
+                perror(m); \
+                exit(EXIT_FAILURE); \
+        } while(0)
+ 
+int main(void)
+{
+	signal(SIGPIPE, SIG_IGN);
+	signal(SIGCHLD, SIG_IGN);
+ 
+	int idlefd = open("/dev/null", O_RDONLY | O_CLOEXEC);
+	int listenfd;
+    
+	if ((listenfd = socket(PF_INET, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, IPPROTO_TCP)) &lt; 0)
+		ERR_EXIT("socket");
+ 
+	struct sockaddr_in servaddr;
+	memset(&amp;servaddr, 0, sizeof(servaddr));
+	servaddr.sin_family = AF_INET;
+	servaddr.sin_port = htons(5188);
+	servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+ 
+	int on = 1;
+	if (setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &amp;on, sizeof(on)) &lt; 0)
+		ERR_EXIT("setsockopt");
+ 
+	if (bind(listenfd, (struct sockaddr*)&amp;servaddr, sizeof(servaddr)) &lt; 0)
+		ERR_EXIT("bind");
+	if (listen(listenfd, SOMAXCONN) &lt; 0)
+		ERR_EXIT("listen");
+
+	//===========================================epoll用法==============================================//
+	std::vector&lt;int&gt; clients;
+	int epollfd;
+	epollfd = epoll_create1(EPOLL_CLOEXEC);
+ 
+	struct epoll_event event;
+	event.data.fd = listenfd; //加入监听套接字
+	event.events = EPOLLIN;    //关注它的可读事件，默认的触发模式是LT模式         /* | EPOLLET*/;
+ 
+	//添加关注事件和监听套接字到epollfd
+	epoll_ctl(epollfd, EPOLL_CTL_ADD, listenfd, &amp;event);
+	
+	EventList events(16); //事件列表
+ 
+	struct sockaddr_in peeraddr;
+	socklen_t peerlen;
+	int connfd;
+ 
+	int nready;
+	while (1)
+	{
+ 
+		nready = epoll_wait(epollfd, &amp;*events.begin(), static_cast&lt;int&gt;(events.size()), -1); //-1设置为超时等待
+		if (nready == -1)
+		{
+			if (errno == EINTR)
+				continue;
+			
+			ERR_EXIT("epoll_wait");
+		}
+		//无事件发生
+		if (nready == 0)	// nothing happended
+			continue;
+ 
+        //事件列表满了 倍增
+		if ((size_t)nready == events.size())
+			events.resize(events.size()*2);
+ 
+        //统一处理事件（监听和已连接）
+		for (int i = 0; i &lt; nready; ++i)
+		{
+			//处理监听套接字
+			if (events[i].data.fd == listenfd)
+			{
+				peerlen = sizeof(peeraddr);
+				connfd = ::accept4(listenfd, (struct sockaddr*)&amp;peeraddr,
+						&amp;peerlen, SOCK_NONBLOCK | SOCK_CLOEXEC); //非阻塞  closeexec
+ 
+                //错误处理
+				if (connfd == -1)
+				{
+					if (errno == EMFILE)
+					{
+						close(idlefd);
+						idlefd = accept(listenfd, NULL, NULL);
+						close(idlefd);
+						idlefd = open("/dev/null", O_RDONLY | O_CLOEXEC);
+						continue;
+					}
+					else
+						ERR_EXIT("accept4");
+				}
+ 
+ 
+				std::cout&lt;&lt;"ip="&lt;&lt;inet_ntoa(peeraddr.sin_addr)&lt;&lt;
+					" port="&lt;&lt;ntohs(peeraddr.sin_port)&lt;&lt;std::endl;
+                      
+				clients.push_back(connfd);
+				
+				//将该文件描述符加入关注 
+				event.data.fd = connfd;
+				event.events = EPOLLIN; //电平触发     /* | EPOLLET*/
+				epoll_ctl(epollfd, EPOLL_CTL_ADD, connfd, &amp;event);
+			}
+			//处理已连接套接字（都是活跃的套接字）
+			else if (events[i].events &amp; EPOLLIN)
+			{
+				connfd = events[i].data.fd;
+				if (connfd &lt; 0)
+					continue;
+ 
+				char buf[1024] = {0};
+				int ret = read(connfd, buf, 1024);
+				if (ret == -1)
+					ERR_EXIT("read");
+				if (ret == 0) //对方关闭
+				{
+					std::cout&lt;&lt;"client close"&lt;&lt;std::endl;
+					close(connfd);
+					event = events[i];
+					epoll_ctl(epollfd, EPOLL_CTL_DEL, connfd, &amp;event);
+					clients.erase(std::remove(clients.begin(), clients.end(), connfd), clients.end());
+					continue;
+				}
+ 
+				std::cout&lt;&lt;buf;
+				write(connfd, buf, strlen(buf));
+			}
+ 
+		}
+	}
+ 
+	return 0;
+}
+</code></pre></div></div>
+
+<h2 id="select-poll-epoll-比较">select poll epoll 比较</h2>
+
+<p><img src="/assets/images/select_poll_epoll_01.jpg" alt="img" /></p>
+
+
+  </section>
+</article>
+
+<section>
+            <div style="text-align:center;margin:50px 0; font:normal 14px/24px 'MicroSoft YaHei';"></div>
+
+            <style type="text/css">
+              .content-play{width:80%;margin-top: 20px;margin-bottom: 10px;height:40px;}
+              .hide_box-play{z-index:999;filter:alpha(opacity=50);background:#666;opacity: 0.5;-moz-opacity: 0.5;left:0;top:0;height:99%;width:100%;position:fixed;display:none;}
+              .shang_box-play{width:540px;height:540px;padding:10px;background-color:#fff;border-radius:10px;position:fixed;z-index:1000;left:50%;top:50%;margin-left:-280px;margin-top:-280px;border:1px dotted #dedede;display:none;}
+              .shang_box-play img{border:none;border-width:0;}
+              .dashang{display:block;width:100px;margin:5px auto;height:25px;line-height:25px;padding:10px;background-color:#E74851;color:#fff;text-align:center;text-decoration:none;border-radius:10px;font-weight:bold;font-size:16px;transition: all 0.3s;}
+              .dashang:hover{opacity:0.8;padding:15px;font-size:18px;}
+              .shang_close-play{float:right;display:inline-block;
+                margin-right: 10px;margin-top: 20px;
+              }
+              .shang_logo{display:block;text-align:center;margin:20px auto;}
+              .shang_tit-play{width: 100%;height: 75px;text-align: center;line-height: 66px;color: #a3a3a3;font-size: 16px;background: url('/images/payimg/cy-reward-title-bg.jpg');font-family: 'Microsoft YaHei';margin-top: 7px;margin-right:2px;}
+              .shang_tit-play p{color:#a3a3a3;text-align:center;font-size:16px;}
+              .shang_payimg{width:140px;padding:10px;padding-left: 80px; /*border:6px solid #EA5F00;**/margin:0 auto;border-radius:3px;height:140px;display:inline-block;}
+              .shang_payimg img{display:inline-block;margin-right:10px;float:left;text-align:center;width:140px;height:140px; }
+              .pay_explain{text-align:center;margin:10px auto;font-size:12px;color:#545454;}
+              .shang_payselect{text-align:center;margin:0 auto;margin-top:40px;cursor:pointer;height:60px;width:500px;margin-left:110px;}
+              .shang_payselect .pay_item{display:inline-block;margin-right:140px;float:left;}
+              .shang_info-play{clear:both;}
+              .shang_info-play p,.shang_info-play a{color:#C3C3C3;text-align:center;font-size:12px;text-decoration:none;line-height:2em;}
+            </style>
+
+       <ul class="pager">
+        
+        <li class="previous">
+            <a href="/2021/05/linux-socket2/" data-toggle="tooltip" data-placement="top" title="socket编程(二)">上一篇：  <span>socket编程(二)</span>
+            </a>
+        </li>
+        
+        
+        <li class="next">
+            <a href="/2021/05/muduo_base01/" data-toggle="tooltip" data-placement="top" title="muduo_base 01 (Timestamp)">下一篇：  <span>muduo_base 01 (Timestamp)</span>
+            </a>
+        </li>
+        
+    </ul>
+</section>
+
+<section class="post-comments">
+  
+  
+
+  
+    <div id="vcomments"></div>
+    <script>
+        new Valine({
+            el: '#vcomments',
+            appId: 'XiYejJhYJ3U89yVy1tqxNYin-MdYXbMMI',
+            appKey: 'Px5FNmnMui05vXUJNqlptSqk'
+        })
+    </script>
+  
+</section>
+
+
+            <section class="footer">
+    <footer>
+        <div class = "footer_div">  
+        <nav class="cover-navigation navigation--social">
+          <ul class="navigation">
+
+          
+          <!-- Github -->
+          <li class="navigation__item_social">
+            <a href="https://github.com/pusidun" title="@pusidun 的 Github" target="_blank">
+              <div class="footer-social-icon" style="background:url(/images/github.png);"></div>
+            </a>
+          </li>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+          <!-- Email -->
+          <li class="navigation__item_social">
+            <a href="mailto:pusidun@hotmail.com" title="Contact me">
+              <div class="footer-social-icon" style="background:url(/images/email.png);"></div>
+            </a>
+          </li>
+          
+          
+          <!-- RSS -->
+          <li class="navigation__item_social">
+            <a href="/feed.xml" rel="author" title="RSS" target="_blank">
+              <div class="footer-social-icon" style="background:url(/images/rss.png);"></div>
+              <span class="label">RSS</span>
+            </a>
+          </li>
+
+          </ul>
+        </nav>
+
+        </div>
+
+        <div class = "footer_div">  
+           <p class="copyright text-muted">
+            Copyright &copy; pusidun 2021
+            </p>
+        	<div align="right">
+    			<link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+          <!-- 访问统计 -->
+          <span id="busuanzi_container_site_pv">
+            本站总访问量
+            <span id="busuanzi_value_site_pv"></span>次
+          </span>
+
+        </div>
+        <div>
+    </footer>
+</section>
+
+        </div>
+    </div>
+    
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="/js/main.js"></script>
+
+<script type="text/javascript" src="/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+  </body>
+
+</html>

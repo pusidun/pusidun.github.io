@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <title>设计模式(一)设计原则</title>
+  <meta name="description" content="前言">
+  <meta name="author" content="leopardpan">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="设计模式(一)设计原则">
+  <meta name="twitter:description" content="前言">
+  
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="设计模式(一)设计原则">
+  <meta property="og:description" content="前言">
+  
+  <link rel="icon" type="image/png" href="/images/favicon.png" />
+  <link href="/images/favicon.png" rel="shortcut icon" type="image/png">
+  
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+
+  <link rel="canonical" href="https://pusidun.github.io/2020/08/DesignPattern-1/">
+  <link rel="alternate" type="application/rss+xml" title="pusidun" href="https://pusidun.github.io/feed.xml">
+  
+  <meta name="google-site-verification" content="1-1ZlHoRvM0T2FqPbW2S-qLgYXN6rsn52kErlMPd_gw" />
+
+<!-- 站点统计 -->
+  <script 
+  async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+  </script>  
+
+<!-- 百度统计 -->
+  
+
+<!-- google 统计 -->
+  
+  <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', 'xxxx', 'auto');
+      ga('send', 'pageview');
+  </script>
+  
+
+  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<script>
+  (adsbygoogle = window.adsbygoogle || []).push({
+    google_ad_client: "ca-pub-9005224472374751",
+    enable_page_level_ads: true
+  });
+</script>
+
+<script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+
+</head>
+
+
+  <body>
+
+    <span class="mobile btn-mobile-menu">        
+      <div class="nav_container">
+         <nav class="nav-menu-item" style = "float:right">
+            <i class="nav-menu-item">
+              <a href="/#blog" title="" class="blog-button">  博客主页
+              </a>
+            </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/archive" title="archive" class="btn-mobile-menu__icon">
+                      所有文章
+                  </a>
+                </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/tags" title="tags" class="btn-mobile-menu__icon">
+                      标签
+                  </a>
+                </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/about" title="about" class="btn-mobile-menu__icon">
+                      关于我
+                  </a>
+                </i>
+            
+          </nav>
+      </div>
+    </span>
+    
+    <header class="panel-cover panel-cover--collapsed" style="background-image: url('/images/background-cover.jpg')">
+  <div class="panel-main">
+
+    <div class="panel-main__inner panel-inverted">
+    <div class="panel-main__content">
+        <!-- 头像效果-start -->
+        <div class="ih-item circle effect right_to_left">            
+            <a href="/#blog" title="前往 pusidun 的主页" class="blog-button">
+                <div class="img"><img src="/images/avatar.jpg" alt="img"></div>
+                <div class="info">
+                    <div class="info-back">
+                        <h2 id="avatarTitle"> 
+                            
+                                pusidun
+                            
+                        </h2>
+                        <p>
+                           
+                                Go / C++
+                            
+                        </p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <!-- 头像效果-end -->
+        <h1 class="panel-cover__title panel-title"><a href="/#blog" title="link to homepage for pusidun" class="blog-button">pusidun</a></h1>
+        
+        <span class="panel-cover__subtitle panel-subtitle">BLOG</span>
+        
+        <hr class="panel-cover__divider" />
+        <p class="panel-cover__description">Welcome to my blog~</p>
+        <hr class="panel-cover__divider panel-cover__divider--secondary" />
+        
+        
+        
+
+        <div class="navigation-wrapper">
+          <div>
+            <nav class="cover-navigation cover-navigation--primary">
+              <ul class="navigation">
+                <li class="navigation__item"><a href="/#blog" title="" class="blog-button">博客主页</a></li>
+                
+                  <li class="navigation__item"><a href="/archive" title="archive">所有文章</a></li>
+                
+                  <li class="navigation__item"><a href="/tags" title="tags">标签</a></li>
+                
+                  <li class="navigation__item"><a href="/about" title="about">关于我</a></li>
+                
+              </ul>
+            </nav>
+          </div>          
+        </div>
+
+
+        </div>
+      </div>
+    </div>
+    
+    
+    <div class="panel-cover--overlay cover-clear"></div>
+    
+  </div>
+</header>
+
+
+    <div class="content-wrapper">
+        <div class="content-wrapper__inner">
+            <article class="post-container post-container--single" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title">设计模式(一)设计原则</h1>
+    <div class="post-meta">
+      <img src="/images/calendar.png" width="20px"/> 
+      <time datetime="2020-08-23 00:00:00 +0000" itemprop="datePublished" class="post-meta__date date">2020-08-23</time>  
+         
+      <span id="busuanzi_container_page_pv"> | 阅读：<span id="busuanzi_value_page_pv"></span>次</span>
+    </p>
+    </div>
+  </header>
+
+  <section class="post">
+    <h2 id="前言">前言</h2>
+
+<p>我认为可以将设计由低到高分为以下3个层次：</p>
+
+<ol>
+  <li>设计原语</li>
+  <li>设计模式</li>
+  <li>架构模式</li>
+</ol>
+
+<p>层次1更多关注具体语言上的技巧，本系列文章讨论的是层次2.</p>
+
+<p>作为开头第一篇，希望读者不要抱着”套用”的想法学习设计模式。GOF这本书列举了常用的23种设计模式，去背诵下来，在开发时考虑特征符合哪种设计模式，然后去套用，并不是学习设计模式的目的，设计模式需要关注的是<strong>设计</strong>而非模式。</p>
+
+<p>GOF这本书的重点就在前几章，通过一个编辑器的例子去告诉你思考的方向。我个人观点，设计模式的重点就在本文提到的几大原则的理解。这几大原则记不住也没关系，可以概括成一句话，<strong>寻找稳定和变化的界限，封装稳定，扩展变化，即封装变化点</strong>。相信只要学会思考哪一部分是稳定的，哪一部分是变化的，代码能够做到隔离稳定和变化，变化依赖稳定，那么即使它不属于现有设计模式的任何一种，它也是设计模式。</p>
+
+<p>本系列文章全部用C++作为例子。关于C++，我补充几种重构技法:</p>
+
+<ul>
+  <li>静态-&gt;动态</li>
+  <li>早绑定-&gt;晚绑定</li>
+  <li>继承-&gt;组合</li>
+  <li>编译时依赖-&gt;运行时依赖</li>
+  <li>紧耦合-&gt;松耦合</li>
+</ul>
+
+<h2 id="solid">S.O.L.I.D</h2>
+
+<p>常见的有如下5个：</p>
+
+<h3 id="srp-单一责任原则">SRP 单一责任原则</h3>
+
+<blockquote>
+  <p>The Single Responsibility Principle</p>
+</blockquote>
+
+<p>不存在多于一个的因素导致类的状态发生变更。变化方向隐含类的责任</p>
+
+<h3 id="ocp-开闭原则">OCP 开闭原则</h3>
+
+<blockquote>
+  <p>The Open Closed Principle</p>
+</blockquote>
+
+<p>对扩展开放，对修改关闭</p>
+
+<h3 id="lsp-里氏代换原则">LSP 里氏代换原则</h3>
+
+<blockquote>
+  <p>The Liskov Subsitution Principle</p>
+</blockquote>
+
+<p>子类能替换父类。继承表达类型抽象</p>
+
+<h3 id="isp-接口隔离原则">ISP 接口隔离原则</h3>
+
+<blockquote>
+  <p>The Interface Segregation Principle</p>
+</blockquote>
+
+<p>不应该强迫客户程序依赖他们不用的方法。接口应该小而完备。</p>
+
+<h3 id="dip-依赖倒置原则">DIP 依赖倒置原则</h3>
+
+<blockquote>
+  <p>The Dependency Inversion Principle</p>
+</blockquote>
+
+<p>高层次模块(稳定)不应该依赖于低层次模块(变化)，二者都应该依赖于抽象(稳定)。抽象(稳定)不依赖于实现细节(变化)，实现细节应该依赖于抽象(稳定)</p>
+
+<h2 id="lccss">L.C.C.S.S</h2>
+
+<h3 id="lod-迪米特法则">LOD 迪米特法则</h3>
+
+<blockquote>
+  <p>The Law of Demeter</p>
+</blockquote>
+
+<p>有被称为最少知识原则。一个对象对其他对象应该有最少的了解。</p>
+
+<h3 id="crp-合成复用原则">CRP 合成复用原则</h3>
+
+<blockquote>
+  <p>The Composite Resuse Principle</p>
+</blockquote>
+
+<p>优先使用对象组合，而不是类继承。类继承通常是白箱复用，对象组合通常为黑箱复用。继承在某种程度上破坏了封装性，子类父类耦合度高。</p>
+
+<h3 id="ccp-共同封闭原则">CCP 共同封闭原则</h3>
+
+<blockquote>
+  <p>The Common Closure Principle</p>
+</blockquote>
+
+<p>一起修改的类，应该组合在一起。如果必须修改应用程序代码，我们希望所有修改都发生在一个包里，而不是遍布在很多包里</p>
+
+<h3 id="sap-稳定抽象原则">SAP 稳定抽象原则</h3>
+
+<blockquote>
+  <p>The Stable Abstractions Principle</p>
+</blockquote>
+
+<p>最稳定的包应该是最抽象的包</p>
+
+<h3 id="sdp-稳定依赖原则">SDP 稳定依赖原则</h3>
+
+<blockquote>
+  <p>The Stable Dependencies Principle</p>
+</blockquote>
+
+<p>包之间的依赖关系应该是稳定方向依赖的，包要依赖的包要比自己更具有稳定性</p>
+
+
+  </section>
+</article>
+
+<section>
+            <div style="text-align:center;margin:50px 0; font:normal 14px/24px 'MicroSoft YaHei';"></div>
+
+            <style type="text/css">
+              .content-play{width:80%;margin-top: 20px;margin-bottom: 10px;height:40px;}
+              .hide_box-play{z-index:999;filter:alpha(opacity=50);background:#666;opacity: 0.5;-moz-opacity: 0.5;left:0;top:0;height:99%;width:100%;position:fixed;display:none;}
+              .shang_box-play{width:540px;height:540px;padding:10px;background-color:#fff;border-radius:10px;position:fixed;z-index:1000;left:50%;top:50%;margin-left:-280px;margin-top:-280px;border:1px dotted #dedede;display:none;}
+              .shang_box-play img{border:none;border-width:0;}
+              .dashang{display:block;width:100px;margin:5px auto;height:25px;line-height:25px;padding:10px;background-color:#E74851;color:#fff;text-align:center;text-decoration:none;border-radius:10px;font-weight:bold;font-size:16px;transition: all 0.3s;}
+              .dashang:hover{opacity:0.8;padding:15px;font-size:18px;}
+              .shang_close-play{float:right;display:inline-block;
+                margin-right: 10px;margin-top: 20px;
+              }
+              .shang_logo{display:block;text-align:center;margin:20px auto;}
+              .shang_tit-play{width: 100%;height: 75px;text-align: center;line-height: 66px;color: #a3a3a3;font-size: 16px;background: url('/images/payimg/cy-reward-title-bg.jpg');font-family: 'Microsoft YaHei';margin-top: 7px;margin-right:2px;}
+              .shang_tit-play p{color:#a3a3a3;text-align:center;font-size:16px;}
+              .shang_payimg{width:140px;padding:10px;padding-left: 80px; /*border:6px solid #EA5F00;**/margin:0 auto;border-radius:3px;height:140px;display:inline-block;}
+              .shang_payimg img{display:inline-block;margin-right:10px;float:left;text-align:center;width:140px;height:140px; }
+              .pay_explain{text-align:center;margin:10px auto;font-size:12px;color:#545454;}
+              .shang_payselect{text-align:center;margin:0 auto;margin-top:40px;cursor:pointer;height:60px;width:500px;margin-left:110px;}
+              .shang_payselect .pay_item{display:inline-block;margin-right:140px;float:left;}
+              .shang_info-play{clear:both;}
+              .shang_info-play p,.shang_info-play a{color:#C3C3C3;text-align:center;font-size:12px;text-decoration:none;line-height:2em;}
+            </style>
+
+       <ul class="pager">
+        
+        <li class="previous">
+            <a href="/2020/07/sharedptr-cnt/" data-toggle="tooltip" data-placement="top" title="gcc5.4.0 shared_ptr源码阅读--引用计数">上一篇：  <span>gcc5.4.0 shared_ptr源码阅读--引用计数</span>
+            </a>
+        </li>
+        
+        
+        <li class="next">
+            <a href="/2020/09/FoldExpressions/" data-toggle="tooltip" data-placement="top" title="fold expressions">下一篇：  <span>fold expressions</span>
+            </a>
+        </li>
+        
+    </ul>
+</section>
+
+<section class="post-comments">
+  
+  
+
+  
+    <div id="vcomments"></div>
+    <script>
+        new Valine({
+            el: '#vcomments',
+            appId: 'XiYejJhYJ3U89yVy1tqxNYin-MdYXbMMI',
+            appKey: 'Px5FNmnMui05vXUJNqlptSqk'
+        })
+    </script>
+  
+</section>
+
+
+            <section class="footer">
+    <footer>
+        <div class = "footer_div">  
+        <nav class="cover-navigation navigation--social">
+          <ul class="navigation">
+
+          
+          <!-- Github -->
+          <li class="navigation__item_social">
+            <a href="https://github.com/pusidun" title="@pusidun 的 Github" target="_blank">
+              <div class="footer-social-icon" style="background:url(/images/github.png);"></div>
+            </a>
+          </li>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+          <!-- Email -->
+          <li class="navigation__item_social">
+            <a href="mailto:pusidun@hotmail.com" title="Contact me">
+              <div class="footer-social-icon" style="background:url(/images/email.png);"></div>
+            </a>
+          </li>
+          
+          
+          <!-- RSS -->
+          <li class="navigation__item_social">
+            <a href="/feed.xml" rel="author" title="RSS" target="_blank">
+              <div class="footer-social-icon" style="background:url(/images/rss.png);"></div>
+              <span class="label">RSS</span>
+            </a>
+          </li>
+
+          </ul>
+        </nav>
+
+        </div>
+
+        <div class = "footer_div">  
+           <p class="copyright text-muted">
+            Copyright &copy; pusidun 2021
+            </p>
+        	<div align="right">
+    			<link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+          <!-- 访问统计 -->
+          <span id="busuanzi_container_site_pv">
+            本站总访问量
+            <span id="busuanzi_value_site_pv"></span>次
+          </span>
+
+        </div>
+        <div>
+    </footer>
+</section>
+
+        </div>
+    </div>
+    
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="/js/main.js"></script>
+
+<script type="text/javascript" src="/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+  </body>
+
+</html>

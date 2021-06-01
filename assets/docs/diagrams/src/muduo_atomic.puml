@@ -1,0 +1,15 @@
+@startuml Atomic
+class Atomic{
+    +AtomicIntegerT
+    +get()
+    +getAndAdd(T x)
+    +addAndGet(T x)
+    +T incrementAndGet()
+    +decrementAndGet()
+    +add(T x)
+    +increment()
+    +void decrement()
+    +T getAndSet()
+    -volatile T value_
+}
+@enduml

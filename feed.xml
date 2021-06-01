@@ -1,0 +1,1946 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>pusidun</title>
+    <description>Welcome to my blog~</description>
+    <link>https://pusidun.github.io/</link>
+    <atom:link href="https://pusidun.github.io/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Tue, 01 Jun 2021 06:20:01 +0000</pubDate>
+    <lastBuildDate>Tue, 01 Jun 2021 06:20:01 +0000</lastBuildDate>
+    <generator>Jekyll v3.9.1</generator>
+    
+      <item>
+        <title>muduo_net 01 (EcpServer EchoServer)</title>
+        <description>&lt;p&gt;本文源码基于&lt;a href=&quot;https://github.com/chenshuo/muduo/releases/tag/v2.0.2&quot; target=&quot;_blank&quot;&gt;muduo v2.0.2&lt;/a&gt;分析&lt;/p&gt;
+
+&lt;h2 id=&quot;tcp网络编程最本质的事是处理三个半事件&quot;&gt;TCP网络编程最本质的事是处理三个半事件&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;连接建立：服务端accept（被动）接受连接，客户端connect（主动）发起连接&lt;/li&gt;
+  &lt;li&gt;连接断开：主动断开（close，shutdown），被动断开（read返回0）&lt;/li&gt;
+  &lt;li&gt;消息到达：文件描述符可读&lt;/li&gt;
+  &lt;li&gt;消息发送完毕：算半个。对于低流量服务，可不必关心这个事件；这里的发送完毕指数据写入OS发送缓冲区，不代表对方已经接收到数据&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;echoserver类图&quot;&gt;EchoServer类图&lt;/h2&gt;
+</description>
+        <pubDate>Tue, 25 May 2021 00:00:00 +0000</pubDate>
+        <link>https://pusidun.github.io/2021/05/muduo_net01/</link>
+        <guid isPermaLink="true">https://pusidun.github.io/2021/05/muduo_net01/</guid>
+        
+        <category>大并发服务器开发</category>
+        
+        <category>muduo</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>muduo_base 05 (MutexLock)</title>
+        <description>&lt;p&gt;本文源码基于&lt;a href=&quot;https://github.com/chenshuo/muduo/releases/tag/v2.0.2&quot; target=&quot;_blank&quot;&gt;muduo v2.0.2&lt;/a&gt;分析&lt;/p&gt;
+
+</description>
+        <pubDate>Tue, 25 May 2021 00:00:00 +0000</pubDate>
+        <link>https://pusidun.github.io/2021/05/muduo_base05/</link>
+        <guid isPermaLink="true">https://pusidun.github.io/2021/05/muduo_base05/</guid>
+        
+        <category>大并发服务器开发</category>
+        
+        <category>muduo</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>muduo_base 04 (Thread)</title>
+        <description>&lt;!-- TOC --&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;#pidpthread_idtid&quot;&gt;pid,pthread_id,tid&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#__thread&quot;&gt;__thread&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#pthread_atfork&quot;&gt;pthread_atfork()&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#reference&quot;&gt;Reference&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;!-- /TOC --&gt;
+&lt;p&gt;本文源码基于&lt;a href=&quot;https://github.com/chenshuo/muduo/releases/tag/v2.0.2&quot; target=&quot;_blank&quot;&gt;muduo v2.0.2&lt;/a&gt;分析&lt;/p&gt;
+
+&lt;h2 id=&quot;pidpthread_idtid&quot;&gt;pid,pthread_id,tid&lt;/h2&gt;
+
+&lt;p&gt;getpid()获取的是进程id，类型pid_t，每个进程在os中有唯一的ID&lt;/p&gt;
+
+&lt;p&gt;pthread_self()获取的是线程ID，线程ID在某进程中是唯一的，在不同的进程中创建的线程可能出现ID值相同的情况。类型为pthread_t。&lt;/p&gt;
+
+&lt;p&gt;Linux中的POSIX线程又被称为LWP（轻量级进程），不管创建线程还是进程都是调用的fork，只是线程共享了部分资源而已。所以POSIX线程还具有一个唯一的真实pid，通常被称为&lt;strong&gt;tid&lt;/strong&gt;。Linux下&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pid_t gettid(void);&lt;/code&gt;可以得到tid，man page的note指出&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Glibc does not provide a wrapper for this system call; call it using syscall(2).&lt;/code&gt;，glibc没有封装改函数，如需使用通过&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;syscall(SYS_gettid)&lt;/code&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;__thread&quot;&gt;__thread&lt;/h2&gt;
+
+&lt;p&gt;gcc内置的线程局部存储设施&lt;/p&gt;
+
+&lt;p&gt;__thread只能修饰POD(plain old data)类型。POD类型指与C兼容的原始数据，例如，结构和整数等C语言中的类型是POD类型，但带有用户定义的构造函数或虚函数的类则不是。非POD类型可以使用线程特定数据TSD&lt;/p&gt;
+
+&lt;p&gt;CurrentThread.cc&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;__thread int t_cachedTid = 0;   //缓存tid
+__thread char t_tidString[32];  //tid字符串表示
+__thread int t_tidStringLength = 6;
+__thread const char* t_threadName = &quot;unknown&quot;;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;被__thread修饰的变量为每个线程各自的全局变量。一个线程的修改不会对其他线程产生影响。&lt;/p&gt;
+
+&lt;p&gt;C++11标准有thread_local，相比__thread有延迟初始化开销。更多不同请见文末参考资料。&lt;/p&gt;
+
+&lt;h2 id=&quot;pthread_atfork&quot;&gt;pthread_atfork()&lt;/h2&gt;
+
+&lt;p&gt;改函数注册fork函数调用前后的句柄&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#include &amp;lt;pthread.h&amp;gt;
+
+int pthread_atfork(void (*prepare)(void), void (*parent)(void),
+                    void (*child)(void));
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;三个参数分别为调用fork前，调用fork后父进程，调用fork后子进程的句柄。置为NULL即为不注册，成功时返回0，失败返回错误码。&lt;/p&gt;
+
+&lt;h2 id=&quot;reference&quot;&gt;Reference&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://blog.csdn.net/weixin_43705457/article/details/106624781&quot; target=&quot;_blank&quot;&gt;thread_local与__thread的区别&lt;/a&gt;&lt;/p&gt;
+</description>
+        <pubDate>Tue, 25 May 2021 00:00:00 +0000</pubDate>
+        <link>https://pusidun.github.io/2021/05/muduo_base04/</link>
+        <guid isPermaLink="true">https://pusidun.github.io/2021/05/muduo_base04/</guid>
+        
+        <category>大并发服务器开发</category>
+        
+        <category>muduo</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>muduo_base 03 (Exception)</title>
+        <description>&lt;!-- TOC --&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;#uml&quot;&gt;UML&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#backtrace打印堆栈&quot;&gt;backtrace打印堆栈&lt;/a&gt;
+    &lt;ul&gt;
+      &lt;li&gt;&lt;a href=&quot;#backtrace和backtrace_symbols&quot;&gt;backtrace和backtrace_symbols&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#__cxa_demangle&quot;&gt;__cxa_demangle&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#reference&quot;&gt;Reference&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;!-- /TOC --&gt;
+&lt;p&gt;本文源码基于&lt;a href=&quot;https://github.com/chenshuo/muduo/releases/tag/v2.0.2&quot; target=&quot;_blank&quot;&gt;muduo v2.0.2&lt;/a&gt;分析&lt;/p&gt;
+&lt;h2 id=&quot;uml&quot;&gt;UML&lt;/h2&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/docs/diagrams/out/muduo_exception/Exception.png&quot; alt=&quot;Exception&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;继承自std::exception。如何使用该类可以看Exception_test.cc文件。
+函数重点关注如何打印堆栈信息&lt;/p&gt;
+
+&lt;h2 id=&quot;backtrace打印堆栈&quot;&gt;backtrace打印堆栈&lt;/h2&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Exception::Exception(string msg)
+  : message_(std::move(msg)),
+    stack_(CurrentThread::stackTrace(/*demangle=*/false))
+{
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;调用Exception的构造函数时会打印当前的堆栈信息。&lt;/p&gt;
+
+&lt;p&gt;CurrentThread::stackTrace(bool)&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;string stackTrace(bool demangle)
+{
+  string stack;
+  const int max_frames = 200;
+  void* frame[max_frames];
+  //打印堆栈地址
+  int nptrs = ::backtrace(frame, max_frames);
+  //将地址转换成可以阅读的符号信息
+  char** strings = ::backtrace_symbols(frame, nptrs);
+  if (strings)
+  {
+    size_t len = 256;
+    //下面这块是由于编译器会将函数名字转换，通过abi::__cxa_demangle给转换回来的过程。具体见下文
+    char* demangled = demangle ? static_cast&amp;lt;char*&amp;gt;(::malloc(len)) : nullptr;
+    for (int i = 1; i &amp;lt; nptrs; ++i)  // skipping the 0-th, which is this function
+    {
+      if (demangle)
+      {
+        // https://panthema.net/2008/0901-stacktrace-demangled/
+        // bin/exception_test(_ZN3Bar4testEv+0x79) [0x401909]
+        char* left_par = nullptr;
+        char* plus = nullptr;
+        for (char* p = strings[i]; *p; ++p)
+        {
+          if (*p == '(')
+            left_par = p;
+          else if (*p == '+')
+            plus = p;
+        }
+
+        if (left_par &amp;amp;&amp;amp; plus)
+        {
+          *plus = '\0';
+          int status = 0;
+          char* ret = abi::__cxa_demangle(left_par+1, demangled, &amp;amp;len, &amp;amp;status);
+          *plus = '+';
+          if (status == 0)
+          {
+            demangled = ret;  // ret could be realloc()
+            stack.append(strings[i], left_par+1);
+            stack.append(demangled);
+            stack.append(plus);
+            stack.push_back('\n');
+            continue;
+          }
+        }
+      }
+      // Fallback to mangled names
+      stack.append(strings[i]);
+      stack.push_back('\n');
+    }
+    free(demangled);
+    free(strings);
+  }
+  return stack;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;backtrace和backtrace_symbols&quot;&gt;backtrace和backtrace_symbols&lt;/h3&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; #include &amp;lt;execinfo.h&amp;gt;
+
+int backtrace(void **buffer, int size);
+
+char **backtrace_symbols(void *const *buffer, int size);
+void backtrace_symbols_fd(void *const *buffer, int size, int fd);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;backtrace返回调用者的堆栈信息，指向buffer指针数组。每个buffer的成员是void*类型，为栈帧的地址。size为地址的最大个数,如果超过了该值，则保留最近的size个栈帧，其余截断。函数返回值为地址个数。&lt;/p&gt;
+
+&lt;p&gt;backtrace_symbols()将地址转换成描述地址符号的string数组。该函数内部调用了malloc并返回，所以使用完毕需要free掉返回值。函数调用失败返回NULL。&lt;/p&gt;
+
+&lt;p&gt;backtrace_symbols_fd同backtrace_symbols，只不过将结果写入了fd中。&lt;/p&gt;
+
+&lt;h3 id=&quot;__cxa_demangle&quot;&gt;__cxa_demangle&lt;/h3&gt;
+
+&lt;p&gt;至此，虽然已经通过backtrace_symbols将地址转换成可阅读的符号，但是因为编译器会对C++的符号名称进行转换，打印出的信息仍然是不可阅读的。&lt;/p&gt;
+
+&lt;p&gt;下面是截取的一段exception_test输出。&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;//转换后的堆栈信息
+Stack inside std::bind:
+./exception_test(Bar::callback()+0x12) [0x401f62]
+./exception_test(foo()+0x13f) [0x401ebf]
+./exception_test(main+0xb) [0x401c9b]
+/usr/lib64/libc.so.6(__libc_start_main+0xf5) [0x7f546b93b555]
+./exception_test() [0x401ccf]
+
+//未转换的打印
+reason: oops
+stack trace:
+./exception_test(_ZN5muduo9ExceptionC1ENSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE+0x50) [0x4021c0]
+./exception_test() [0x401b7c]
+./exception_test(main+0xb) [0x401c9b]
+/usr/lib64/libc.so.6(__libc_start_main+0xf5) [0x7f546b93b555]
+./exception_test() [0x401ccf]
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;可以看到我们并不知道&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;_ZN5muduo9ExceptionC1ENSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE+0x50&lt;/code&gt;代表了什么。通过__cxa_demangle，可以还原编译器对符号的转换。&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;/*
+Parameters:
+mangled_name 	A NUL-terminated character string containing the name to be demangled.
+output_buffer 	A region of memory, allocated with malloc, of *length bytes, into which the demangled name is stored. If output_buffer is not long enough, it is expanded using realloc. output_buffer may instead be NULL; in that case, the demangled name is placed in a region of memory allocated with malloc.
+length 	If length is non-NULL, the length of the buffer containing the demangled name is placed in *length.
+status 	*status is set to one of the following values:
+0: The demangling operation succeeded.
+-1: A memory allocation failiure occurred.
+-2: mangled_name is not a valid name under the C++ ABI mangling rules.
+-3: One of the arguments is invalid.
+Returns:
+A pointer to the start of the NUL-terminated demangled name, or NULL if the demangling fails. The caller is responsible for deallocating this memory using free.
+*/
+char* abi::__cxa_demangle	(	const char * 	mangled_name,
+                            char * 	output_buffer,
+                            size_t * 	length,
+                            int * 	status	 
+                            )	
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;reference&quot;&gt;Reference&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://gcc.gnu.org/onlinedocs/libstdc++/libstdc++-html-USERS-4.3/a01696.html&quot;&gt;abi Namespace Reference&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://panthema.net/2008/0901-stacktrace-demangled/&quot;&gt;C++ Code Snippet - Print Stack Backtrace Programmatically with Demangled Function Names&lt;/a&gt;&lt;/p&gt;
+</description>
+        <pubDate>Tue, 25 May 2021 00:00:00 +0000</pubDate>
+        <link>https://pusidun.github.io/2021/05/muduo_base03/</link>
+        <guid isPermaLink="true">https://pusidun.github.io/2021/05/muduo_base03/</guid>
+        
+        <category>大并发服务器开发</category>
+        
+        <category>muduo</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>muduo_base 02 (Atomic)</title>
+        <description>&lt;!-- TOC --&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;#原子操作&quot;&gt;原子操作&lt;/a&gt;
+    &lt;ul&gt;
+      &lt;li&gt;&lt;a href=&quot;#gcc41中的原子操作&quot;&gt;GCC4.1+中的原子操作&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#c11中的原子操作&quot;&gt;C++11中的原子操作&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#类图&quot;&gt;类图&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#参考阅读&quot;&gt;参考阅读&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;!-- /TOC --&gt;
+&lt;p&gt;本文源码基于&lt;a href=&quot;https://github.com/chenshuo/muduo/releases/tag/v2.0.2&quot; target=&quot;_blank&quot;&gt;muduo v2.0.2&lt;/a&gt;分析&lt;/p&gt;
+
+&lt;h2 id=&quot;原子操作&quot;&gt;原子操作&lt;/h2&gt;
+
+&lt;h3 id=&quot;gcc41中的原子操作&quot;&gt;GCC4.1+中的原子操作&lt;/h3&gt;
+
+&lt;p&gt;muduo用了下面几个（需要加编译选项-march=cpu-type）：&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;//原子自增：返回旧值，原值加value
+type __sync_fetch_and_add(type *ptr, type value)
+
+//原子比较和交换操作：if the current value of *ptr is oldval, then write newval into *ptr.
+type __sync_val_compare_and_swap(type* ptr, type oldval,type newval)
+bool __sync_bool_compare_and_swap(type* ptr, type oldval,type newval)
+
+//原子赋值操作：writes value into *ptr, and returns the previous contents of *ptr
+type __sync_lock_test_and_set(type* ptr, type value)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;更多的&lt;a href=&quot;http://gcc.gnu.org/onlinedocs/gcc-4.1.1/gcc/Atomic-Builtins.html&quot;&gt;GCC手册Atomic-Builtins&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;c11中的原子操作&quot;&gt;C++11中的原子操作&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://en.cppreference.com/w/cpp/atomic&quot;&gt;cppreference atomic&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;类图&quot;&gt;类图&lt;/h2&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/docs/diagrams/out/muduo_atomic/Atomic.png&quot; alt=&quot;Atomic&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;主要就这2个方法需要关注，其他方法基于这2个方法&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;T get()
+{
+// in gcc &amp;gt;= 4.7: __atomic_load_n(&amp;amp;value_, __ATOMIC_SEQ_CST)
+return __sync_val_compare_and_swap(&amp;amp;value_, 0, 0);
+}
+
+T getAndAdd(T x)
+{
+// in gcc &amp;gt;= 4.7: __atomic_fetch_add(&amp;amp;value_, x, __ATOMIC_SEQ_CST)
+return __sync_fetch_and_add(&amp;amp;value_, x);
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;参考阅读&quot;&gt;参考阅读&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://coolshell.cn/articles/8239.html&quot;&gt;coolshell-无锁队列的实现&lt;/a&gt;&lt;/p&gt;
+</description>
+        <pubDate>Mon, 24 May 2021 00:00:00 +0000</pubDate>
+        <link>https://pusidun.github.io/2021/05/muduo_base02/</link>
+        <guid isPermaLink="true">https://pusidun.github.io/2021/05/muduo_base02/</guid>
+        
+        <category>大并发服务器开发</category>
+        
+        <category>muduo</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>muduo_base 01 (Timestamp)</title>
+        <description>&lt;!-- TOC --&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;#类图&quot;&gt;类图&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#通读源码之前的几点说明&quot;&gt;通读源码之前的几点说明&lt;/a&gt;
+    &lt;ul&gt;
+      &lt;li&gt;&lt;a href=&quot;#copyable--nocopyable&quot;&gt;copyable &amp;amp; nocopyable&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#equality_comparable--less_than_comparable&quot;&gt;equality_comparable &amp;amp; less_than_comparable&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#静态断言static_assert&quot;&gt;静态断言static_assert&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#多平台prid64占位&quot;&gt;多平台PRid64占位&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#通读源码&quot;&gt;通读源码&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#unittest代码&quot;&gt;unittest代码&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;!-- /TOC --&gt;
+
+&lt;p&gt;本文源码基于&lt;a href=&quot;https://github.com/chenshuo/muduo/releases/tag/v2.0.2&quot; target=&quot;_blank&quot;&gt;muduo v2.0.2&lt;/a&gt;分析&lt;/p&gt;
+
+&lt;h2 id=&quot;类图&quot;&gt;类图&lt;/h2&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/docs/diagrams/out/muduo_timestamp/Timestamp.png&quot; alt=&quot;muduo_timestamp.puml&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;通读源码之前的几点说明&quot;&gt;通读源码之前的几点说明&lt;/h2&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;class Timestamp : public muduo::copyable,
+                  public boost::equality_comparable&amp;lt;Timestamp&amp;gt;,
+                  public boost::less_than_comparable&amp;lt;Timestamp&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Timestamp继承的3个基类，下面将分别介绍&lt;/p&gt;
+
+&lt;h3 id=&quot;copyable--nocopyable&quot;&gt;copyable &amp;amp; nocopyable&lt;/h3&gt;
+
+&lt;p&gt;值语义：可以拷贝，拷贝之后与原对象脱离关系&lt;/p&gt;
+
+&lt;p&gt;对象语义：要么不能拷贝，要么可以拷贝，拷贝之后与原对象仍然有联系，比如共享底层资源（要实现自己的拷贝构造函数）&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;class copyable
+{
+ protected:
+  copyable() = default;
+  ~copyable() = default;
+};
+
+class noncopyable
+{
+ public:
+  noncopyable(const noncopyable&amp;amp;) = delete;
+  void operator=(const noncopyable&amp;amp;) = delete;
+
+ protected:
+  noncopyable() = default;
+  ~noncopyable() = default;
+};
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;equality_comparable--less_than_comparable&quot;&gt;equality_comparable &amp;amp; less_than_comparable&lt;/h3&gt;
+
+&lt;p&gt;头文件boost/operators.hpp&lt;/p&gt;
+
+&lt;p&gt;要派生自 boost::less_than_comparable, 派生类(T)必须提供：&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;bool operator&amp;lt;(const T&amp;amp;, const T&amp;amp;);&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;less_than_comparable 将依照 operator&amp;lt; 实现其余的三个操作符&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bool operator&amp;gt;(const T&amp;amp;,const T&amp;amp;);
+bool operator&amp;lt;=(const T&amp;amp;,const T&amp;amp;);
+bool operator&amp;gt;=(const T&amp;amp;,const T&amp;amp;);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;同理，要派生自 boost::equality_comparable, 派生类(T)必须提供：&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;bool operator==(const T&amp;amp;,const T&amp;amp;);&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;将自动完成&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;bool operator!=(const T&amp;amp;,const T&amp;amp;);&lt;/code&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;静态断言static_assert&quot;&gt;静态断言static_assert&lt;/h3&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;static_assert(sizeof(Timestamp) == sizeof(int64_t),
+              &quot;Timestamp is same size as int64_t&quot;);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;编译时断言，条件为true不打印信息，false时打印&lt;/p&gt;
+
+&lt;h3 id=&quot;多平台prid64占位&quot;&gt;多平台PRid64占位&lt;/h3&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;snprintf(buf, sizeof(buf)-1, &quot;%&quot; PRId64 &quot;.%06&quot; PRId64 &quot;&quot;, seconds, microseconds);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;64位类型的printf占位符是ld，而32位是lld。为适应32位和64位的系统，使用了PRId64&lt;/p&gt;
+
+&lt;p&gt;PRId64位于头文件inttypes.h&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# if __WORDSIZE == 64
+#  define __PRI64_PREFIX	&quot;l&quot;
+# else
+#  define __PRI64_PREFIX	&quot;ll&quot;
+# endif
+
+# define PRId64		__PRI64_PREFIX &quot;d&quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;同时，inttypes头文件可能需要定义宏__STDC_FORMAT_MACROS后才能include，具体根据编译器&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#ifndef __STDC_FORMAT_MACROS
+#define __STDC_FORMAT_MACROS
+#include &amp;lt;inttypes.h&amp;gt;
+#undef __STDC_FORMAT_MACROS
+#endif
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://stackoverflow.com/questions/12497894/d-stdc-format-macros-gnu-compiler-option&quot;&gt;stackoverflow 讨论&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;通读源码&quot;&gt;通读源码&lt;/h2&gt;
+
+&lt;p&gt;Timestamp整体实现比较简单。从静态函数now()开始看起,其余函数围绕now得到的时间，进行格式化输出等操作。&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Timestamp Timestamp::now()
+{
+  struct timeval tv;
+  gettimeofday(&amp;amp;tv, NULL);
+  int64_t seconds = tv.tv_sec;
+  return Timestamp(seconds * kMicroSecondsPerSecond + tv.tv_usec);
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;gettimeofday原型&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#include &amp;lt;sys/time.h&amp;gt;
+
+int gettimeofday(struct timeval *restrict tv,
+                struct timezone *restrict tz);
+int settimeofday(const struct timeval *tv,
+                const struct timezone *tz);
+/*
+struct timeval {
+        time_t      tv_sec;     /* seconds */
+        suseconds_t tv_usec;    /* microseconds */
+    };
+struct timezone {
+        int tz_minuteswest;     /* minutes west of Greenwich */
+        int tz_dsttime;         /* type of DST correction */
+    };
+
+@ret: return 0 for success.On error, -1 is returned and errno is set to indicate the error.
+*/
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;gettimeofday是C库提供的函数，其封装了sys_gettimeofday系统调用。但在x64结构上，gettimeofday可以不通过系统调用拿到系统时间。先看2个概念:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;墙上时间:即实际时间（1970/1/1号以来的时间），它是由我们主板电池供电的（装过PC机的同学都了解）RTC单元存储的，这样即使机器断电了时间也不用重设。当操作系统启动时，会用这个RTC来初始化墙上时间，接着，内核会在一定精度内根据jiffies维护这个墙上时间。&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;jiffies：就是操作系统启动后经过的时间，它的单位是节拍数。有些体系架构，1个节拍数是10ms，但我们常用的x86体系下，1个节拍数是1ms。也就是说，jiffies这个全局变量存储了操作系统启动以来共经历了多少毫秒。&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;x64下do_gettimeofday&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;void do_gettimeofday(struct timeval *tv)
+{
+	unsigned long seq, t;
+ 	unsigned int sec, usec;
+ 
+	do {
+		seq = read_seqbegin(&amp;amp;xtime_lock);
+ 
+		sec = xtime.tv_sec;
+		usec = xtime.tv_nsec / 1000;
+		t = (jiffies - wall_jiffies) * (1000000L / HZ) +
+			do_gettimeoffset();
+		usec += t;
+ 
+	} while (read_seqretry(&amp;amp;xtime_lock, seq));
+ 
+	tv-&amp;gt;tv_sec = sec + usec / 1000000;
+	tv-&amp;gt;tv_usec = usec % 1000000;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;可以看出是通过xtime和jiffies共同得出的tv，没有经过系统调用。
+更多的讨论请看&lt;a href=&quot;https://blog.csdn.net/russell_tao/article/details/7185588&quot;&gt;浅谈时间函数gettimeofday的成本-陶辉&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;其他函数不再讨论&lt;/p&gt;
+
+&lt;h2 id=&quot;unittest代码&quot;&gt;unittest代码&lt;/h2&gt;
+
+&lt;p&gt;benchmark部分：&lt;/p&gt;
+
+&lt;p&gt;调用Timestamp::now()填充一个大小为1M的std::vector&lt;Timestamp&gt;，并且打印出小于100ms的延迟分布情况&lt;/Timestamp&gt;&lt;/p&gt;
+</description>
+        <pubDate>Mon, 24 May 2021 00:00:00 +0000</pubDate>
+        <link>https://pusidun.github.io/2021/05/muduo_base01/</link>
+        <guid isPermaLink="true">https://pusidun.github.io/2021/05/muduo_base01/</guid>
+        
+        <category>大并发服务器开发</category>
+        
+        <category>muduo</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>select/poll/epoll</title>
+        <description>&lt;!-- TOC --&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;#select&quot;&gt;select&lt;/a&gt;
+    &lt;ul&gt;
+      &lt;li&gt;&lt;a href=&quot;#api&quot;&gt;API&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#socket何时可读写&quot;&gt;socket何时可读写&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#poll&quot;&gt;poll&lt;/a&gt;
+    &lt;ul&gt;
+      &lt;li&gt;&lt;a href=&quot;#api-1&quot;&gt;API&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#poll使用案例&quot;&gt;poll使用案例&lt;/a&gt;
+        &lt;ul&gt;
+          &lt;li&gt;&lt;a href=&quot;#代码几点说明&quot;&gt;代码几点说明&lt;/a&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;a href=&quot;#代码存在的缺陷&quot;&gt;代码存在的缺陷&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#epoll&quot;&gt;epoll&lt;/a&gt;
+    &lt;ul&gt;
+      &lt;li&gt;&lt;a href=&quot;#api-2&quot;&gt;API&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#epoll-lt例子&quot;&gt;epoll LT例子&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#select-poll-epoll-比较&quot;&gt;select poll epoll 比较&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;!-- /TOC --&gt;
+&lt;h2 id=&quot;select&quot;&gt;select&lt;/h2&gt;
+
+&lt;h3 id=&quot;api&quot;&gt;API&lt;/h3&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;/*
+@作用：在一定时间内，监听用户感兴趣的文件描述符上的可读可写和异常事件
+
+@返回值：
+
+成功时返回就绪文件描述符总数。
+
+失败时返回-1并设置errno。如果再select等待期间程序收到信号，select立即返回-1，并设置errno为EINTR
+
+@说明：
+
+nfds:监听的文件描述符总数，等于最大文件描述符值+1
+fd_set:结构体，操作
+    FD_ZERO(fd_set* fdset);
+    FD_SET(int fd, fd_set* fdset);
+    FD_CLR(int fd, fd_set* fdset);
+    int FD_ISSET(int fd, fd_set* fdset);
+timeout:
+    struct timeval{
+        long tv_sec;
+        long tv_usec;
+    };
+*/
+#include&amp;lt;sys/select.h&amp;gt;
+int select(int nfds, fd_set* readfds, fd_set* writefds, fd_set* exceptfds,
+            struct timeval* timeout);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;socket何时可读写&quot;&gt;socket何时可读写&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;以下情况socket可读&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;socket内核接受缓冲区中的字节数大于等于低水位标记SO_RCVLOWAT&lt;/li&gt;
+  &lt;li&gt;socket通信对方关闭连接。此时读操作返回0&lt;/li&gt;
+  &lt;li&gt;监听socket上有新的连接请求&lt;/li&gt;
+  &lt;li&gt;socket上有未处理的错误。此时我们可以使用getsockopt来读取和清除错误&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;以下情况socket可写&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;socket内核发送缓冲区的可用字节数大于或等于低水位标记SO_SNDLOWAT&lt;/li&gt;
+  &lt;li&gt;socket写操作被关闭。对写操作被关闭的socket执行写操作或触发SIGPIPE&lt;/li&gt;
+  &lt;li&gt;socket使用非阻塞connect连接成功或者失败（超时）之后&lt;/li&gt;
+  &lt;li&gt;socket上有未处理的错误。此时我们可以使用getsockopt来读取和清除错误&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;poll&quot;&gt;poll&lt;/h2&gt;
+
+&lt;h3 id=&quot;api-1&quot;&gt;API&lt;/h3&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;/*
+@作用：把当前的文件指针挂到等待队列 (多路检测可用套接字)
+
+@返回值：
+成功时，poll()返回结构体中revents域不为0的文件描述符个数；
+如果在超时前没有任何事件发生，poll()返回0；
+ 
+失败时，poll()返回-1，并设置errno为下列值之一：
+    EBADF：一个或多个结构体中指定的文件描述符无效。
+　　EFAULT：fds指针指向的地址超出进程的地址空间。
+　　EINTR：请求的事件之前产生一个信号，调用可以重新发起。
+　　EINVAL：nfds参数超出PLIMIT_NOFILE值。
+　　ENOMEM：可用内存不足，无法完成请求。
+*/
+#include&amp;lt;poll.h&amp;gt;
+int poll(struct pollfd fd[], nfds_t nfds, int timeout);
+
+/*
+struct pollfd的结构如下：
+ 
+struct pollfd{
+ 
+　int fd； // 文件描述符
+ 
+　short event；// 请求的事件
+ 
+　short revent；// 返回的事件
+ 
+}
+每个pollfd结构体指定了一个被监视的文件描述符。
+ 
+每个结构体的events是监视该文件描述符的事件掩码，由用户来设置。
+revents是文件描述符的操作结果事件，内核在调用返回时设置。
+events中请求的任何事件都可能在revents中返回。
+
+第一个参数是一个数组，即poll函数可以监视多个文件描述符。
+第二个参数nfds：要监视的描述符的数目。
+第三个参数timeout: 指定等待的毫秒数，无论I/O是否准备好，poll都会返回。
+                   timeout指定为负数值表示无限超时；
+                   timeout为0指示poll调用立即返回并列出准备好I/O的文件描述符，但并不等待其它的事件。这种情况下，poll()就像它的名字那样，一旦选举出来，立即返回。
+*/
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;poll使用案例&quot;&gt;poll使用案例&lt;/h3&gt;
+
+&lt;p&gt;echoserv.cc&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#include &amp;lt;unistd.h&amp;gt;
+#include &amp;lt;sys/types.h&amp;gt;
+#include &amp;lt;fcntl.h&amp;gt;
+#include &amp;lt;sys/socket.h&amp;gt;
+#include &amp;lt;netinet/in.h&amp;gt;
+#include &amp;lt;arpa/inet.h&amp;gt;
+#include &amp;lt;signal.h&amp;gt;
+#include &amp;lt;sys/wait.h&amp;gt;
+#include &amp;lt;poll.h&amp;gt;
+
+#include &amp;lt;stdlib.h&amp;gt;
+#include &amp;lt;stdio.h&amp;gt;
+#include &amp;lt;errno.h&amp;gt;
+#include &amp;lt;string.h&amp;gt;
+
+#include &amp;lt;vector&amp;gt;
+#include &amp;lt;iostream&amp;gt;
+
+#define ERR_EXIT(m)         \
+	do                      \
+	{                       \
+		perror(m);          \
+		exit(EXIT_FAILURE); \
+	} while (0)
+
+typedef std::vector&amp;lt;struct pollfd&amp;gt; PollFdList;
+
+int main(void)
+{
+	signal(SIGPIPE, SIG_IGN);
+	signal(SIGCHLD, SIG_IGN); //避免僵死进程
+
+	int listenfd;
+
+	//监听套接字                                     //非阻塞
+	if ((listenfd = socket(PF_INET, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, IPPROTO_TCP)) &amp;lt; 0)
+		ERR_EXIT(&quot;socket&quot;);
+
+	//填充地址相关
+	struct sockaddr_in servaddr;
+	memset(&amp;amp;servaddr, 0, sizeof(servaddr));
+	servaddr.sin_family = AF_INET;
+	servaddr.sin_port = htons(5188);
+	servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+
+	int on = 1;
+	//设置地址的重复利用
+	if (setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &amp;amp;on, sizeof(on)) &amp;lt; 0)
+		ERR_EXIT(&quot;setsockopt&quot;);
+
+	//绑定
+	if (bind(listenfd, (struct sockaddr *)&amp;amp;servaddr, sizeof(servaddr)) &amp;lt; 0)
+		ERR_EXIT(&quot;bind&quot;);
+	//监听
+	if (listen(listenfd, SOMAXCONN) &amp;lt; 0)
+		ERR_EXIT(&quot;listen&quot;);
+
+	//========================poll的使用=======================//
+	struct pollfd pfd;
+	pfd.fd = listenfd;
+	pfd.events = POLLIN; //关注POLLIN（读）事件
+
+	PollFdList pollfds; //pollfd队列
+	pollfds.push_back(pfd);
+
+	int nready; //待处理的事件数
+
+	struct sockaddr_in peeraddr;
+	socklen_t peerlen;
+	int connfd;
+
+	while (1)
+	{
+		nready = poll(pollfds.data(), pollfds.size(), -1); //无限超时等待
+		if (nready == -1)
+		{
+			if (errno == EINTR)
+				continue;
+
+			ERR_EXIT(&quot;poll&quot;);
+		}
+		if (nready == 0) // nothing happended
+			continue;
+
+		if (pollfds[0].revents &amp;amp; POLLIN) //判断是否有POLLIN事件到来
+		{
+			peerlen = sizeof(peeraddr);
+			connfd = accept4(listenfd, (struct sockaddr *)&amp;amp;peeraddr,
+							 &amp;amp;peerlen, SOCK_NONBLOCK | SOCK_CLOEXEC); //非阻塞的  CLOEXEC标记的
+
+			if (connfd == -1)
+				ERR_EXIT(&quot;accept4&quot;);
+
+			//把得到的已连接的套接字加入监听队列
+			pfd.fd = connfd;
+			pfd.events = POLLIN;
+			pfd.revents = 0;
+			pollfds.push_back(pfd);
+			--nready;
+
+			//连接成功
+			std::cout &amp;lt;&amp;lt; &quot;ip=&quot; &amp;lt;&amp;lt; inet_ntoa(peeraddr.sin_addr) &amp;lt;&amp;lt; &quot; port=&quot; &amp;lt;&amp;lt; ntohs(peeraddr.sin_port) &amp;lt;&amp;lt; std::endl;
+
+			//说明事件都处理完了
+			if (nready == 0)
+				continue;
+		}
+
+		//遍历已连接字套接字子集
+		for (PollFdList::iterator it = pollfds.begin() + 1; //第一个套接字总是监听套接字
+			 it != pollfds.end() &amp;amp;&amp;amp; nready &amp;gt; 0; ++it)
+		{
+			if (it-&amp;gt;revents &amp;amp; POLLIN) //具有可读事件
+			{
+				--nready; //处理一个事件，待处理事件数减一
+
+				connfd = it-&amp;gt;fd;
+				char buf[1024] = {0};
+				int ret = read(connfd, buf, 1024);
+				if (ret == -1)
+					ERR_EXIT(&quot;read&quot;);
+				if (ret == 0) //对方关闭了套接字
+				{
+					std::cout &amp;lt;&amp;lt; &quot;client close&quot; &amp;lt;&amp;lt; std::endl;
+					it = pollfds.erase(it); //移除
+					--it;
+
+					close(connfd);
+					continue;
+				}
+
+				std::cout &amp;lt;&amp;lt; buf;
+				write(connfd, buf, strlen(buf));
+			}
+		}
+	}
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h4 id=&quot;代码几点说明&quot;&gt;代码几点说明&lt;/h4&gt;
+
+&lt;p&gt;SIGPIPE: 客户端关闭了套接字close，服务端会收到RST segment。若服务端再次调用write，会产生SIGPIPE，默认是退出进程&lt;/p&gt;
+
+&lt;p&gt;SIGCHLD: SIGCHLD避免僵死进程&lt;/p&gt;
+
+&lt;p&gt;time_wait对服务器影响：应该避免服务器的time_wait状态。os会保留一定资源维护该状态，不适合大并发情况。在协议设计上，应该让客户端断开连接，同时服务器有机制去踢掉不活跃的连接。&lt;/p&gt;
+
+&lt;h4 id=&quot;代码存在的缺陷&quot;&gt;代码存在的缺陷&lt;/h4&gt;
+
+&lt;p&gt;1、read可能并没有把connfd接收缓冲区的数据都读完，那么connfd仍然是活跃的。我们应该将读到的数据保存在connfd的应用层缓冲区。&lt;/p&gt;
+
+&lt;p&gt;2、write时发送缓冲区满了，因为connfd是非阻塞的，数据可能丢失。我们应该有一个应用层的发送缓冲区。&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;ret = write(connfd, buf, strlen(buf));
+if(ret &amp;lt; 10000) {
+	//将未发送的数据添加到应用层缓冲区OutBuffer
+	//关注connfd的POLLOUT事件
+}
+//connfd POLLOUT事件到来
+//取出应用层缓冲区中的数据发送write(connfd,...);
+//如果应用层缓冲区中的数据发送完毕，取消关注POLLOUT事件
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;3、accept(2)返回EMFILE（太多的文件描述符）&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;调高进程的文件描述符数目&lt;/li&gt;
+  &lt;li&gt;死等&lt;/li&gt;
+  &lt;li&gt;退出程序&lt;/li&gt;
+  &lt;li&gt;关闭监听套接字&lt;/li&gt;
+  &lt;li&gt;如果是epoll模型，可以用ET&lt;/li&gt;
+  &lt;li&gt;准备一个空闲的文件描述符。遇到这种情况先关闭该文件描述符，然后accept拿到文件描述符后立刻关闭，这样就优雅的断开了和客户端的连接，最后再打开空闲文件描述符。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;if(errno == EMFILE)
+{
+	close(idlefd);
+	idlefd = accept(listenfd, NULL, NULL);
+	close(idlefd);
+	idlefd = open(&quot;/dev/null&quot;, O_RDONLY | O_CLOEXEC);
+	continue;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;epoll&quot;&gt;epoll&lt;/h2&gt;
+
+&lt;h3 id=&quot;api-2&quot;&gt;API&lt;/h3&gt;
+
+&lt;p&gt;epoll_create&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;/*
+@作用：创建一个epoll的句柄
+
+@返回：调用成功时返回一个epoll句柄描述符，失败时返回-1。
+
+@说明：
+size
+表明内核要监听的描述符数量 自从Linux 2.6.8开始，size参数被忽略，但是依然要大于0。
+ 
+ 
+flags：
+0:             如果这个参数是0，这个函数等价于poll_create（0）
+EPOLL_CLOEXEC：这是这个参数唯一的有效值，如果这个参数设置为这个。
+               那么当进程替换映像的时候会关闭这个文件描述符，
+               这样新的映像中就无法对这个文件描述符操作，适用于多进程编程+映像替换的环境里
+*/
+#include &amp;lt;sys/epoll.h&amp;gt;
+int epoll_create(int size);
+int epoll_create1(int flags);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;epoll_ctl&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;/*
+@作用：操作一个多路复用的文件描述符
+
+@返回：success：0   error：-1 errno被设置
+
+@说明：
+epfd：epoll_create1的返回值
+ 
+op：要执行的命令
+EPOLL_CTL_ADD：向多路复用实例加入一个连接socket的文件描述符
+EPOLL_CTL_MOD：改变多路复用实例中的一个socket的文件描述符的触发事件
+EPOLL_CTL_DEL：移除多路复用实例中的一个socket的文件描述符
+ 
+fd：要操作的socket的文件描述符
+ 
+event：
+typedef union epoll_data {
+               void        *ptr;
+               int          fd;
+               uint32_t     u32;
+               uint64_t     u64;
+           } epoll_data_t;
+ 
+struct epoll_event {
+               uint32_t     events;      /* Epoll events */
+               epoll_data_t data;        /* User data variable */
+};
+events可以是下列命令的任意按位与
+EPOLLIN： 对应的文件描述有可以读取的内容
+EPOLLOUT：对应的文件描述符有可以写入
+EPOLLRDHUP：写到一半的时候连接断开
+EPOLLPRI：发生异常情况，比如所tcp连接中收到了带外消息
+EPOLLET： 设置多路复用实例的文件描述符的事件触发机制为边沿触发，默认为水平触发
+1、当多路复用的实例中注册了一个管道，并且设置了触发事件EPOLLIN，
+2、管道对端的写入2kb的数据，
+3、epoll_wait收到了一个可读事件，并向上层抛出，这个文件描述符
+4、调用者调用read读取了1kb的数据，
+5、再次调用epoll_wait
+ 
+ 
+边沿触发：上面的调用结束后，在输入缓存区中还有1kb的数据没有读取，但是epoll_wait将不会再抛出文件描述符。这就导致接受数据不全，对端得不到回应，可能会阻塞或者自己关闭
+因为边沿触发的模式下，只有改变多路复用实例中某个文件描述符的状态，才会抛出事件。
+相当于，边沿触发方式，内核只会在第一次通知调用者，不管对这个文件描述符做了怎么样的操作
+ 
+水平触发：
+只要文件描述符处于可操作状态，每次调用epoll_wait，内核都会通知你
+ 
+EPOLLONESHOT：epoll_wait只会对该文件描述符第一个到达的事件有反应，之后的其他事件都不向调用者抛出。需要调用epoll_ctl函数，对它的事件掩码重新设置
+EPOLLWAKEUP
+EPOLLEXCLUSIVE
+*/
+#include &amp;lt;sys/epoll.h&amp;gt;
+int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;epoll_wait&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;/*
+@作用：等待一个epoll队列中的文件描述符的I/O事件发生
+
+@返回：&amp;gt;=0，表示准备就绪的文件描述符个数      -1：出错，errno被设置
+
+@说明：
+epfd：目标epoll队列的描述符
+events：用于放置epoll队列中准备就绪（被触发）的事件
+maxevents：最大事件？
+timeout：指定函数等待的时间。这个函数阻塞这么长一段时间之后接触阻塞。
+
+#include &amp;lt;sys/epoll.h&amp;gt;
+int epoll_wait(int epfd, struct epoll_event *events,int maxevents, int timeout);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;epoll-lt例子&quot;&gt;epoll LT例子&lt;/h3&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#include &amp;lt;unistd.h&amp;gt;
+#include &amp;lt;sys/types.h&amp;gt;
+#include &amp;lt;fcntl.h&amp;gt;
+#include &amp;lt;sys/socket.h&amp;gt;
+#include &amp;lt;netinet/in.h&amp;gt;
+#include &amp;lt;arpa/inet.h&amp;gt;
+#include &amp;lt;signal.h&amp;gt;
+#include &amp;lt;fcntl.h&amp;gt;
+#include &amp;lt;sys/wait.h&amp;gt;
+#include &amp;lt;sys/epoll.h&amp;gt;
+ 
+#include &amp;lt;stdlib.h&amp;gt;
+#include &amp;lt;stdio.h&amp;gt;
+#include &amp;lt;errno.h&amp;gt;
+#include &amp;lt;string.h&amp;gt;
+ 
+#include &amp;lt;vector&amp;gt;
+#include &amp;lt;algorithm&amp;gt;
+#include &amp;lt;iostream&amp;gt;
+ 
+typedef std::vector&amp;lt;struct epoll_event&amp;gt; EventList;
+ 
+#define ERR_EXIT(m) \
+        do \
+        { \
+                perror(m); \
+                exit(EXIT_FAILURE); \
+        } while(0)
+ 
+int main(void)
+{
+	signal(SIGPIPE, SIG_IGN);
+	signal(SIGCHLD, SIG_IGN);
+ 
+	int idlefd = open(&quot;/dev/null&quot;, O_RDONLY | O_CLOEXEC);
+	int listenfd;
+    
+	if ((listenfd = socket(PF_INET, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, IPPROTO_TCP)) &amp;lt; 0)
+		ERR_EXIT(&quot;socket&quot;);
+ 
+	struct sockaddr_in servaddr;
+	memset(&amp;amp;servaddr, 0, sizeof(servaddr));
+	servaddr.sin_family = AF_INET;
+	servaddr.sin_port = htons(5188);
+	servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+ 
+	int on = 1;
+	if (setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &amp;amp;on, sizeof(on)) &amp;lt; 0)
+		ERR_EXIT(&quot;setsockopt&quot;);
+ 
+	if (bind(listenfd, (struct sockaddr*)&amp;amp;servaddr, sizeof(servaddr)) &amp;lt; 0)
+		ERR_EXIT(&quot;bind&quot;);
+	if (listen(listenfd, SOMAXCONN) &amp;lt; 0)
+		ERR_EXIT(&quot;listen&quot;);
+
+	//===========================================epoll用法==============================================//
+	std::vector&amp;lt;int&amp;gt; clients;
+	int epollfd;
+	epollfd = epoll_create1(EPOLL_CLOEXEC);
+ 
+	struct epoll_event event;
+	event.data.fd = listenfd; //加入监听套接字
+	event.events = EPOLLIN;    //关注它的可读事件，默认的触发模式是LT模式         /* | EPOLLET*/;
+ 
+	//添加关注事件和监听套接字到epollfd
+	epoll_ctl(epollfd, EPOLL_CTL_ADD, listenfd, &amp;amp;event);
+	
+	EventList events(16); //事件列表
+ 
+	struct sockaddr_in peeraddr;
+	socklen_t peerlen;
+	int connfd;
+ 
+	int nready;
+	while (1)
+	{
+ 
+		nready = epoll_wait(epollfd, &amp;amp;*events.begin(), static_cast&amp;lt;int&amp;gt;(events.size()), -1); //-1设置为超时等待
+		if (nready == -1)
+		{
+			if (errno == EINTR)
+				continue;
+			
+			ERR_EXIT(&quot;epoll_wait&quot;);
+		}
+		//无事件发生
+		if (nready == 0)	// nothing happended
+			continue;
+ 
+        //事件列表满了 倍增
+		if ((size_t)nready == events.size())
+			events.resize(events.size()*2);
+ 
+        //统一处理事件（监听和已连接）
+		for (int i = 0; i &amp;lt; nready; ++i)
+		{
+			//处理监听套接字
+			if (events[i].data.fd == listenfd)
+			{
+				peerlen = sizeof(peeraddr);
+				connfd = ::accept4(listenfd, (struct sockaddr*)&amp;amp;peeraddr,
+						&amp;amp;peerlen, SOCK_NONBLOCK | SOCK_CLOEXEC); //非阻塞  closeexec
+ 
+                //错误处理
+				if (connfd == -1)
+				{
+					if (errno == EMFILE)
+					{
+						close(idlefd);
+						idlefd = accept(listenfd, NULL, NULL);
+						close(idlefd);
+						idlefd = open(&quot;/dev/null&quot;, O_RDONLY | O_CLOEXEC);
+						continue;
+					}
+					else
+						ERR_EXIT(&quot;accept4&quot;);
+				}
+ 
+ 
+				std::cout&amp;lt;&amp;lt;&quot;ip=&quot;&amp;lt;&amp;lt;inet_ntoa(peeraddr.sin_addr)&amp;lt;&amp;lt;
+					&quot; port=&quot;&amp;lt;&amp;lt;ntohs(peeraddr.sin_port)&amp;lt;&amp;lt;std::endl;
+                      
+				clients.push_back(connfd);
+				
+				//将该文件描述符加入关注 
+				event.data.fd = connfd;
+				event.events = EPOLLIN; //电平触发     /* | EPOLLET*/
+				epoll_ctl(epollfd, EPOLL_CTL_ADD, connfd, &amp;amp;event);
+			}
+			//处理已连接套接字（都是活跃的套接字）
+			else if (events[i].events &amp;amp; EPOLLIN)
+			{
+				connfd = events[i].data.fd;
+				if (connfd &amp;lt; 0)
+					continue;
+ 
+				char buf[1024] = {0};
+				int ret = read(connfd, buf, 1024);
+				if (ret == -1)
+					ERR_EXIT(&quot;read&quot;);
+				if (ret == 0) //对方关闭
+				{
+					std::cout&amp;lt;&amp;lt;&quot;client close&quot;&amp;lt;&amp;lt;std::endl;
+					close(connfd);
+					event = events[i];
+					epoll_ctl(epollfd, EPOLL_CTL_DEL, connfd, &amp;amp;event);
+					clients.erase(std::remove(clients.begin(), clients.end(), connfd), clients.end());
+					continue;
+				}
+ 
+				std::cout&amp;lt;&amp;lt;buf;
+				write(connfd, buf, strlen(buf));
+			}
+ 
+		}
+	}
+ 
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;select-poll-epoll-比较&quot;&gt;select poll epoll 比较&lt;/h2&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/select_poll_epoll_01.jpg&quot; alt=&quot;img&quot; /&gt;&lt;/p&gt;
+</description>
+        <pubDate>Thu, 20 May 2021 00:00:00 +0000</pubDate>
+        <link>https://pusidun.github.io/2021/05/linux-selectpollepoll/</link>
+        <guid isPermaLink="true">https://pusidun.github.io/2021/05/linux-selectpollepoll/</guid>
+        
+        <category>大并发服务器开发</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>socket编程(二)</title>
+        <description>&lt;!-- TOC --&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;#流协议与粘包&quot;&gt;流协议与粘包&lt;/a&gt;
+    &lt;ul&gt;
+      &lt;li&gt;&lt;a href=&quot;#产生原因&quot;&gt;产生原因:&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#粘包处理方案--本质上是要在应用层维护消息与消息的边界&quot;&gt;粘包处理方案–本质上是要在应用层维护消息与消息的边界&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#readwrite与recvsend&quot;&gt;read、write与recv、send&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#getsocknamegetpeername&quot;&gt;getsockname、getpeername&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#gethostnamegethostbynamegethostbyaddr&quot;&gt;gethostname、gethostbyname、gethostbyaddr&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#僵进程与sigchld信号&quot;&gt;僵进程与SIGCHLD信号&lt;/a&gt;
+    &lt;ul&gt;
+      &lt;li&gt;&lt;a href=&quot;#wait&quot;&gt;wait&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#waitpid&quot;&gt;waitpid&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#wait与waitpid区别&quot;&gt;wait与waitpid区别&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;!-- /TOC --&gt;
+&lt;h2 id=&quot;流协议与粘包&quot;&gt;流协议与粘包&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;争议&lt;/strong&gt;：粘包并非专业术语，该数据包应指应用层的包。常常由于应用层未提供数据边界，而TCP作为流式传输协议，造成客户端无法区分数据包起始所造成的现象。&lt;strong&gt;TCP粘包为绝对的错误说法&lt;/strong&gt;，TCP不存在包的概念。&lt;/p&gt;
+
+&lt;h3 id=&quot;产生原因&quot;&gt;产生原因:&lt;/h3&gt;
+
+&lt;p&gt;1.SQ_SNDBUF套接字本身有缓冲区（发送缓冲区，接收缓冲区）&lt;/p&gt;
+
+&lt;p&gt;2.tcp传送的网络数据最大值MSS大小限制&lt;/p&gt;
+
+&lt;p&gt;3.链路层也有MTU（最大传输单元）大小限制，如果数据包大于&amp;gt;MTU要在IP层进行分片，导致消息分割。&lt;/p&gt;
+
+&lt;p&gt;4.tcp的流量控制和拥塞控制，也可能导致粘包&lt;/p&gt;
+
+&lt;p&gt;5.tcp延迟发送机制等等&lt;/p&gt;
+
+&lt;p&gt;结论：TCP/IP协议，在传输层没有处理粘包问题，必须由程序员处理&lt;/p&gt;
+
+&lt;h3 id=&quot;粘包处理方案本质上是要在应用层维护消息与消息的边界&quot;&gt;粘包处理方案–本质上是要在应用层维护消息与消息的边界&lt;/h3&gt;
+
+&lt;p&gt;1.定包长&lt;/p&gt;
+
+&lt;p&gt;2.包尾加\r\n（比如ftp协议）&lt;/p&gt;
+
+&lt;p&gt;3.包头加上包体长度&lt;/p&gt;
+
+&lt;p&gt;4.更复杂的应用层协议&lt;/p&gt;
+
+&lt;p&gt;例子：定义packet结构体&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;typedef struct _packet
+{
+    int len; //定义包体长度
+    char buf[1024]; //定义包体
+} Packet;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;a href=&quot;/assets/src/packet/readn.c&quot;&gt;readn.c&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;/assets/src/packet/writen.c&quot;&gt;writen.c&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;readwrite与recvsend&quot;&gt;read、write与recv、send&lt;/h2&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#include &amp;lt;sys/types.h&amp;gt; 
+#include &amp;lt;sys/socket.h&amp;gt;
+int recv(int sockfd,void *buf,int len,int flags)
+ 
+int send(int sockfd,void *buf,int len,int flags)
+
+/*
+前面的三个参数和read,write相同，第四个参数能够是0或是以下的组合：
+ 
+______________________________________________________________
+ 
+| MSG_DONTROUTE | 不查找路由表 |
+ 
+| MSG_OOB       | 接受或发送带外数据 |
+ 
+| MSG_PEEK      | 查看数据,并不从系统缓冲区移走数据 |
+ 
+| MSG_WAITALL   | 等待任何数据 |
+ 
+|————————————————————–|
+ 
+ 
+MSG_DONTROUTE:
+是send函数使用的标志.这个标志告诉IP协议.目的主机在本地网络上面,没有必要查找路由表.这个标志一般用网络诊断和路由程式里面.
+ 
+MSG_OOB:
+表示能够接收和发送带外的数据.关于带外数据我们以后会解释的.
+ 
+MSG_PEEK:
+是recv函数的使用标志,表示只是从系统缓冲区中读取内容,而不清楚系统缓冲区的内容.
+这样下次读的时候,仍然是相同的内容.一般在有多个进程读写数据时能够使用这个标志.
+ 
+MSG_WAITALL
+是recv函数的使用标志,表示等到任何的信息到达时才返回.
+使用这个标志的时候recv回一直阻塞,直到指定的条件满足,或是发生了错误.1
+*/
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;getsocknamegetpeername&quot;&gt;getsockname、getpeername&lt;/h2&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;//getsockname函数用于获取与某个套接字关联的本地协议地址
+//getpeername函数用于获取与某个套接字关联的外地协议地址
+//对于这两个函数，如果函数调用成功，则返回0，如果调用出错，则返回-1。
+#include&amp;lt;sys/socket.h&amp;gt;
+int getsockname(int sockfd, struct sockaddr *localaddr, socklen_t *addrlen);
+int getpeername(int sockfd, struct sockaddr *peeraddr, socklen_t *addrlen); 
+
+/*
+使用这两个函数，我们可以通过套接字描述符来获取自己的IP地址和连接对端的IP地址，
+如在未调用bind函数的TCP客户端程序上，可以通过调用getsockname()函数获取由内核赋予该连接的本地IP地址和本地端口号，
+还可以在TCP的服务器端accept成功后，通过getpeername()函数来获取当前连接的客户端的IP地址和端口号。
+*/
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;gethostnamegethostbynamegethostbyaddr&quot;&gt;gethostname、gethostbyname、gethostbyaddr&lt;/h2&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;/*
+gethostname() ： 返回本地主机的标准主机名。
+gethostbyname(): 通过主机名称获取主机的信息
+gethostbyaddr(): 通过一个IPv4的地址来获取主机信息
+
+返回值
+gethostname()  ： 函数成功，则返回0。如果发生错误则返回-1。错误号存放在外部变量errno中。
+gethostbyname(): 返回hostent结构体类型指针 
+gethostbyaddr(): 返回hostent结构体类型指针
+*/
+#include &amp;lt;netdb.h&amp;gt;
+#include &amp;lt;unistd.h&amp;gt;
+int              gethostname(char *name, size_t len);
+struct hostent*  gethostbyname(const char *name);
+struct hostent * gethostbyaddr(const char * addr, socklen_t len, int family);
+
+/*
+gethostname() ： 
+接收缓冲区name，其长度必须为len字节或是更长,存获得的主机名。
+接收缓冲区name的最大长度
+ 
+ 
+gethostbyname(): 
+传入值是域名或者主机名，例如&quot;www.google.cn&quot;等等。传出值，是一个hostent的结构。
+ 
+ 
+gethostbyaddr(): 
+addr：指向网络字节顺序地址的指针。
+len： 地址的长度，在AF_INET类型地址中为4。
+type：地址类型，应为AF_INE
+*/
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;僵进程与sigchld信号&quot;&gt;僵进程与SIGCHLD信号&lt;/h2&gt;
+
+&lt;p&gt;一个进程执行了exit系统调用退出时会向父进程发送SIGCHLD信号，而其父进程并没有为它收尸(调用wait或waitpid来获得它的结束状态，如进程ID、终止状态等等)的进程。&lt;/p&gt;
+
+&lt;p&gt;设置僵死状态的目的是维护子进程的信息，以便父进程在以后某个时候获取。&lt;/p&gt;
+
+&lt;p&gt;如何避免僵尸进程：&lt;/p&gt;
+
+&lt;p&gt;1、通过signal(SIGCHLD, SIG_IGN)通知内核对子进程的结束不关心，由内核回收。
+2、父进程调用wait/waitpid等函数等待子进程结束，如果尚无子进程退出wait会导致父进程阻塞。waitpid可以通过传递WNOHANG使父进程不阻塞立即返回。
+3、如果父进程很忙可以用signal注册信号处理函数，在信号处理函数调用wait/waitpid等待子进程退出。
+4、通过两次调用fork。父进程首先调用fork创建一个子进程然后waitpid等待子进程退出，子进程再fork一个孙进程后退出。这样子进程退出后会被父进程等待回收，而对于孙子进程其父进程已经退出所以孙进程成为一个孤儿进程，孤儿进程由init进程接管，孙进程结束后，init会等待回收。&lt;/p&gt;
+
+&lt;h3 id=&quot;wait&quot;&gt;wait&lt;/h3&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;//成功，wait会返回被收集的子进程的进程ID，如果调用进程没有子进程，调用就会失败，此时wait返回-1，同时errno被置为ECHIL
+#include &amp;lt;sys/types.h&amp;gt; 
+#include &amp;lt;sys/wait.h&amp;gt;
+pid_t wait(int *status);
+
+/*
+进程一旦调用了wait，就立即阻塞自己.
+wait系统调用会使父进程暂停执行，直到它的一个子进程结束为止。
+返回的是子进程的PID，它通常是结束的子进程
+状态信息允许父进程判定子进程的退出状态，即从子进程的main函数返回的值或子进程中exit语句的退出码。
+如果status不是一个空指针，状态信息将被写入它指向的位置
+*/
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;waitpid&quot;&gt;waitpid&lt;/h3&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;//返回值：如果成功返回等待子进程的ID，失败返回-1
+#include &amp;lt;sys/types.h&amp;gt; 
+#include &amp;lt;sys/wait.h&amp;gt;
+pid_t waitpid(pid_t pid, int *status, int options);
+/*
+status:如果不是空，会把状态信息写到它指向的位置，与wait一样
+
+options：允许改变waitpid的行为，最有用的一个选项是WNOHANG,它的作用是防止waitpid把调用者的执行挂起
+ 
+----------------------------------------------------------------------------
+|-对于waitpid的p i d参数的解释与其值有关：
+|-
+|-pid == -1 等待任一子进程。于是在这一功能方面waitpid与wait等效。
+|-
+|-pid &amp;gt; 0 等待其进程I D与p i d相等的子进程。
+|-
+|-pid == 0 等待其组I D等于调用进程的组I D的任一子进程。换句话说是与调用者进程同在一个组的进程。
+|-
+|-pid &amp;lt; -1 等待其组I D等于p i d的绝对值的任一子进程
+----------------------------------------------------------------------------
+*/
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;wait与waitpid区别&quot;&gt;wait与waitpid区别&lt;/h3&gt;
+
+&lt;p&gt;在一个子进程终止前， wait 使其调用者阻塞，而waitpid 有一选择项，可使调用者不阻塞。&lt;/p&gt;
+
+&lt;p&gt;waitpid并不等待第一个终止的子进程—它有若干个选择项，可以控制它所等待的特定进程。&lt;/p&gt;
+
+&lt;p&gt;实际上wait函数是waitpid函数的一个特例。waitpid(-1, &amp;amp;status, 0);&lt;/p&gt;
+
+</description>
+        <pubDate>Wed, 19 May 2021 00:00:00 +0000</pubDate>
+        <link>https://pusidun.github.io/2021/05/linux-socket2/</link>
+        <guid isPermaLink="true">https://pusidun.github.io/2021/05/linux-socket2/</guid>
+        
+        <category>Linux</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>socket编程(一)</title>
+        <description>&lt;!-- TOC --&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;#ipv4套接字地址结构&quot;&gt;IPv4套接字地址结构&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#字节序转换函数&quot;&gt;字节序转换函数&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#地址转换函数&quot;&gt;地址转换函数&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#套接字类型&quot;&gt;套接字类型&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#socketbindlistenacceptconnect&quot;&gt;socket、bind、listen、accept、connect&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#so_reuseaddr&quot;&gt;SO_REUSEADDR&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#p2p聊天demo&quot;&gt;p2p聊天demo&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;!-- /TOC --&gt;
+&lt;h2 id=&quot;ipv4套接字地址结构&quot;&gt;IPv4套接字地址结构&lt;/h2&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#include &amp;lt;netinet/in.h&amp;gt;
+/* sockaddr_in */
+
+struct in_addr {
+    in_addr_t        s_addr;         /* 23 bits IPv4 address */
+};                                   /* network byte ordered */
+ 
+struct sockaddr_in {
+    uint8_t          sin_len;        /* length of structure(16) */
+    sa_family_t      sin_family;     /* AF_INET */
+    in_port_t        sin_port;       /* 16-bit TCP or UDP port number */
+                                     /* network byte ordered */
+    struct in_addr   sin_addr;       /* 32-bit IPv4 address */
+                                     /* network byte ordered */
+    char             sin_zero[8];    /* unused */
+};
+ 
+ 
+/*
+sin_len成员
+表示地址结构体的长度，它是一个无符号的八位整数。
+需要强调的是，这个成员并不是地址结构必须有的。
+假如没有这个成员，其所占的一个字节被并入到sin_family成员中；
+同时，在传递地址结构的指针时，结构长度需要通过另外的参数来传递。
+sin_family成员
+指代的是所用的协议族，在有sin_len成员的情况下，它是一个8位的无符号整数；
+在没有sin_len成员的情况下，它是一个16位的无符号整数。
+由于IP协议属于TCP/IP协议族，所以在这里该成员应该赋值为“AF_INET”。
+sin_port成员
+表示TCP或UDP协议的端口号，它是一个16位的无符号整数。
+它是以网络字节顺序（大端字节序）来存储的。
+in_addr成员
+用来保存32位的IPv4地址，它同样是以网络字节顺序来存储的。
+sin_zero成员
+是不使用的，通常会将它置为0，它的存在只是为了与通用套接字地址结构struct sockaddr在内存中对齐。
+*/
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;字节序转换函数&quot;&gt;字节序转换函数&lt;/h2&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#include&amp;lt;arpa/inet.h&amp;gt;
+//函数中 h代表host    n代表network    s代表short   l代表long
+
+// hton* 主机字节转网络字节序
+ 
+uint32_t htonl(uint32_t hostlong);
+ 
+uint16_t htons(uint16_t hostshort);
+ 
+ 
+// ntoh* 网络字节序转主机字节序
+ 
+uint32_t ntohl(uint32_t netlong);
+ 
+uint16_t ntohs(uint16_t netshort);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;地址转换函数&quot;&gt;地址转换函数&lt;/h2&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#include &amp;lt;arpa/inet.h&amp;gt;
+
+int         inet_aton (const char *__cp, struct in_addr *__inp);
+int         inet_pton(int af, const char *restrict src, void *restrict dst);
+in_addr_t   inet_addr (const char *__cp);
+char *      inet_ntoa (struct in_addr __in);
+const char *inet_ntop(int af, const void *restrict src,
+                             char *restrict dst, socklen_t size);
+
+/* 
+以上三个函数在点分十进制数串（如“127.0.0.1&quot;）和32位网络字节序二进制值之间转换IPv4地址。
+ 
+inet_aton将__cp指向的字符串转成网络序的地址存在__inp指向的地址结构。
+成功返回1，否则返回0。
+(据书中所说，如果__inp指针为空，那么该函数仍然对输入字符串进行有效性检查但是不存储任何结果)
+
+inet_pron将字符串转换成指定协议族的网络地址，并将其拷贝到dst网络地址结构体中。成功返回1，失败返回0并设置errno
+
+inet_addr功能和inet_aton类似，
+但是inet_addr出错时返回INADDR_NONE常值（通常是32位均为1的值），
+这就意味着至少有一个IPv4的地址（通常为广播地址255.255.255.255）不能由该函数处理。
+建议使用inet_aton代替inet_addr。
+
+inet_ntoa将网络序二进制IPv4地址转换成点分十进制数串。
+该函数的返回值所指向的字符串驻留在静态内存中。
+这意味着该函数是不可重入的。
+同时我们也该注意到该函数以一个结构体为参数而不是常见的以一个结构体指针作为参数。
+
+inet_ntop扩展inet_ntoa功能，支持不同协议族从网络地址到字符串的转换。如果成功，函数返回指向dst的非空指针。如果失败返回NULL，并设置errno
+*/
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;套接字类型&quot;&gt;套接字类型&lt;/h2&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;SOCK_STREAM：流式套接字，提供面向连接、可靠的数据传输服务，数据按字节流、按顺序收发，保证在传输过程中无丢失、无冗余。TCP协议支持该套接字。&lt;/li&gt;
+  &lt;li&gt;SOCK_DGRAM：数据报套接字，提供面向无连接的服务，数据收发无序，不能保证数据的准确到达。UDP协议支持该套接字。&lt;/li&gt;
+  &lt;li&gt;SOCK_RAW：原始套接字。允许对低于传输层的协议或物理网络直接访问，例如可以接收和发送ICMP报文。常用于检测新的协议。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;socketbindlistenacceptconnect&quot;&gt;socket、bind、listen、accept、connect&lt;/h2&gt;
+
+&lt;p&gt;1、socket&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;//socket()打开一个网络通讯端口，如果成功的话，返回一个文件描述符
+//成功返回一个新的文件描述符，失败返回-1，设置errno
+#include &amp;lt;sys/types.h&amp;gt; /* See NOTES */
+#include &amp;lt;sys/socket.h&amp;gt;
+int socket(int domain, int type, int protocol);
+
+/*
+domain: 
+AF_INET  这是大多数用来产生socket的协议，使用TCP或UDP来传输，用IPv4的地址 
+AF_INET6 与上面类似，不过是来用IPv6的地址 
+AF_UNIX  本地协议，使用在Unix和Linux系统上，一般都是当客户端和服务器在同一台及其上的时候使用
+ 
+type: 
+SOCK_STREAM 这个协议是按照顺序的、可靠的、数据完整的基于字节流的连接。这是一个使用最多的socket类型，这个socket是使用TCP来进行传输。 
+SOCK_DGRAM 这个协议是无连接的、固定长度的传输调用。该协议是不可靠的，使用UDP来进行它的连接。 
+SOCK_SEQPACKET 这个协议是双线路的、可靠的连接，发送固定长度的数据包进行传输。必须把这个包完整的接受才能进行读取。 
+SOCK_RAW 这个socket类型提供单一的网络访问，这个socket类型使用ICMP公共协议。（ping、traceroute使用该协议） 
+SOCK_RDM 这个类型是很少使用的，在大部分的操作系统上没有实现，它是提供给数据链路层使用，不保证数据包的顺序
+ 
+protocol: 
+0 默认协议
+*/
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;2、bind&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;//bind()的作用是将参数sockfd和addr绑定在一起，使sockfd这个用于网络通讯的文件描述符监听addr所描述的地址和端口号。
+//成功返回0，失败返回-1, 设置errno
+#include &amp;lt;sys/types.h&amp;gt; /* See NOTES */
+#include &amp;lt;sys/socket.h&amp;gt;
+int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
+/*
+sockfd： 
+socket文件描述符
+ 
+addr: 
+构造出IP地址加端口号
+ 
+addrlen: 
+sizeof(addr)长度
+*/
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;3、listen&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;/*
+listen()声明sockfd处于监听状态，并且最多允许有backlog个客户端处于连接待状态，如果接收到更多的连接请求就忽略。
+ 
+查看系统默认backlog
+cat /proc/sys/net/ipv4/tcp_max_syn_backlog
+ 
+ 
+内核为任何一个给定的监听套接字维护两个队列：
+（1）未完成连接队列，每个这样的SYN分节对应其中一项：已由某个客户发出并到达服务器，而服务器正在等待完成相应的TCP三路握手过程。这些套接字处于SYN_RECV状态
+ 
+（2）已完成连接队列，每个已完成TCP三路握手过程的客户对应其中一项。这些套接字处于ESTABLISHED状态。
+*/
+//成功返回0，失败返回-1。
+#include &amp;lt;sys/types.h&amp;gt; /* See NOTES */
+#include &amp;lt;sys/socket.h&amp;gt;
+/*
+sockfd: 
+socket文件描述符
+ 
+backlog: 
+排队建立3次握手队列和刚刚建立3次握手队列的链接数和
+*/
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;4、accept&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;//三方握手完成后，服务器调用accept()接受连接，如果服务器调用accept()时还没有客户端的连接请求，就阻塞等待直到有客户端连接上来。
+//成功返回一个新的socket文件描述符，用于和客户端通信，失败返回-1，设置errno
+#include &amp;lt;sys/types.h&amp;gt; /* See NOTES */
+#include &amp;lt;sys/socket.h&amp;gt;
+int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
+/*
+sockdf: 
+socket文件描述符
+ 
+addr: 
+传出参数，返回链接客户端地址信息，含IP地址和端口号
+ 
+addrlen: 
+传入传出参数（值-结果）,传入sizeof(addr)大小，函数返回时返回真正接收到地址结构体的大小
+*/
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;5、connect&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;//客户端需要调用connect()连接服务器，connect和bind的参数形式一致，区别在于 bind的参数是自己的地址，而connect的参数是对方的地址。
+//成功返回0，失败返回-1，设置errno
+#include &amp;lt;sys/types.h&amp;gt; /* See NOTES */
+#include &amp;lt;sys/socket.h&amp;gt;
+int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
+/*
+sockdf: 
+socket文件描述符
+ 
+addr: 
+传入参数，指定服务器端地址信息，含IP地址和端口号
+ 
+addrlen: 
+传入参数,传入sizeof(addr)大小
+*/
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;so_reuseaddr&quot;&gt;SO_REUSEADDR&lt;/h2&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;setsockopt（SO_REUSEADDR）用在服务器端，socket()创建之后，bind()之前.
+所有TCP服务器都应该指定本套接字选项，以防止当套接字处于TIME_WAIT时bind()失败的情形出现&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;SO_REUSEADDR允许启动一个监听服务器并捆绑其端口，即使以前建立的将端口用作他们的本地端口的连接仍旧存在
+【即便TIME_WAIT状态存在，服务器bind()也能成功】&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;允许同一个端口上启动同一个服务器的多个实例，只要每个实例捆绑一个不同的本地IP地址即可&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;SO_REUSEADDR允许单个进程捆绑同一个端口到多个套接字，只要每次捆绑指定不同的本地IP地址即可&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;SO_REUSEADDR允许完全重复的绑定：当一个IP地址和端口已经绑定到某个套接字上时，如果传输协议支持，同样的IP地址和端口还可以绑定到另一个套接字上；一般来说本特性仅支持UDP套接字[TCP不行]&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;p2p聊天demo&quot;&gt;p2p聊天demo&lt;/h2&gt;
+
+&lt;p&gt; - p2pcli.c&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#include&amp;lt;sys/types.h&amp;gt;
+#include&amp;lt;sys/socket.h&amp;gt;
+#include&amp;lt;arpa/inet.h&amp;gt;
+#include&amp;lt;stdio.h&amp;gt;
+#include&amp;lt;signal.h&amp;gt;
+#include&amp;lt;unistd.h&amp;gt;
+#include&amp;lt;stdlib.h&amp;gt;
+#include&amp;lt;string.h&amp;gt;
+
+void handle(int sig){
+    printf(&quot;recv sig: %d\n&quot;, sig);
+    exit(0);
+}
+
+int main(){
+    int clt_fd;
+    struct sockaddr_in serv_addr;
+
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_port = htons(8080);
+    if(inet_aton(&quot;127.0.0.1&quot;, &amp;amp;serv_addr.sin_addr) == 0){
+        perror(&quot;inet_aton&quot;);
+        exit(-1);
+    }
+    
+    clt_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if(clt_fd &amp;lt; 0){
+        perror(&quot;socket&quot;);
+        exit(-1);
+    }
+
+    signal(SIGUSR1, handle);
+
+    char addr_dst[32];
+    char buff[1024];
+    if(connect(clt_fd, (struct sockaddr*)&amp;amp;serv_addr, sizeof(serv_addr)) == -1){
+        perror(&quot;connect&quot;);
+        exit(-1);
+    }
+    printf(&quot;Connect successfully\t%s at PORT %d\n&quot;,inet_ntop(AF_INET,&amp;amp;serv_addr.sin_addr,addr_dst,sizeof(addr_dst)),ntohs(serv_addr.sin_port));
+    pid_t pid = fork();
+    //parent.send msg
+    if(pid &amp;gt; 0){
+        printf(&quot;Please input the alphabet:&quot;);
+        while(fgets(buff, sizeof(buff), stdin)){
+            write(clt_fd, buff, strlen(buff));
+            memset(buff, 0, sizeof(buff));
+            printf(&quot;Please input the alphabet:&quot;);
+        }
+    }
+    //child.recv msg.
+    else if(pid == 0) {
+        while(1) {
+            int ret = read(clt_fd, buff, sizeof(buff));
+            if(ret == 0){
+                printf(&quot;server close\n&quot;);
+                break;
+            }
+            else if(ret &amp;lt; 0){
+                perror(&quot;read&quot;);
+                exit(-1);
+            }
+            fputs(buff,stdout);
+            memset(buff, 0, sizeof(buff));
+        }
+        close(clt_fd);
+        kill(getppid(), SIGUSR1);
+    }
+    else if(pid == -1){
+        perror(&quot;fork&quot;);
+        close(clt_fd);
+        exit(-1);
+    }
+    return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt; - p2psvr.c&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#include&amp;lt;sys/types.h&amp;gt;
+#include&amp;lt;sys/socket.h&amp;gt;
+#include&amp;lt;arpa/inet.h&amp;gt;
+#include&amp;lt;stdio.h&amp;gt;
+#include&amp;lt;signal.h&amp;gt;
+#include&amp;lt;unistd.h&amp;gt;
+#include&amp;lt;stdlib.h&amp;gt;
+#include&amp;lt;string.h&amp;gt;
+
+void handle(int sig){
+    printf(&quot;recv sig: %d\n&quot;, sig);
+    exit(-1);
+}
+
+int main(){
+    signal(SIGUSR1, handle);
+    
+    int serv_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if(serv_fd == -1){
+        perror(&quot;socket&quot;);
+        exit(-1);
+    }
+
+    int opt_val;
+    if(setsockopt(serv_fd,SOL_SOCKET,SO_REUSEADDR,&amp;amp;opt_val, sizeof(opt_val)) == -1){
+        perror(&quot;setsockopt&quot;);
+        exit(-1);
+    }
+    struct sockaddr_in serv_addr;
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_port = htons(8080);
+    serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+
+    if(bind(serv_fd,(struct sockaddr*)&amp;amp;serv_addr,sizeof(serv_addr)) == -1){
+        perror(&quot;bind&quot;);
+        exit(-1);
+    }
+
+    if(listen(serv_fd,5) == -1){
+        perror(&quot;listen&quot;);
+        exit(-1);
+    }
+
+    int conn_fd,clt_len;
+    struct sockaddr_in clt_addr;
+    char dst[32],buff[1024];
+    if( -1 == (conn_fd = accept(serv_fd,(struct sockaddr*)&amp;amp;clt_addr, &amp;amp;clt_len))){
+        perror(&quot;accept&quot;);
+        exit(-1);
+    }
+
+    printf(&quot;recv from %s at PORT %d&quot;, inet_ntop(AF_INET, &amp;amp;clt_addr, dst, sizeof(dst)), ntohs(clt_addr.sin_port));
+
+    pid_t pid = fork();
+
+    if(pid &amp;gt; 0){
+        while(1){
+            int ret = read(conn_fd, buff, sizeof(buff));
+            if(ret == 0){
+                printf(&quot;client close\n&quot;);
+                break;
+            }
+            else if(ret &amp;lt; 0){
+                perror(&quot;read&quot;);
+                exit(-1);
+            }
+            fputs(buff, stdout);
+            memset(buff, 0, sizeof(buff));
+        }
+        close(conn_fd);
+        close(serv_fd);
+        kill(pid, SIGUSR1);
+    }
+    else if(pid == 0){
+        printf(&quot;Please input alphabet:&quot;);
+        while(fgets(buff, sizeof(buff), stdin)){
+            write(conn_fd, buff, sizeof(buff));
+            memset(buff, 0, sizeof(buff));
+            printf(&quot;Please input alphabet:&quot;);
+        }
+    }
+    else if(pid == -1){
+        perror(&quot;fork&quot;);
+        close(conn_fd);
+        close(serv_fd);
+        exit(-1);
+    }
+    return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+</description>
+        <pubDate>Tue, 18 May 2021 00:00:00 +0000</pubDate>
+        <link>https://pusidun.github.io/2021/05/linux-socket1/</link>
+        <guid isPermaLink="true">https://pusidun.github.io/2021/05/linux-socket1/</guid>
+        
+        <category>Linux</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>深入理解Java虚拟机ch3：垃圾收集器与内存分配策略</title>
+        <description>&lt;!-- TOC --&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;#深入理解java虚拟机ch3垃圾收集器与内存分配策略&quot;&gt;深入理解Java虚拟机ch3：垃圾收集器与内存分配策略&lt;/a&gt;
+    &lt;ul&gt;
+      &lt;li&gt;&lt;a href=&quot;#引用计数法&quot;&gt;引用计数法&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#可达性分析&quot;&gt;可达性分析&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#引用分类&quot;&gt;引用分类&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#回收条件&quot;&gt;回收条件&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#垃圾收集算法&quot;&gt;垃圾收集算法&lt;/a&gt;
+        &lt;ul&gt;
+          &lt;li&gt;&lt;a href=&quot;#标记-清除算法-mark-sweep&quot;&gt;标记-清除算法 Mark-Sweep&lt;/a&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;a href=&quot;#复制算法-copying&quot;&gt;复制算法 Copying&lt;/a&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;a href=&quot;#标记-整理算法-mark-compact&quot;&gt;标记-整理算法 Mark-Compact&lt;/a&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;a href=&quot;#分代收集&quot;&gt;分代收集&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;!-- /TOC --&gt;
+&lt;h2 id=&quot;深入理解java虚拟机ch3垃圾收集器与内存分配策略&quot;&gt;深入理解Java虚拟机ch3：垃圾收集器与内存分配策略&lt;/h2&gt;
+
+&lt;p&gt;主要思考以下3点&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;哪些内存需要回收&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;什么时候回收&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;如何回收&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&quot;引用计数法&quot;&gt;引用计数法&lt;/h3&gt;
+
+&lt;p&gt;给对象添加引用计数器，每当一个地方引用时，计数器+1，引用失效时，计数器-1&lt;/p&gt;
+
+&lt;p&gt;缺陷：循环引用时，双方引用计数不为0，无法回收&lt;/p&gt;
+
+&lt;h3 id=&quot;可达性分析&quot;&gt;可达性分析&lt;/h3&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/JVMch31.jpg&quot; alt=&quot;ch3-1&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;通过一系列被称为GC Roots的对象作为起始点，从这些节点开始向下搜索，搜索经过的路径称为引用链。当一个对象和GC Roots不连通时，称为该对象不可达。&lt;/p&gt;
+
+&lt;p&gt;可作为GC Roots的对象包括下面几种：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;虚拟机栈（栈帧中的本地变量表）中引用的对象。&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;方法区中类静态属性引用的对象。&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;方法区中常量引用的对象。&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;本地方法栈中JNI（即一般说的Native方法）引用的对象。&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;引用分类&quot;&gt;引用分类&lt;/h3&gt;
+
+&lt;p&gt;JDK 1.2前，如果reference类型的数据中存储的值代表另一块内存的起始地址，就称这块内存代表着一个引用
+JDK 1.2之后，引用分为强引用，软引用，弱引用，虚引用4种。引用强度依次逐渐减弱。&lt;/p&gt;
+
+&lt;p&gt;强引用（Strong Reference）：只要存在，垃圾收集器永远不会回收掉被引用的对象。&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Object obj = new Object()&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;软引用（Soft Reference）：有用非必须对象。在系统将发生内存溢出异常之前，将会把这些对象列进回收范围之中进行二次回收。如果这次回收还没有足够的内存才会抛出异常。&lt;/p&gt;
+
+&lt;p&gt;弱引用（Weak Reference）：有用非必须对象，但比软引用更弱。被弱引用关联的对象只能生存到下一次垃圾收集发生之前。当垃圾收集器工作时，无论内存是否足够都会回收。&lt;/p&gt;
+
+&lt;p&gt;虚引用（Phantom Reference）：一个对象是否有虚引用存在，不会对生存时间构成影响，也无法通过虚引用来去的一个对象实例。为一个对象设置虚引用关联的唯一目的就是能在这个对象被收集器回收时收到一个系统通知。&lt;/p&gt;
+
+&lt;h3 id=&quot;回收条件&quot;&gt;回收条件&lt;/h3&gt;
+
+&lt;p&gt;要经过2次标记。&lt;/p&gt;
+
+&lt;p&gt;第一次标记：可达性分析时，发现没有与GC Roots连接的引用链。并筛选看此对象是否有必要执行finalize()方法。如对象没有覆盖finalize()方法或者finalize()方法以及被虚拟机调用过，虚拟机认为没必要执行。&lt;/p&gt;
+
+&lt;p&gt;否则，虚拟机认为有必要执行finalize()方法。那么会放入F-Queue队列中，并在稍后由Finalizer线程执行它，但不承诺执行完毕，防止死循环时F-Queue其他对象永久等待。稍后GC会对F-Queue中对象进行第二次标记。如果此时仍然没有和引用链任何对象关联，那么就会被回收。&lt;/p&gt;
+
+&lt;h3 id=&quot;垃圾收集算法&quot;&gt;垃圾收集算法&lt;/h3&gt;
+
+&lt;h4 id=&quot;标记-清除算法-mark-sweep&quot;&gt;标记-清除算法 Mark-Sweep&lt;/h4&gt;
+
+&lt;p&gt;统一标记，统一回收。标记判断见上文。&lt;/p&gt;
+
+&lt;p&gt;缺点：1.效率不高 2.清除会产生大量不连续碎片&lt;/p&gt;
+
+&lt;h4 id=&quot;复制算法-copying&quot;&gt;复制算法 Copying&lt;/h4&gt;
+
+&lt;p&gt;内存划分为相等大小的两块，每次用其中一块。当一块快用完的时候，将还存活的对象复制到另一块上。&lt;/p&gt;
+
+&lt;p&gt;缺点：内存利用效率太低，只有一半能使用&lt;/p&gt;
+
+&lt;h4 id=&quot;标记-整理算法-mark-compact&quot;&gt;标记-整理算法 Mark-Compact&lt;/h4&gt;
+
+&lt;p&gt;标记同标记-清除算法，但后续不是直接对可回收对象清理，而是让所有存活对象向另一端移动，然后清理掉边界外的内存。&lt;/p&gt;
+
+&lt;h4 id=&quot;分代收集&quot;&gt;分代收集&lt;/h4&gt;
+
+&lt;p&gt;根据对象存活周期划分内存&lt;/p&gt;
+
+&lt;p&gt;新生代：大批对象死去，少量存活，选复制算法&lt;/p&gt;
+
+&lt;p&gt;老年代：存活率高，没有额外空间为分配担保，标记-清除算法或标记-整理算法&lt;/p&gt;
+</description>
+        <pubDate>Mon, 12 Apr 2021 00:00:00 +0000</pubDate>
+        <link>https://pusidun.github.io/2021/04/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BAch3/</link>
+        <guid isPermaLink="true">https://pusidun.github.io/2021/04/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BAch3/</guid>
+        
+        <category>读书笔记</category>
+        
+        
+      </item>
+    
+  </channel>
+</rss>

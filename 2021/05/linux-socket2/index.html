@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <title>socket编程(二)</title>
+  <meta name="description" content="">
+  <meta name="author" content="leopardpan">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="socket编程(二)">
+  <meta name="twitter:description" content="">
+  
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="socket编程(二)">
+  <meta property="og:description" content="">
+  
+  <link rel="icon" type="image/png" href="/images/favicon.png" />
+  <link href="/images/favicon.png" rel="shortcut icon" type="image/png">
+  
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+
+  <link rel="canonical" href="https://pusidun.github.io/2021/05/linux-socket2/">
+  <link rel="alternate" type="application/rss+xml" title="pusidun" href="https://pusidun.github.io/feed.xml">
+  
+  <meta name="google-site-verification" content="1-1ZlHoRvM0T2FqPbW2S-qLgYXN6rsn52kErlMPd_gw" />
+
+<!-- 站点统计 -->
+  <script 
+  async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+  </script>  
+
+<!-- 百度统计 -->
+  
+
+<!-- google 统计 -->
+  
+  <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', 'xxxx', 'auto');
+      ga('send', 'pageview');
+  </script>
+  
+
+  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<script>
+  (adsbygoogle = window.adsbygoogle || []).push({
+    google_ad_client: "ca-pub-9005224472374751",
+    enable_page_level_ads: true
+  });
+</script>
+
+<script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+
+</head>
+
+
+  <body>
+
+    <span class="mobile btn-mobile-menu">        
+      <div class="nav_container">
+         <nav class="nav-menu-item" style = "float:right">
+            <i class="nav-menu-item">
+              <a href="/#blog" title="" class="blog-button">  博客主页
+              </a>
+            </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/archive" title="archive" class="btn-mobile-menu__icon">
+                      所有文章
+                  </a>
+                </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/tags" title="tags" class="btn-mobile-menu__icon">
+                      标签
+                  </a>
+                </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/about" title="about" class="btn-mobile-menu__icon">
+                      关于我
+                  </a>
+                </i>
+            
+          </nav>
+      </div>
+    </span>
+    
+    <header class="panel-cover panel-cover--collapsed" style="background-image: url('/images/background-cover.jpg')">
+  <div class="panel-main">
+
+    <div class="panel-main__inner panel-inverted">
+    <div class="panel-main__content">
+        <!-- 头像效果-start -->
+        <div class="ih-item circle effect right_to_left">            
+            <a href="/#blog" title="前往 pusidun 的主页" class="blog-button">
+                <div class="img"><img src="/images/avatar.jpg" alt="img"></div>
+                <div class="info">
+                    <div class="info-back">
+                        <h2 id="avatarTitle"> 
+                            
+                                pusidun
+                            
+                        </h2>
+                        <p>
+                           
+                                Go / C++
+                            
+                        </p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <!-- 头像效果-end -->
+        <h1 class="panel-cover__title panel-title"><a href="/#blog" title="link to homepage for pusidun" class="blog-button">pusidun</a></h1>
+        
+        <span class="panel-cover__subtitle panel-subtitle">BLOG</span>
+        
+        <hr class="panel-cover__divider" />
+        <p class="panel-cover__description">Welcome to my blog~</p>
+        <hr class="panel-cover__divider panel-cover__divider--secondary" />
+        
+        
+        
+
+        <div class="navigation-wrapper">
+          <div>
+            <nav class="cover-navigation cover-navigation--primary">
+              <ul class="navigation">
+                <li class="navigation__item"><a href="/#blog" title="" class="blog-button">博客主页</a></li>
+                
+                  <li class="navigation__item"><a href="/archive" title="archive">所有文章</a></li>
+                
+                  <li class="navigation__item"><a href="/tags" title="tags">标签</a></li>
+                
+                  <li class="navigation__item"><a href="/about" title="about">关于我</a></li>
+                
+              </ul>
+            </nav>
+          </div>          
+        </div>
+
+
+        </div>
+      </div>
+    </div>
+    
+    
+    <div class="panel-cover--overlay cover-clear"></div>
+    
+  </div>
+</header>
+
+
+    <div class="content-wrapper">
+        <div class="content-wrapper__inner">
+            <article class="post-container post-container--single" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title">socket编程(二)</h1>
+    <div class="post-meta">
+      <img src="/images/calendar.png" width="20px"/> 
+      <time datetime="2021-05-19 00:00:00 +0000" itemprop="datePublished" class="post-meta__date date">2021-05-19</time>  
+         
+      <span id="busuanzi_container_page_pv"> | 阅读：<span id="busuanzi_value_page_pv"></span>次</span>
+    </p>
+    </div>
+  </header>
+
+  <section class="post">
+    <!-- TOC -->
+
+<ul>
+  <li><a href="#流协议与粘包">流协议与粘包</a>
+    <ul>
+      <li><a href="#产生原因">产生原因:</a></li>
+      <li><a href="#粘包处理方案--本质上是要在应用层维护消息与消息的边界">粘包处理方案–本质上是要在应用层维护消息与消息的边界</a></li>
+    </ul>
+  </li>
+  <li><a href="#readwrite与recvsend">read、write与recv、send</a></li>
+  <li><a href="#getsocknamegetpeername">getsockname、getpeername</a></li>
+  <li><a href="#gethostnamegethostbynamegethostbyaddr">gethostname、gethostbyname、gethostbyaddr</a></li>
+  <li><a href="#僵进程与sigchld信号">僵进程与SIGCHLD信号</a>
+    <ul>
+      <li><a href="#wait">wait</a></li>
+      <li><a href="#waitpid">waitpid</a></li>
+      <li><a href="#wait与waitpid区别">wait与waitpid区别</a></li>
+    </ul>
+  </li>
+</ul>
+
+<!-- /TOC -->
+<h2 id="流协议与粘包">流协议与粘包</h2>
+
+<p><strong>争议</strong>：粘包并非专业术语，该数据包应指应用层的包。常常由于应用层未提供数据边界，而TCP作为流式传输协议，造成客户端无法区分数据包起始所造成的现象。<strong>TCP粘包为绝对的错误说法</strong>，TCP不存在包的概念。</p>
+
+<h3 id="产生原因">产生原因:</h3>
+
+<p>1.SQ_SNDBUF套接字本身有缓冲区（发送缓冲区，接收缓冲区）</p>
+
+<p>2.tcp传送的网络数据最大值MSS大小限制</p>
+
+<p>3.链路层也有MTU（最大传输单元）大小限制，如果数据包大于&gt;MTU要在IP层进行分片，导致消息分割。</p>
+
+<p>4.tcp的流量控制和拥塞控制，也可能导致粘包</p>
+
+<p>5.tcp延迟发送机制等等</p>
+
+<p>结论：TCP/IP协议，在传输层没有处理粘包问题，必须由程序员处理</p>
+
+<h3 id="粘包处理方案本质上是要在应用层维护消息与消息的边界">粘包处理方案–本质上是要在应用层维护消息与消息的边界</h3>
+
+<p>1.定包长</p>
+
+<p>2.包尾加\r\n（比如ftp协议）</p>
+
+<p>3.包头加上包体长度</p>
+
+<p>4.更复杂的应用层协议</p>
+
+<p>例子：定义packet结构体</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>typedef struct _packet
+{
+    int len; //定义包体长度
+    char buf[1024]; //定义包体
+} Packet;
+</code></pre></div></div>
+
+<p><a href="/assets/src/packet/readn.c">readn.c</a></p>
+
+<p><a href="/assets/src/packet/writen.c">writen.c</a></p>
+
+<h2 id="readwrite与recvsend">read、write与recv、send</h2>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#include &lt;sys/types.h&gt; 
+#include &lt;sys/socket.h&gt;
+int recv(int sockfd,void *buf,int len,int flags)
+ 
+int send(int sockfd,void *buf,int len,int flags)
+
+/*
+前面的三个参数和read,write相同，第四个参数能够是0或是以下的组合：
+ 
+______________________________________________________________
+ 
+| MSG_DONTROUTE | 不查找路由表 |
+ 
+| MSG_OOB       | 接受或发送带外数据 |
+ 
+| MSG_PEEK      | 查看数据,并不从系统缓冲区移走数据 |
+ 
+| MSG_WAITALL   | 等待任何数据 |
+ 
+|————————————————————–|
+ 
+ 
+MSG_DONTROUTE:
+是send函数使用的标志.这个标志告诉IP协议.目的主机在本地网络上面,没有必要查找路由表.这个标志一般用网络诊断和路由程式里面.
+ 
+MSG_OOB:
+表示能够接收和发送带外的数据.关于带外数据我们以后会解释的.
+ 
+MSG_PEEK:
+是recv函数的使用标志,表示只是从系统缓冲区中读取内容,而不清楚系统缓冲区的内容.
+这样下次读的时候,仍然是相同的内容.一般在有多个进程读写数据时能够使用这个标志.
+ 
+MSG_WAITALL
+是recv函数的使用标志,表示等到任何的信息到达时才返回.
+使用这个标志的时候recv回一直阻塞,直到指定的条件满足,或是发生了错误.1
+*/
+</code></pre></div></div>
+
+<h2 id="getsocknamegetpeername">getsockname、getpeername</h2>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//getsockname函数用于获取与某个套接字关联的本地协议地址
+//getpeername函数用于获取与某个套接字关联的外地协议地址
+//对于这两个函数，如果函数调用成功，则返回0，如果调用出错，则返回-1。
+#include&lt;sys/socket.h&gt;
+int getsockname(int sockfd, struct sockaddr *localaddr, socklen_t *addrlen);
+int getpeername(int sockfd, struct sockaddr *peeraddr, socklen_t *addrlen); 
+
+/*
+使用这两个函数，我们可以通过套接字描述符来获取自己的IP地址和连接对端的IP地址，
+如在未调用bind函数的TCP客户端程序上，可以通过调用getsockname()函数获取由内核赋予该连接的本地IP地址和本地端口号，
+还可以在TCP的服务器端accept成功后，通过getpeername()函数来获取当前连接的客户端的IP地址和端口号。
+*/
+</code></pre></div></div>
+
+<h2 id="gethostnamegethostbynamegethostbyaddr">gethostname、gethostbyname、gethostbyaddr</h2>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/*
+gethostname() ： 返回本地主机的标准主机名。
+gethostbyname(): 通过主机名称获取主机的信息
+gethostbyaddr(): 通过一个IPv4的地址来获取主机信息
+
+返回值
+gethostname()  ： 函数成功，则返回0。如果发生错误则返回-1。错误号存放在外部变量errno中。
+gethostbyname(): 返回hostent结构体类型指针 
+gethostbyaddr(): 返回hostent结构体类型指针
+*/
+#include &lt;netdb.h&gt;
+#include &lt;unistd.h&gt;
+int              gethostname(char *name, size_t len);
+struct hostent*  gethostbyname(const char *name);
+struct hostent * gethostbyaddr(const char * addr, socklen_t len, int family);
+
+/*
+gethostname() ： 
+接收缓冲区name，其长度必须为len字节或是更长,存获得的主机名。
+接收缓冲区name的最大长度
+ 
+ 
+gethostbyname(): 
+传入值是域名或者主机名，例如"www.google.cn"等等。传出值，是一个hostent的结构。
+ 
+ 
+gethostbyaddr(): 
+addr：指向网络字节顺序地址的指针。
+len： 地址的长度，在AF_INET类型地址中为4。
+type：地址类型，应为AF_INE
+*/
+</code></pre></div></div>
+
+<h2 id="僵进程与sigchld信号">僵进程与SIGCHLD信号</h2>
+
+<p>一个进程执行了exit系统调用退出时会向父进程发送SIGCHLD信号，而其父进程并没有为它收尸(调用wait或waitpid来获得它的结束状态，如进程ID、终止状态等等)的进程。</p>
+
+<p>设置僵死状态的目的是维护子进程的信息，以便父进程在以后某个时候获取。</p>
+
+<p>如何避免僵尸进程：</p>
+
+<p>1、通过signal(SIGCHLD, SIG_IGN)通知内核对子进程的结束不关心，由内核回收。
+2、父进程调用wait/waitpid等函数等待子进程结束，如果尚无子进程退出wait会导致父进程阻塞。waitpid可以通过传递WNOHANG使父进程不阻塞立即返回。
+3、如果父进程很忙可以用signal注册信号处理函数，在信号处理函数调用wait/waitpid等待子进程退出。
+4、通过两次调用fork。父进程首先调用fork创建一个子进程然后waitpid等待子进程退出，子进程再fork一个孙进程后退出。这样子进程退出后会被父进程等待回收，而对于孙子进程其父进程已经退出所以孙进程成为一个孤儿进程，孤儿进程由init进程接管，孙进程结束后，init会等待回收。</p>
+
+<h3 id="wait">wait</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//成功，wait会返回被收集的子进程的进程ID，如果调用进程没有子进程，调用就会失败，此时wait返回-1，同时errno被置为ECHIL
+#include &lt;sys/types.h&gt; 
+#include &lt;sys/wait.h&gt;
+pid_t wait(int *status);
+
+/*
+进程一旦调用了wait，就立即阻塞自己.
+wait系统调用会使父进程暂停执行，直到它的一个子进程结束为止。
+返回的是子进程的PID，它通常是结束的子进程
+状态信息允许父进程判定子进程的退出状态，即从子进程的main函数返回的值或子进程中exit语句的退出码。
+如果status不是一个空指针，状态信息将被写入它指向的位置
+*/
+</code></pre></div></div>
+
+<h3 id="waitpid">waitpid</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//返回值：如果成功返回等待子进程的ID，失败返回-1
+#include &lt;sys/types.h&gt; 
+#include &lt;sys/wait.h&gt;
+pid_t waitpid(pid_t pid, int *status, int options);
+/*
+status:如果不是空，会把状态信息写到它指向的位置，与wait一样
+
+options：允许改变waitpid的行为，最有用的一个选项是WNOHANG,它的作用是防止waitpid把调用者的执行挂起
+ 
+----------------------------------------------------------------------------
+|-对于waitpid的p i d参数的解释与其值有关：
+|-
+|-pid == -1 等待任一子进程。于是在这一功能方面waitpid与wait等效。
+|-
+|-pid &gt; 0 等待其进程I D与p i d相等的子进程。
+|-
+|-pid == 0 等待其组I D等于调用进程的组I D的任一子进程。换句话说是与调用者进程同在一个组的进程。
+|-
+|-pid &lt; -1 等待其组I D等于p i d的绝对值的任一子进程
+----------------------------------------------------------------------------
+*/
+</code></pre></div></div>
+
+<h3 id="wait与waitpid区别">wait与waitpid区别</h3>
+
+<p>在一个子进程终止前， wait 使其调用者阻塞，而waitpid 有一选择项，可使调用者不阻塞。</p>
+
+<p>waitpid并不等待第一个终止的子进程—它有若干个选择项，可以控制它所等待的特定进程。</p>
+
+<p>实际上wait函数是waitpid函数的一个特例。waitpid(-1, &amp;status, 0);</p>
+
+
+
+  </section>
+</article>
+
+<section>
+            <div style="text-align:center;margin:50px 0; font:normal 14px/24px 'MicroSoft YaHei';"></div>
+
+            <style type="text/css">
+              .content-play{width:80%;margin-top: 20px;margin-bottom: 10px;height:40px;}
+              .hide_box-play{z-index:999;filter:alpha(opacity=50);background:#666;opacity: 0.5;-moz-opacity: 0.5;left:0;top:0;height:99%;width:100%;position:fixed;display:none;}
+              .shang_box-play{width:540px;height:540px;padding:10px;background-color:#fff;border-radius:10px;position:fixed;z-index:1000;left:50%;top:50%;margin-left:-280px;margin-top:-280px;border:1px dotted #dedede;display:none;}
+              .shang_box-play img{border:none;border-width:0;}
+              .dashang{display:block;width:100px;margin:5px auto;height:25px;line-height:25px;padding:10px;background-color:#E74851;color:#fff;text-align:center;text-decoration:none;border-radius:10px;font-weight:bold;font-size:16px;transition: all 0.3s;}
+              .dashang:hover{opacity:0.8;padding:15px;font-size:18px;}
+              .shang_close-play{float:right;display:inline-block;
+                margin-right: 10px;margin-top: 20px;
+              }
+              .shang_logo{display:block;text-align:center;margin:20px auto;}
+              .shang_tit-play{width: 100%;height: 75px;text-align: center;line-height: 66px;color: #a3a3a3;font-size: 16px;background: url('/images/payimg/cy-reward-title-bg.jpg');font-family: 'Microsoft YaHei';margin-top: 7px;margin-right:2px;}
+              .shang_tit-play p{color:#a3a3a3;text-align:center;font-size:16px;}
+              .shang_payimg{width:140px;padding:10px;padding-left: 80px; /*border:6px solid #EA5F00;**/margin:0 auto;border-radius:3px;height:140px;display:inline-block;}
+              .shang_payimg img{display:inline-block;margin-right:10px;float:left;text-align:center;width:140px;height:140px; }
+              .pay_explain{text-align:center;margin:10px auto;font-size:12px;color:#545454;}
+              .shang_payselect{text-align:center;margin:0 auto;margin-top:40px;cursor:pointer;height:60px;width:500px;margin-left:110px;}
+              .shang_payselect .pay_item{display:inline-block;margin-right:140px;float:left;}
+              .shang_info-play{clear:both;}
+              .shang_info-play p,.shang_info-play a{color:#C3C3C3;text-align:center;font-size:12px;text-decoration:none;line-height:2em;}
+            </style>
+
+       <ul class="pager">
+        
+        <li class="previous">
+            <a href="/2021/05/linux-socket1/" data-toggle="tooltip" data-placement="top" title="socket编程(一)">上一篇：  <span>socket编程(一)</span>
+            </a>
+        </li>
+        
+        
+        <li class="next">
+            <a href="/2021/05/linux-selectpollepoll/" data-toggle="tooltip" data-placement="top" title="select/poll/epoll">下一篇：  <span>select/poll/epoll</span>
+            </a>
+        </li>
+        
+    </ul>
+</section>
+
+<section class="post-comments">
+  
+  
+
+  
+    <div id="vcomments"></div>
+    <script>
+        new Valine({
+            el: '#vcomments',
+            appId: 'XiYejJhYJ3U89yVy1tqxNYin-MdYXbMMI',
+            appKey: 'Px5FNmnMui05vXUJNqlptSqk'
+        })
+    </script>
+  
+</section>
+
+
+            <section class="footer">
+    <footer>
+        <div class = "footer_div">  
+        <nav class="cover-navigation navigation--social">
+          <ul class="navigation">
+
+          
+          <!-- Github -->
+          <li class="navigation__item_social">
+            <a href="https://github.com/pusidun" title="@pusidun 的 Github" target="_blank">
+              <div class="footer-social-icon" style="background:url(/images/github.png);"></div>
+            </a>
+          </li>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+          <!-- Email -->
+          <li class="navigation__item_social">
+            <a href="mailto:pusidun@hotmail.com" title="Contact me">
+              <div class="footer-social-icon" style="background:url(/images/email.png);"></div>
+            </a>
+          </li>
+          
+          
+          <!-- RSS -->
+          <li class="navigation__item_social">
+            <a href="/feed.xml" rel="author" title="RSS" target="_blank">
+              <div class="footer-social-icon" style="background:url(/images/rss.png);"></div>
+              <span class="label">RSS</span>
+            </a>
+          </li>
+
+          </ul>
+        </nav>
+
+        </div>
+
+        <div class = "footer_div">  
+           <p class="copyright text-muted">
+            Copyright &copy; pusidun 2021
+            </p>
+        	<div align="right">
+    			<link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+          <!-- 访问统计 -->
+          <span id="busuanzi_container_site_pv">
+            本站总访问量
+            <span id="busuanzi_value_site_pv"></span>次
+          </span>
+
+        </div>
+        <div>
+    </footer>
+</section>
+
+        </div>
+    </div>
+    
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="/js/main.js"></script>
+
+<script type="text/javascript" src="/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+  </body>
+
+</html>

@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <title>pusidun</title>
+  <meta name="description" content="Welcome to my blog~">
+  <meta name="author" content="leopardpan">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="pusidun">
+  <meta name="twitter:description" content="Welcome to my blog~">
+  
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="pusidun">
+  <meta property="og:description" content="Welcome to my blog~">
+  
+  <link rel="icon" type="image/png" href="/images/favicon.png" />
+  <link href="/images/favicon.png" rel="shortcut icon" type="image/png">
+  
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+
+  <link rel="canonical" href="https://pusidun.github.io/">
+  <link rel="alternate" type="application/rss+xml" title="pusidun" href="https://pusidun.github.io/feed.xml">
+  
+  <meta name="google-site-verification" content="1-1ZlHoRvM0T2FqPbW2S-qLgYXN6rsn52kErlMPd_gw" />
+
+<!-- 站点统计 -->
+  <script 
+  async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+  </script>  
+
+<!-- 百度统计 -->
+  
+
+<!-- google 统计 -->
+  
+  <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', 'xxxx', 'auto');
+      ga('send', 'pageview');
+  </script>
+  
+
+  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<script>
+  (adsbygoogle = window.adsbygoogle || []).push({
+    google_ad_client: "ca-pub-9005224472374751",
+    enable_page_level_ads: true
+  });
+</script>
+
+<script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+
+</head>
+
+
+  <body>
+
+    <span class="mobile btn-mobile-menu">        
+      <div class="nav_container">
+         <nav class="nav-menu-item" style = "float:right">
+            <i class="nav-menu-item">
+              <a href="/#blog" title="" class="blog-button">  博客主页
+              </a>
+            </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/archive" title="archive" class="btn-mobile-menu__icon">
+                      所有文章
+                  </a>
+                </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/tags" title="tags" class="btn-mobile-menu__icon">
+                      标签
+                  </a>
+                </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/about" title="about" class="btn-mobile-menu__icon">
+                      关于我
+                  </a>
+                </i>
+            
+          </nav>
+      </div>
+    </span>
+    
+    <header class="panel-cover " style="background-image: url('/images/background-cover.jpg')">
+  <div class="panel-main">
+
+    <div class="panel-main__inner panel-inverted">
+    <div class="panel-main__content">
+        <!-- 头像效果-start -->
+        <div class="ih-item circle effect right_to_left">            
+            <a href="/#blog" title="前往 pusidun 的主页" class="blog-button">
+                <div class="img"><img src="/images/avatar.jpg" alt="img"></div>
+                <div class="info">
+                    <div class="info-back">
+                        <h2 id="avatarTitle"> 
+                            
+                                pusidun
+                            
+                        </h2>
+                        <p>
+                           
+                                Go / C++
+                            
+                        </p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <!-- 头像效果-end -->
+        <h1 class="panel-cover__title panel-title"><a href="/#blog" title="link to homepage for pusidun" class="blog-button">pusidun</a></h1>
+        
+        <span class="panel-cover__subtitle panel-subtitle">BLOG</span>
+        
+        <hr class="panel-cover__divider" />
+        <p class="panel-cover__description">Welcome to my blog~</p>
+        <hr class="panel-cover__divider panel-cover__divider--secondary" />
+        
+        
+        
+
+        <div class="navigation-wrapper">
+          <div>
+            <nav class="cover-navigation cover-navigation--primary">
+              <ul class="navigation">
+                <li class="navigation__item"><a href="/#blog" title="" class="blog-button">博客主页</a></li>
+                
+                  <li class="navigation__item"><a href="/archive" title="archive">所有文章</a></li>
+                
+                  <li class="navigation__item"><a href="/tags" title="tags">标签</a></li>
+                
+                  <li class="navigation__item"><a href="/about" title="about">关于我</a></li>
+                
+              </ul>
+            </nav>
+          </div>          
+        </div>
+
+
+        </div>
+      </div>
+    </div>
+    
+    
+    <div class="panel-cover--overlay cover-clear"></div>
+    
+  </div>
+</header>
+
+
+    <div class="content-wrapper">
+        <div class="content-wrapper__inner">
+            <div class="main-post-list hidden">
+
+  <ol class="post-list">
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2021/05/muduo_net01/" title="访问 muduo_net 01 (EcpServer EchoServer)">muduo_net 01 (EcpServer EchoServer)</a></h2>
+      <p class="excerpt">本文源码基于muduo v2.0.2分析TCP网络编程最本质的事是处理三个半事件  连接建立：服务端accept（被动）接受连接，客户端connect（主动）发起连接  连接断开：主动断开（close，shutdown），被动断开（read返回0）  消息到达：文件描述符可读  消息发送完毕：算半个。对于低流量服务，可不必关心这个事件；这里的发送完毕指数据写入OS发送缓冲区，不代表对方已经接收到数据EchoServer类图&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2021-05-25 00:00:00 +0000" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2021-05-25</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">大并发服务器开发muduo</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2021/05/muduo_net01/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2021/05/muduo_base05/" title="访问 muduo_base 05 (MutexLock)">muduo_base 05 (MutexLock)</a></h2>
+      <p class="excerpt">本文源码基于muduo v2.0.2分析&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2021-05-25 00:00:00 +0000" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2021-05-25</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">大并发服务器开发muduo</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2021/05/muduo_base05/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2021/05/muduo_base04/" title="访问 muduo_base 04 (Thread)">muduo_base 04 (Thread)</a></h2>
+      <p class="excerpt">  pid,pthread_id,tid  __thread  pthread_atfork()  Reference本文源码基于muduo v2.0.2分析pid,pthread_id,tidgetpid()获取的是进程id，类型pid_t，每个进程在os中有唯一的IDpthread_self()获取的是线程ID，线程ID在某进程中是唯一的，在不同的进程中创建的线程可能出现ID值相同的情况。类型为pthread_t。Linux中的POSIX线程又被称为LWP（轻量级进程），不管创建线程还...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2021-05-25 00:00:00 +0000" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2021-05-25</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">大并发服务器开发muduo</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2021/05/muduo_base04/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2021/05/muduo_base03/" title="访问 muduo_base 03 (Exception)">muduo_base 03 (Exception)</a></h2>
+      <p class="excerpt">  UML  backtrace打印堆栈          backtrace和backtrace_symbols      __cxa_demangle        Reference本文源码基于muduo v2.0.2分析UML继承自std::exception。如何使用该类可以看Exception_test.cc文件。函数重点关注如何打印堆栈信息backtrace打印堆栈Exception::Exception(string msg)  : message_(std::move(m...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2021-05-25 00:00:00 +0000" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2021-05-25</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">大并发服务器开发muduo</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2021/05/muduo_base03/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2021/05/muduo_base02/" title="访问 muduo_base 02 (Atomic)">muduo_base 02 (Atomic)</a></h2>
+      <p class="excerpt">  原子操作          GCC4.1+中的原子操作      C++11中的原子操作        类图  参考阅读本文源码基于muduo v2.0.2分析原子操作GCC4.1+中的原子操作muduo用了下面几个（需要加编译选项-march=cpu-type）：//原子自增：返回旧值，原值加valuetype __sync_fetch_and_add(type *ptr, type value)//原子比较和交换操作：if the current value of *ptr is ...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2021-05-24 00:00:00 +0000" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2021-05-24</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">大并发服务器开发muduo</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2021/05/muduo_base02/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2021/05/muduo_base01/" title="访问 muduo_base 01 (Timestamp)">muduo_base 01 (Timestamp)</a></h2>
+      <p class="excerpt">  类图  通读源码之前的几点说明          copyable &amp; nocopyable      equality_comparable &amp; less_than_comparable      静态断言static_assert      多平台PRid64占位        通读源码  unittest代码本文源码基于muduo v2.0.2分析类图通读源码之前的几点说明class Timestamp : public muduo::copyable,     ...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2021-05-24 00:00:00 +0000" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2021-05-24</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">大并发服务器开发muduo</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2021/05/muduo_base01/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2021/05/linux-selectpollepoll/" title="访问 select/poll/epoll">select/poll/epoll</a></h2>
+      <p class="excerpt">  select          API      socket何时可读写        poll          API      poll使用案例                  代码几点说明          代码存在的缺陷                      epoll          API      epoll LT例子        select poll epoll 比较selectAPI/*@作用：在一定时间内，监听用户感兴趣的文件描述符上的可读可写和异常事...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2021-05-20 00:00:00 +0000" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2021-05-20</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">大并发服务器开发</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2021/05/linux-selectpollepoll/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2021/05/linux-socket2/" title="访问 socket编程(二)">socket编程(二)</a></h2>
+      <p class="excerpt">  流协议与粘包          产生原因:      粘包处理方案–本质上是要在应用层维护消息与消息的边界        read、write与recv、send  getsockname、getpeername  gethostname、gethostbyname、gethostbyaddr  僵进程与SIGCHLD信号          wait      waitpid      wait与waitpid区别      流协议与粘包争议：粘包并非专业术语，该数据包应指应用层的包。...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2021-05-19 00:00:00 +0000" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2021-05-19</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">Linux</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2021/05/linux-socket2/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2021/05/linux-socket1/" title="访问 socket编程(一)">socket编程(一)</a></h2>
+      <p class="excerpt">  IPv4套接字地址结构  字节序转换函数  地址转换函数  套接字类型  socket、bind、listen、accept、connect  SO_REUSEADDR  p2p聊天demoIPv4套接字地址结构#include &lt;netinet/in.h&gt;/* sockaddr_in */struct in_addr {    in_addr_t        s_addr;         /* 23 bits IPv4 address */};            ...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2021-05-18 00:00:00 +0000" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2021-05-18</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">Linux</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2021/05/linux-socket1/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2021/04/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BAch3/" title="访问 深入理解Java虚拟机ch3：垃圾收集器与内存分配策略">深入理解Java虚拟机ch3：垃圾收集器与内存分配策略</a></h2>
+      <p class="excerpt">  深入理解Java虚拟机ch3：垃圾收集器与内存分配策略          引用计数法      可达性分析      引用分类      回收条件      垃圾收集算法                  标记-清除算法 Mark-Sweep          复制算法 Copying          标记-整理算法 Mark-Compact          分代收集                    深入理解Java虚拟机ch3：垃圾收集器与内存分配策略主要思考以下3点   ...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2021-04-12 00:00:00 +0000" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2021-04-12</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">读书笔记</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2021/04/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BAch3/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2021/04/LinuxProgrammingInterface-FIO/" title="访问 【The Linux programming interface】File I/O">【The Linux programming interface】File I/O</a></h2>
+      <p class="excerpt">  本篇总结自«The Linux programming interface a Linux and UNIX system programming handbook by Michael Kerrisk» ch4,ch5  四个基本IO系统调用          简介      open      read      write      close      四个基本IO系统调用简介#include&lt;unistd.h&gt;STDIN_FILENO    0STDOUT_FIL...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2021-04-09 00:00:00 +0000" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2021-04-09</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">Linux</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2021/04/LinuxProgrammingInterface-FIO/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2020/09/FoldExpressions/" title="访问 fold expressions">fold expressions</a></h2>
+      <p class="excerpt">  C++17 Fold Expressions          用折叠表达式简化以前的代码      如何使用折叠表达式                  一元折叠          二元折叠          lambda表达式使用fold expressions                    C++17 Fold Expressions本文介绍C++17新特性折叠表达式。文章示例代码通过MinGW编译，宏__cplusplus=201703下面我们从一个模板函数sum开始，...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2020-09-03 00:00:00 +0000" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2020-09-03</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">modern_c++</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2020/09/FoldExpressions/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2020/08/DesignPattern-1/" title="访问 设计模式(一)设计原则">设计模式(一)设计原则</a></h2>
+      <p class="excerpt">前言我认为可以将设计由低到高分为以下3个层次：  设计原语  设计模式  架构模式层次1更多关注具体语言上的技巧，本系列文章讨论的是层次2.作为开头第一篇，希望读者不要抱着”套用”的想法学习设计模式。GOF这本书列举了常用的23种设计模式，去背诵下来，在开发时考虑特征符合哪种设计模式，然后去套用，并不是学习设计模式的目的，设计模式需要关注的是设计而非模式。GOF这本书的重点就在前几章，通过一个编辑器的例子去告诉你思考的方向。我个人观点，设计模式的重点就在本文提到的几大原则的理解。这几大原则...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2020-08-23 00:00:00 +0000" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2020-08-23</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">博客</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2020/08/DesignPattern-1/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2020/07/sharedptr-cnt/" title="访问 gcc5.4.0 shared_ptr源码阅读--引用计数">gcc5.4.0 shared_ptr源码阅读--引用计数</a></h2>
+      <p class="excerpt">引言本文探究在gcc5.4.0中，shared_ptr引用计数的实现相关源码：来源：Ubuntu 16路径：/usr/include/c++/5.4.0/bits文件：shared_ptr_atomic.h  shared_ptr_base.h  shared_ptr.hshared_ptr类下面是我精简的shared_ptr类代码，完整的在文末template &lt;typename _Tp&gt;  class shared_ptr : public __shared_ptr&lt;...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2020-07-15 00:00:00 +0000" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2020-07-15</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">博客</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2020/07/sharedptr-cnt/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2020/03/java-time/" title="访问 Java中时间处理">Java中时间处理</a></h2>
+      <p class="excerpt">  Date  SimpleDateFormat  Calendar  LocalDateTime  ZonedDateTime  DateTimeFormatter  Instant  新旧API转换旧 API：位于 java.util 包中，里面主要有 Date、Calendar、TimeZone 类新 API：位于 java.time 包中，里面主要有 LocalDateTime、ZonedDateTime、ZoneId 类Datepublic static void main( S...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2020-03-09 00:00:00 +0000" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2020-03-09</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">博客</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2020/03/java-time/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2019/12/Redis01sds/" title="访问 Redis源码阅读一:简单动态字符串SDS">Redis源码阅读一:简单动态字符串SDS</a></h2>
+      <p class="excerpt">  C字符串缺点  SDS结构体          3.0版本的SDS      5.0版本的SDS        相关操作函数          创建      释放      拼接      源码阅读基于Redis5.0.9C字符串缺点redis 127.0.0.1:6379&gt; SET dbname redisOKredis 127.0.0.1:6379&gt; GET dbname"redis"从上面的例子可以看到，key为dbname的值是一个字符串“redis”Redis源...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2019-12-14 00:00:00 +0000" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2019-12-14</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">Redis</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2019/12/Redis01sds/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2018/04/ubuntu-service/" title="访问 Ubuntu16.06常见服务搭建">Ubuntu16.06常见服务搭建</a></h2>
+      <p class="excerpt">  摘要  ssh          安装        samba          安装      配置      samba的用户权限      windows登陆samba        vimrc摘要系统环境Ubuntu 16.04 amd64隔一段时间要配一次服务记不住，记录在这里方便以后安装。目前更新了以下服务：  ssh  samba  vimrc // 20200126更新ssh安装sudo apt-get install openssh-server附个SecureCR...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2018-04-05 00:00:00 +0000" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2018-04-05</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">博客</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2018/04/ubuntu-service/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+  </ol>
+
+  <hr class="post-list__divider " />
+
+<nav class="pagination" role="navigation">
+
+	<!-- 百度搜索 -->
+	<script type="text/javascript">(function(){document.write(unescape('%3Cdiv id="bdcs"%3E%3C/div%3E'));var bdcs = document.createElement('script');bdcs.type = 'text/javascript';bdcs.async = true;bdcs.src = 'http://znsv.baidu.com/customer_search/api/js?sid=12441349038163667913' + '&plate_url=' + encodeURIComponent(window.location.href) + '&t=' + Math.ceil(new Date()/3600000);var s = document.getElementsByTagName('script')[0];s.parentNode.insertBefore(bdcs, s);})();
+	</script>
+	
+    
+    <span class="pagination__page-number">1 / 1</span>
+    
+</nav>
+
+
+</div>
+
+            <section class="footer">
+    <footer>
+        <div class = "footer_div">  
+        <nav class="cover-navigation navigation--social">
+          <ul class="navigation">
+
+          
+          <!-- Github -->
+          <li class="navigation__item_social">
+            <a href="https://github.com/pusidun" title="@pusidun 的 Github" target="_blank">
+              <div class="footer-social-icon" style="background:url(/images/github.png);"></div>
+            </a>
+          </li>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+          <!-- Email -->
+          <li class="navigation__item_social">
+            <a href="mailto:pusidun@hotmail.com" title="Contact me">
+              <div class="footer-social-icon" style="background:url(/images/email.png);"></div>
+            </a>
+          </li>
+          
+          
+          <!-- RSS -->
+          <li class="navigation__item_social">
+            <a href="/feed.xml" rel="author" title="RSS" target="_blank">
+              <div class="footer-social-icon" style="background:url(/images/rss.png);"></div>
+              <span class="label">RSS</span>
+            </a>
+          </li>
+
+          </ul>
+        </nav>
+
+        </div>
+
+        <div class = "footer_div">  
+           <p class="copyright text-muted">
+            Copyright &copy; pusidun 2021
+            </p>
+        	<div align="right">
+    			<link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+          <!-- 访问统计 -->
+          <span id="busuanzi_container_site_pv">
+            本站总访问量
+            <span id="busuanzi_value_site_pv"></span>次
+          </span>
+
+        </div>
+        <div>
+    </footer>
+</section>
+
+        </div>
+    </div>
+    
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="/js/main.js"></script>
+
+<script type="text/javascript" src="/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+  </body>
+
+</html>
