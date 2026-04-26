@@ -1,0 +1,49 @@
+<!-- TOC -->
+
+<ul>
+  <li><a href="#pidpthread_idtid">pid,pthread_id,tid</a></li>
+  <li><a href="#__thread">__thread</a></li>
+  <li><a href="#pthread_atfork">pthread_atfork()</a></li>
+  <li><a href="#reference">Reference</a></li>
+</ul>
+
+<!-- /TOC -->
+<p>本文源码基于<a href="https://github.com/chenshuo/muduo/releases/tag/v2.0.2" target="_blank">muduo v2.0.2</a>分析</p>
+
+<h2 id="pidpthread_idtid">pid,pthread_id,tid</h2>
+
+<p>getpid()获取的是进程id，类型pid_t，每个进程在os中有唯一的ID</p>
+
+<p>pthread_self()获取的是线程ID，线程ID在某进程中是唯一的，在不同的进程中创建的线程可能出现ID值相同的情况。类型为pthread_t。</p>
+
+<p>Linux中的POSIX线程又被称为LWP（轻量级进程），不管创建线程还是进程都是调用的fork，只是线程共享了部分资源而已。所以POSIX线程还具有一个唯一的真实pid，通常被称为<strong>tid</strong>。Linux下<code class="language-plaintext highlighter-rouge">pid_t gettid(void);</code>可以得到tid，man page的note指出<code class="language-plaintext highlighter-rouge">Glibc does not provide a wrapper for this system call; call it using syscall(2).</code>，glibc没有封装改函数，如需使用通过<code class="language-plaintext highlighter-rouge">syscall(SYS_gettid)</code></p>
+
+<h2 id="__thread">__thread</h2>
+
+<p>gcc内置的线程局部存储设施</p>
+
+<p>__thread只能修饰POD(plain old data)类型。POD类型指与C兼容的原始数据，例如，结构和整数等C语言中的类型是POD类型，但带有用户定义的构造函数或虚函数的类则不是。非POD类型可以使用线程特定数据TSD</p>
+
+<p>CurrentThread.cc</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>__thread int t_cachedTid = 0;   //缓存tid
+__thread char t_tidString[32];  //tid字符串表示
+__thread int t_tidStringLength = 6;
+__thread const char* t_threadName = "unknown";
+</code></pre></div></div>
+<p>被__thread修饰的变量为每个线程各自的全局变量。一个线程的修改不会对其他线程产生影响。</p>
+
+<p>C++11标准有thread_local，相比__thread有延迟初始化开销。更多不同请见文末参考资料。</p>
+
+<h2 id="pthread_atfork">pthread_atfork()</h2>
+
+<p>改函数注册fork函数调用前后的句柄</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#include &lt;pthread.h&gt;
+
+int pthread_atfork(void (*prepare)(void), void (*parent)(void),
+                    void (*child)(void));
+</code></pre></div></div>
+<p>三个参数分别为调用fork前，调用fork后父进程，调用fork后子进程的句柄。置为NULL即为不注册，成功时返回0，失败返回错误码。</p>
+
+<h2 id="reference">Reference</h2>
+
+<p><a href="https://blog.csdn.net/weixin_43705457/article/details/106624781" target="_blank">thread_local与__thread的区别</a></p>

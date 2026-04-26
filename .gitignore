@@ -3,3 +3,9 @@
 .sass-cache
 Gemfile.lock
 /.jekyll-cache
+/.claude
+node_modules/
+.DS_Store
+*.swp
+*~
+/.claude

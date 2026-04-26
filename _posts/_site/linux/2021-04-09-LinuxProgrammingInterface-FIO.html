@@ -1,0 +1,92 @@
+<blockquote>
+  <p>本篇总结自«The Linux programming interface a Linux and UNIX system programming handbook by Michael Kerrisk» ch4,ch5
+<!-- TOC --></p>
+</blockquote>
+
+<ul>
+  <li><a href="#四个基本io系统调用">四个基本IO系统调用</a>
+    <ul>
+      <li><a href="#简介">简介</a></li>
+      <li><a href="#open">open</a></li>
+      <li><a href="#read">read</a></li>
+      <li><a href="#write">write</a></li>
+      <li><a href="#close">close</a></li>
+    </ul>
+  </li>
+</ul>
+
+<!-- /TOC -->
+<h2 id="四个基本io系统调用">四个基本IO系统调用</h2>
+
+<h3 id="简介">简介</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#include&lt;unistd.h&gt;
+STDIN_FILENO    0
+STDOUT_FILENO   1
+STDERR_FILENO   2
+
+4 system call:
+fd = open(pathname,flags,mod)
+numread = read(fd, buffer, count)
+numwritten = write(fd, buffer, count)
+status = close(fd)
+</code></pre></div></div>
+
+<p>例子copy.c:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#include &lt;unistd.h&gt;
+#include &lt;fcntl.h&gt;
+
+// copy oldfile newfile
+int main(int argc, char* argv[]) {
+    char buff[1024];
+    int input_fd, output_fd;
+    if(argc &lt; 3){
+        return -1;
+    }
+    
+    input_fd = open(argv[1], O_RDONLY);
+    if(input_fd == -1)
+        return -1;
+    
+    mode_t filePerms = S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH;
+    output_fd = open(argv[2], O_WRONLY|O_CREAT|O_TRUNC, filePerms);
+    if(output_fd == -1)
+        return -1;
+
+    int numRead = 0;
+    while((numRead = read(input_fd, buff, sizeof(buff))) &gt; 0)
+        if(write(output_fd, buff, numRead) == -1)
+            return -1;
+    if(numRead == -1)
+        return -1;
+
+    if(close(input_fd) == -1)
+        return -1;
+    if(close(output_fd) == -1)
+        return -1;
+    return 0;
+}
+</code></pre></div></div>
+
+<h3 id="open">open</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#include&lt;sys/stat.h&gt;
+#include&lt;fcntl.h&gt;
+int open(const char *pathname, int flags, .../* mod_t mode */);
+// returns file desc on success, or -1 on error
+</code></pre></div></div>
+
+<p>flags划分为三类</p>
+<ul>
+  <li>File access mode flags：fcntl F_GETFL可以得到</li>
+  <li>File creation flags：不能被修改或者读取</li>
+  <li>Open file status flags：fcntl F_GETFL可以得到，F_SETFL设置</li>
+</ul>
+
+<p><img src="/assets/images/LinuxProgrammingInterface-FIO-001.jpg" alt="LinuxProgrammingInterface-FIO-001" /></p>
+
+<h3 id="read">read</h3>
+
+<h3 id="write">write</h3>
+
+<h3 id="close">close</h3>

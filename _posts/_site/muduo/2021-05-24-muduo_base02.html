@@ -1,0 +1,58 @@
+<!-- TOC -->
+
+<ul>
+  <li><a href="#原子操作">原子操作</a>
+    <ul>
+      <li><a href="#gcc41中的原子操作">GCC4.1+中的原子操作</a></li>
+      <li><a href="#c11中的原子操作">C++11中的原子操作</a></li>
+    </ul>
+  </li>
+  <li><a href="#类图">类图</a></li>
+  <li><a href="#参考阅读">参考阅读</a></li>
+</ul>
+
+<!-- /TOC -->
+<p>本文源码基于<a href="https://github.com/chenshuo/muduo/releases/tag/v2.0.2" target="_blank">muduo v2.0.2</a>分析</p>
+
+<h2 id="原子操作">原子操作</h2>
+
+<h3 id="gcc41中的原子操作">GCC4.1+中的原子操作</h3>
+
+<p>muduo用了下面几个（需要加编译选项-march=cpu-type）：</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//原子自增：返回旧值，原值加value
+type __sync_fetch_and_add(type *ptr, type value)
+
+//原子比较和交换操作：if the current value of *ptr is oldval, then write newval into *ptr.
+type __sync_val_compare_and_swap(type* ptr, type oldval,type newval)
+bool __sync_bool_compare_and_swap(type* ptr, type oldval,type newval)
+
+//原子赋值操作：writes value into *ptr, and returns the previous contents of *ptr
+type __sync_lock_test_and_set(type* ptr, type value)
+</code></pre></div></div>
+<p>更多的<a href="http://gcc.gnu.org/onlinedocs/gcc-4.1.1/gcc/Atomic-Builtins.html">GCC手册Atomic-Builtins</a></p>
+
+<h3 id="c11中的原子操作">C++11中的原子操作</h3>
+
+<p><a href="https://en.cppreference.com/w/cpp/atomic">cppreference atomic</a></p>
+
+<h2 id="类图">类图</h2>
+
+<p><img src="/assets/docs/diagrams/out/muduo_atomic/Atomic.png" alt="Atomic" /></p>
+
+<p>主要就这2个方法需要关注，其他方法基于这2个方法</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>T get()
+{
+// in gcc &gt;= 4.7: __atomic_load_n(&amp;value_, __ATOMIC_SEQ_CST)
+return __sync_val_compare_and_swap(&amp;value_, 0, 0);
+}
+
+T getAndAdd(T x)
+{
+// in gcc &gt;= 4.7: __atomic_fetch_add(&amp;value_, x, __ATOMIC_SEQ_CST)
+return __sync_fetch_and_add(&amp;value_, x);
+}
+</code></pre></div></div>
+
+<h2 id="参考阅读">参考阅读</h2>
+
+<p><a href="https://coolshell.cn/articles/8239.html">coolshell-无锁队列的实现</a></p>

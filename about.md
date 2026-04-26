@@ -6,7 +6,7 @@ title: About me
 ### 如何联系我
 
 <table>
-<tr><th>Email</th><th>pusidun@hotmail.com</th></tr>
+<tr><th>Email</th><th>pusidun@126.com</th></tr>
 <tr><th>QQ(base64编码)</th><th>NDA4MDUxNzQ3</th></tr>
 <tr><th>WeChat</th><th>pusden</th></tr>
 <tr><th>cnblogs</th><th><a href="https://www.cnblogs.com/pusidun/" target="_blank">pusidun's cnblogs</a></th></tr>
@@ -32,6 +32,4 @@ title: About me
 
 ### 友情链接：
 
-<a href="http://wonderxxf.gitee.io/coderfan/" target="_blank">wonder聚聚-奔跑的小石头</a>
-<a href="http://www.linya.pub/" target="_blank">大佬的书签</a>
 <a href="https://blog.csdn.net/qq_34863439" target="_blank">try1024</a>

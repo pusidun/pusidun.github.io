@@ -1,0 +1,32 @@
+<nav class="top-navbar">
+  <div class="navbar-inner">
+    <div class="navbar-brand">
+      <a href="/" class="navbar-logo">{{ site.title }}</a>
+    </div>
+    <div class="navbar-search">
+      <span class="navbar-search-icon">&#128269;</span>
+      <input type="text" id="navbar-search-input" placeholder="按下 S 搜索" autocomplete="off">
+      <div class="search-results" id="search-results"></div>
+    </div>
+    <button class="navbar-toggle" id="navbar-toggle" aria-label="Toggle navigation">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="navbar-menu" id="navbar-menu">
+      <a href="/" class="navbar-link{% if page.url == '/' or page.url == '/index.html' %} active{% endif %}">首页</a>
+      <div class="navbar-dropdown">
+        <a href="javascript:void(0)" class="navbar-link navbar-link--has-dropdown{% if page.layout == 'topic' %} active{% endif %}">专题 <span class="dropdown-arrow">&#9662;</span></a>
+        <div class="navbar-dropdown-menu">
+          {% for topic in site.data.topics %}
+            <a href="{{ topic.url }}" class="navbar-dropdown-item">{{ topic.name }}</a>
+          {% endfor %}
+        </div>
+      </div>
+      {% for item in site.nav %}
+        <a href="{{ item.url }}" class="navbar-link{% if page.url == item.url %} active{% endif %}">{{ item.title }}</a>
+      {% endfor %}
+      {% if site.social.github %}
+        <a href="https://github.com/{{ site.social.github }}" class="navbar-link navbar-link--external" target="_blank">GitHub</a>
+      {% endif %}
+    </div>
+  </div>
+</nav>
