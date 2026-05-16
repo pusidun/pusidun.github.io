@@ -1,0 +1,106 @@
+---
+// 3-layer silhouette trio for the hero, P5R "All-Out-Attack" chromatic shimmer.
+// Each layer drifts independently to create a subtle vibrating echo effect.
+//
+// Required image files (PNG with transparent background):
+//   public/images/silhouette-black.png  — solid black version (used as shadow)
+//   public/images/silhouette-red.png    — solid red version (the main layer)
+//   public/images/silhouette-white.png  — solid white version (highlight echo)
+---
+<div class="char-trio" aria-hidden="true">
+  <img src="/images/silhouette-black.png" alt="" class="char-layer char-black" loading="lazy" />
+  <img src="/images/silhouette-red.png"   alt="" class="char-layer char-red"   loading="lazy" />
+  <img src="/images/silhouette-white.png" alt="" class="char-layer char-white" loading="lazy" />
+</div>
+
+<style>
+  .char-trio {
+    position: absolute;
+    right: -4%;
+    bottom: 0;
+    width: min(60vmin, 620px);   /* explicit width so absolute children anchor properly */
+    height: 92%;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0;
+    animation: trioIn 1.4s cubic-bezier(0.2, 0, 0.2, 1) 600ms forwards;
+  }
+
+  .char-layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: bottom right;
+    will-change: transform;
+  }
+
+  /* --- Layer 1 (BLACK): the "shadow" — back-most, offset down-right, drifts slowly --- */
+  .char-black {
+    transform: translate(14px, 12px);
+    opacity: 0.55;
+    animation: driftBlack 7s ease-in-out infinite;
+  }
+  @keyframes driftBlack {
+    0%, 100% { transform: translate(14px, 12px) rotate(0deg); }
+    50%      { transform: translate(10px,  6px) rotate(-0.6deg); }
+  }
+
+  /* --- Layer 2 (RED): the primary visual — middle, biggest opacity, anchor --- */
+  .char-red {
+    transform: translate(0, 0);
+    opacity: 0.92;
+    animation: driftRed 5.5s ease-in-out infinite;
+  }
+  @keyframes driftRed {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    50%      { transform: translate(2px, -3px) rotate(0.3deg); }
+  }
+
+  /* --- Layer 3 (WHITE): the "highlight echo" — front-most, offset up-left, lightest --- */
+  .char-white {
+    transform: translate(-12px, -10px);
+    opacity: 0.32;
+    mix-blend-mode: screen;
+    animation: driftWhite 6.3s ease-in-out infinite reverse;
+  }
+  @keyframes driftWhite {
+    0%, 100% { transform: translate(-12px, -10px) rotate(0deg); }
+    50%      { transform: translate(-8px,  -6px) rotate(0.5deg); }
+  }
+
+  /* Entrance: trio fades in + slides from the right after preloader */
+  @keyframes trioIn {
+    from { opacity: 0; transform: translateX(60px) scale(1.02); }
+    to   { opacity: 1; transform: translateX(0) scale(1); }
+  }
+
+  /* Mobile: show smaller, positioned bottom-right, lower opacity per layer
+     so it acts as ambient decoration without competing with hero text. */
+  @media (max-width: 767px) {
+    .char-trio {
+      width: 70vw;
+      right: -6%;
+      bottom: 0;
+      height: 60vh;
+    }
+    .char-black { opacity: 0.4; }
+    .char-red   { opacity: 0.65; }
+    .char-white { opacity: 0.2; }
+  }
+
+  /* Glitch flash on every ~6s — quick chromatic split-out */
+  .char-trio::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    animation: glitchPulse 8s ease-in-out infinite 4s;
+  }
+  @keyframes glitchPulse {
+    0%, 92%, 100% { opacity: 0; }
+    93%, 96%      { opacity: 1; transform: translate(4px, -2px); }
+    94%           { transform: translate(-3px, 1px); }
+  }
+</style>

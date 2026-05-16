@@ -361,3 +361,20 @@
   -webkit-text-stroke: 2px var(--p5-white);
   color: transparent;
 }
+
+/* --- Keyboard-cap chip (P5R "↵" / "↑" / "↓" badges in hint text) --- */
+.p5-kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.4em;
+  padding: 0.15em 0.4em;
+  background: var(--p5-gray);
+  color: var(--p5-yellow);
+  border: 1.5px solid var(--p5-yellow);
+  font-family: 'Anton', 'Impact', sans-serif;
+  font-weight: 900;
+  font-size: 0.85em;
+  line-height: 1;
+  letter-spacing: 0;
+}

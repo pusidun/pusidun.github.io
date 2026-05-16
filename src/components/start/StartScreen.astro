@@ -2,6 +2,7 @@
 import MenuButton from './MenuButton.astro';
 import BgPattern from './BgPattern.astro';
 import Preloader from './Preloader.svelte';
+import CharacterTrio from './CharacterTrio.astro';
 
 const menu = [
   { href: '/cv', label: 'CV', subtitle: 'CAREER' },
@@ -12,6 +13,9 @@ const menu = [
 ---
 <section class="relative min-h-screen overflow-hidden bg-p5-black flex">
   <BgPattern />
+
+  <!-- Layered silhouette trio (black + red + white, chromatic shimmer) -->
+  <CharacterTrio />
 
 
   <div class="relative z-10 flex flex-col lg:flex-row w-full max-w-7xl mx-auto px-6 sm:px-10 py-12">
@@ -64,10 +68,13 @@ const menu = [
         />
       ))}
 
-      <div class="mt-6 flex items-center gap-3 text-p5-white/40 text-xs font-bold tracking-widest">
-        <span>PRESS</span>
-        <kbd class="px-2 py-1 bg-p5-gray text-p5-yellow border border-p5-yellow font-black">↵</kbd>
-        <span>TO SELECT</span>
+      <div class="mt-6 flex flex-wrap items-center gap-1.5 text-p5-white/40 text-[10px] sm:text-xs font-bold tracking-widest">
+        <kbd class="p5-kbd">↑</kbd>
+        <kbd class="p5-kbd">↓</kbd>
+        <span class="ml-1">NAVIGATE</span>
+        <span class="opacity-40 mx-2">·</span>
+        <kbd class="p5-kbd">↵</kbd>
+        <span class="ml-1">SELECT</span>
       </div>
     </div>
   </div>

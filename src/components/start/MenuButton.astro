@@ -7,45 +7,122 @@ export interface Props {
 }
 const { href, label, subtitle = '', index } = Astro.props;
 const delay = `${100 + index * 80}ms`;
+const chars = label.split('');
 ---
 <a
   href={href}
-  class="group relative block"
+  class="menu-link group"
   style={`animation-delay: ${delay}`}
   data-menu-button
 >
-  <div
-    class="relative flex items-center gap-4 bg-p5-white text-p5-black p5-clip-button px-7 sm:px-8 py-3 sm:py-4 transition-all duration-200 group-hover:bg-p5-yellow group-hover:translate-x-2 group-hover:-translate-y-1"
-  >
-    <span class="p5-menu-font p5-menu-wave text-2xl sm:text-3xl">{label}</span>
-    {subtitle && (
-      <span class="text-[10px] sm:text-xs font-black tracking-[0.2em] text-p5-red/70 ml-auto p5-menu-font">
-        {subtitle}
-      </span>
-    )}
-    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-p5-red font-black text-xl opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all">
-      ▶
-    </span>
-  </div>
-  <div
-    class="absolute -bottom-2 left-3 -right-3 h-full bg-p5-red p5-clip-button -z-10 transition-transform group-hover:translate-x-1 group-hover:translate-y-1"
-    aria-hidden="true"
-  ></div>
+  <span class="menu-label">
+    {chars.map((ch, i) => (
+      <span class:list={[
+        'ch',
+        i === 0 ? 'ch-first' : '',
+        i % 2 === 0 ? 'ch-even' : 'ch-odd',
+      ]}>{ch === ' ' ? ' ' : ch}</span>
+    ))}
+  </span>
+
+  {subtitle && (
+    <span class="menu-subtitle">{subtitle}</span>
+  )}
+
+  <span class="menu-arrow" aria-hidden="true">▶</span>
 </a>
 
 <style>
-  [data-menu-button] {
+  .menu-link {
+    position: relative;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.7rem;
+    padding: 0.45rem 1.1rem 0.6rem;
+    text-decoration: none;
+    cursor: pointer;
+    line-height: 1;
     opacity: 0;
     animation: slideInLeft 500ms cubic-bezier(0.5, 0, 0.2, 1) forwards;
   }
   @keyframes slideInLeft {
-    from {
-      opacity: 0;
-      transform: translateX(-60px) skewX(-8deg);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0) skewX(0);
-    }
+    from { opacity: 0; transform: translateX(-50px) skewX(-6deg); }
+    to   { opacity: 1; transform: translateX(0) skewX(0); }
+  }
+
+  .menu-label {
+    display: inline-flex;
+    align-items: baseline;
+    line-height: 1;
+  }
+
+  /* Per-letter ransom-note styling.
+     Default: white fill + thick black stroke (always-on).
+     Hover: add red + black offset text-shadow (matches the hero "Build." word). */
+  .ch {
+    display: inline-block;
+    font-family: 'Bungee', 'Anton', sans-serif;
+    color: var(--p5-white);
+    -webkit-text-stroke: 3px var(--p5-black);
+    paint-order: stroke fill;
+    text-transform: uppercase;
+    line-height: 0.95;
+    letter-spacing: 0.02em;
+    text-shadow: 0 0 0 transparent;
+    transition: text-shadow 240ms ease-out, transform 220ms ease-out;
+  }
+  .ch-even {
+    font-size: clamp(1.4rem, 4.5vw, 2.2rem);
+    transform: translateY(-2px) rotate(-1.5deg);
+  }
+  .ch-odd {
+    font-size: clamp(1.4rem, 4.5vw, 2.2rem);
+    transform: translateY(1px) rotate(1.8deg);
+  }
+  .ch.ch-first {
+    font-size: clamp(2rem, 6.5vw, 3.2rem);
+    transform: rotate(-2.5deg);
+  }
+
+  /* Hover: red glow edge (same stack as the "Build." hero word) */
+  .menu-link:hover .ch,
+  .menu-link:focus-visible .ch {
+    text-shadow:
+      3px 3px 0 var(--p5-red),
+      6px 6px 0 var(--p5-black);
+  }
+
+  /* Subtitle */
+  .menu-subtitle {
+    font-family: 'Bungee', sans-serif;
+    font-size: clamp(0.55rem, 1.3vw, 0.7rem);
+    letter-spacing: 0.22em;
+    color: var(--p5-yellow);
+    -webkit-text-stroke: 1.5px var(--p5-black);
+    paint-order: stroke fill;
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: opacity 200ms ease-out, transform 200ms ease-out;
+  }
+  .menu-link:hover .menu-subtitle,
+  .menu-link:focus-visible .menu-subtitle {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  /* Arrow */
+  .menu-arrow {
+    color: var(--p5-yellow);
+    font-size: 0.85rem;
+    -webkit-text-stroke: 1px var(--p5-black);
+    paint-order: stroke fill;
+    opacity: 0;
+    transform: translateX(-6px);
+    transition: opacity 200ms ease-out, transform 200ms ease-out;
+  }
+  .menu-link:hover .menu-arrow,
+  .menu-link:focus-visible .menu-arrow {
+    opacity: 1;
+    transform: translateX(0);
   }
 </style>

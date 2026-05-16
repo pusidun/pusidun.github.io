@@ -27,6 +27,7 @@ const projects = [
 
 const friends = [
   { name: 'try1024', href: 'https://blog.csdn.net/qq_34863439' },
+  { name: 'caoqinping', href: 'https://www.caoqinping.com/' },
 ];
 ---
 <BaseLayout title="ABOUT · PUSIDUN" description="关于我">
@@ -34,7 +35,7 @@ const friends = [
 
   <main class="relative max-w-4xl mx-auto px-4 sm:px-10 py-8 sm:py-12">
     <div class="mb-8 sm:mb-12">
-      <span class="p5-type-badge"><span>PROFILE / ME</span></span>
+      <span class="p5-type-badge"><span>INTEL / SUBJECT 01</span></span>
       <h1 class="p5-headline text-5xl sm:text-7xl text-p5-white mt-3 p5-heading-underline">
         ABOUT
       </h1>
@@ -42,8 +43,10 @@ const friends = [
 
     <!-- Contact -->
     <section class="mb-12">
-      <h2 class="p5-headline text-2xl text-p5-yellow mb-4 inline-block border-b-4 border-p5-red pb-1" style="transform: skewX(-6deg);">
-        CONTACT
+      <h2 class="p5-headline text-2xl text-p5-yellow mb-4 inline-flex items-baseline gap-3 border-b-4 border-p5-red pb-1" style="transform: skewX(-6deg);">
+        <span class="text-p5-red text-sm font-black tracking-widest">/01</span>
+        <span>CALLING CARD</span>
+        <span class="text-sm font-bold text-p5-white/50 tracking-wider">予告状</span>
       </h2>
       <div class="bg-p5-gray border-l-8 border-p5-red p-5">
         <dl class="grid grid-cols-1 sm:grid-cols-[120px_1fr] gap-y-3 gap-x-4">
@@ -65,8 +68,10 @@ const friends = [
 
     <!-- Projects -->
     <section class="mb-12">
-      <h2 class="p5-headline text-2xl text-p5-yellow mb-4 inline-block border-b-4 border-p5-red pb-1" style="transform: skewX(-6deg);">
-        OPEN SOURCE
+      <h2 class="p5-headline text-2xl text-p5-yellow mb-4 inline-flex items-baseline gap-3 border-b-4 border-p5-red pb-1" style="transform: skewX(-6deg);">
+        <span class="text-p5-red text-sm font-black tracking-widest">/02</span>
+        <span>ARSENAL</span>
+        <span class="text-sm font-bold text-p5-white/50 tracking-wider">武装</span>
       </h2>
       <div class="space-y-4">
         {projects.map((p) => (
@@ -88,8 +93,10 @@ const friends = [
 
     <!-- QR -->
     <section class="mb-12">
-      <h2 class="p5-headline text-2xl text-p5-yellow mb-4 inline-block border-b-4 border-p5-red pb-1" style="transform: skewX(-6deg);">
-        公众号
+      <h2 class="p5-headline text-2xl text-p5-yellow mb-4 inline-flex items-baseline gap-3 border-b-4 border-p5-red pb-1" style="transform: skewX(-6deg);">
+        <span class="text-p5-red text-sm font-black tracking-widest">/03</span>
+        <span>BROADCAST</span>
+        <span class="text-sm font-bold text-p5-white/50 tracking-wider">信号</span>
       </h2>
       <div class="inline-block border-4 border-p5-white p-2 bg-p5-white" style="box-shadow: 6px 6px 0 var(--p5-red);">
         <img src="/assets/images/GongZhongHao.jpg" alt="公众号二维码" class="block max-w-[200px]" />
@@ -98,8 +105,10 @@ const friends = [
 
     <!-- Friend links -->
     <section>
-      <h2 class="p5-headline text-2xl text-p5-yellow mb-4 inline-block border-b-4 border-p5-red pb-1" style="transform: skewX(-6deg);">
-        友情链接
+      <h2 class="p5-headline text-2xl text-p5-yellow mb-4 inline-flex items-baseline gap-3 border-b-4 border-p5-red pb-1" style="transform: skewX(-6deg);">
+        <span class="text-p5-red text-sm font-black tracking-widest">/04</span>
+        <span>ACCOMPLICES</span>
+        <span class="text-sm font-bold text-p5-white/50 tracking-wider">共犯</span>
       </h2>
       <ul class="space-y-2">
         {friends.map((f) => (

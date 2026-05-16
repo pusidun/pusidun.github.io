@@ -10,6 +10,7 @@ export default {
           black: '#0A0A0A',
           white: '#F5F1E8',
           yellow: '#FFD400',
+          cyan: '#19B5DC',
           gray: '#2A2A2A',
           'gray-light': '#4A4A4A',
         },
