@@ -22,5 +22,8 @@
   "devDependencies": {
     "@types/node": "^22.10.2",
     "gray-matter": "^4.0.3"
+  },
+  "engines": {
+    "node": ">=22.12.0"
   }
 }
