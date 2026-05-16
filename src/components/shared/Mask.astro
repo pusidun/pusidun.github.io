@@ -1,0 +1,37 @@
+---
+// Iconic Phantom-Thief style mask silhouette.
+// `color` controls the mask body (CSS currentColor).
+// `eyeColor` controls the eye cutouts (defaults to the page background).
+export interface Props {
+  class?: string;
+  eyeColor?: string;
+}
+const { class: className = '', eyeColor = '#0A0A0A' } = Astro.props;
+---
+<svg
+  class={className}
+  viewBox="0 0 200 80"
+  xmlns="http://www.w3.org/2000/svg"
+  aria-hidden="true"
+  fill="currentColor"
+>
+  <!-- Mask body — curvy outline with pointed center -->
+  <path d="
+    M 10 40
+    C 10 14, 36 8, 62 14
+    L 90 32
+    L 100 4
+    L 110 32
+    L 138 14
+    C 164 8, 190 14, 190 40
+    C 190 64, 168 70, 144 60
+    L 124 50
+    L 100 76
+    L 76 50
+    L 56 60
+    C 32 70, 10 64, 10 40
+    Z" />
+  <!-- Eye cutouts -->
+  <ellipse cx="55" cy="36" rx="18" ry="10" fill={eyeColor} />
+  <ellipse cx="145" cy="36" rx="18" ry="10" fill={eyeColor} />
+</svg>

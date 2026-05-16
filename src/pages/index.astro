@@ -1,0 +1,57 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import StartScreen from '../components/start/StartScreen.astro';
+import ArcanaSection from '../components/start/ArcanaSection.astro';
+import LatestPosts from '../components/start/LatestPosts.astro';
+---
+<BaseLayout
+  title="PUSIDUN — Portfolio"
+  description="pusidun 的个人站点 · CV · Blog · Projects · About"
+>
+  <!-- First-paint priority: Hero is the first thing the user sees.
+       The Calling Card preloader is rendered inside StartScreen (bottom-right)
+       and locks page scroll until it reaches 100%. -->
+  <StartScreen />
+
+  <!-- Below-the-fold: static HTML rendered server-side, but their reveal
+       animations don't initialize until the preloader fires "preloader:done". -->
+  <ArcanaSection />
+  <LatestPosts />
+
+  <!-- Footer -->
+  <footer class="relative border-t-4 border-p5-red py-8 px-6 sm:px-10 text-center">
+    <div class="text-xs font-bold tracking-widest text-p5-white/40">
+      © 2026 PUSIDUN ·
+      <a href="https://github.com/pusidun" target="_blank" rel="noopener" class="hover:text-p5-yellow transition-colors">GITHUB</a>
+    </div>
+  </footer>
+
+  <!-- Init GSAP scroll animations as soon as the preloader hits 100%.
+       Robust fail-safes ensure animations never stall content visibility. -->
+  <script>
+    import { initHomeScroll } from '../scripts/scroll-anim';
+
+    let started = false;
+    const start = () => {
+      if (started) return;
+      started = true;
+      initHomeScroll();
+    };
+
+    window.addEventListener('preloader:done', start, { once: true });
+
+    // Fail-safe 1: window load + grace period in case preloader event never fires
+    window.addEventListener('load', () => {
+      setTimeout(start, 4500);
+    }, { once: true });
+
+    // Fail-safe 2: if the user scrolls before everything else, just initialize now.
+    // (Elements are visible by default in CSS, so this is purely to enable
+    // any below-fold reveal animations the user hasn't reached yet.)
+    const onFirstScroll = () => {
+      window.removeEventListener('scroll', onFirstScroll);
+      start();
+    };
+    window.addEventListener('scroll', onFirstScroll, { passive: true, once: true });
+  </script>
+</BaseLayout>

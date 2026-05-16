@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --p5-red: #E60012;
+    --p5-red-dark: #A8000D;
+    --p5-black: #0A0A0A;
+    --p5-white: #F5F1E8;
+    --p5-yellow: #FFD400;
+    --p5-gray: #2A2A2A;
+    --p5-gray-light: #4A4A4A;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    background: var(--p5-black);
+    color: var(--p5-white);
+    /* Hide scrollbar — Firefox / IE / Edge */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  body {
+    @apply font-body bg-p5-black text-p5-white;
+    min-height: 100vh;
+    overflow-x: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  ::selection {
+    background: var(--p5-red);
+    color: var(--p5-white);
+  }
+
+  /* Hide scrollbar — Chrome / Safari / Opera */
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar,
+  *::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+  }
+}

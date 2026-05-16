@@ -1,0 +1,24 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TopNav from '../components/nav/TopNav.astro';
+import Timeline from '../components/cv/Timeline.astro';
+---
+<BaseLayout title="CV · PUSIDUN" description="工作经历时间轴">
+  <TopNav current="cv" />
+
+  <main class="relative max-w-5xl mx-auto px-4 sm:px-10 py-8 sm:py-12">
+    <div class="mb-8 sm:mb-12">
+      <span class="p5-type-badge"><span>CAREER / 2016-NOW</span></span>
+      <h1 class="p5-headline text-5xl sm:text-7xl text-p5-white mt-3 p5-heading-underline">
+        CAREER
+      </h1>
+    </div>
+
+    <Timeline />
+
+    <div class="mt-16 text-center text-xs font-bold tracking-widest text-p5-white/40">
+      <span class="block w-12 h-[2px] bg-p5-red mx-auto mb-2"></span>
+      END OF CAREER
+    </div>
+  </main>
+</BaseLayout>

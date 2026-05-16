@@ -1,0 +1,94 @@
+---
+import Mask from '../shared/Mask.astro';
+import VertKana from '../shared/VertKana.astro';
+---
+<div class="pointer-events-none absolute inset-0 overflow-hidden">
+  <!-- Top diagonal red bar with yellow trim -->
+  <div
+    class="absolute -top-24 -right-40 w-[140%] h-44 bg-p5-red opacity-95"
+    style="transform: rotate(-12deg);"
+  ></div>
+  <div
+    class="absolute -top-10 -right-40 w-[140%] h-2 bg-p5-yellow"
+    style="transform: rotate(-12deg);"
+  ></div>
+  <div
+    class="absolute -top-6 -right-40 w-[140%] h-[3px] bg-p5-yellow"
+    style="transform: rotate(-12deg); opacity: 0.5;"
+  ></div>
+
+  <!-- Bottom diagonal red bar -->
+  <div
+    class="absolute -bottom-24 -left-40 w-[140%] h-36 bg-p5-red opacity-90"
+    style="transform: rotate(-12deg);"
+  ></div>
+  <div
+    class="absolute -bottom-10 -left-40 w-[140%] h-[3px] bg-p5-yellow"
+    style="transform: rotate(-12deg);"
+  ></div>
+
+  <!-- Soft diagonal stripes layer -->
+  <div class="absolute inset-0 bg-stripes-soft"></div>
+
+  <!-- High-density halftone -->
+  <div class="absolute inset-0 bg-halftone-dense opacity-80"></div>
+
+  <!-- Giant mask silhouette behind content -->
+  <Mask
+    class="absolute -bottom-32 -left-24 w-[120vmin] text-p5-red/20 hidden sm:block"
+    eyeColor="#0A0A0A"
+  />
+
+  <!-- Arcana wheel decoration (top-right) -->
+  <div
+    class="p5-arcana-wheel w-[80vmin] h-[80vmin] -top-[20vmin] -right-[20vmin] hidden lg:block"
+  ></div>
+  <div
+    class="p5-arcana-wheel w-[40vmin] h-[40vmin] -top-[8vmin] -right-[8vmin] hidden lg:block"
+    style="animation-direction: reverse; animation-duration: 40s; border-style: dotted;"
+  ></div>
+
+  <!-- Top-left burst star -->
+  <svg
+    class="absolute top-10 left-10 w-20 h-20 text-p5-yellow opacity-90 animate-pulse-fast"
+    viewBox="0 0 100 100"
+    fill="currentColor"
+    aria-hidden="true"
+  >
+    <polygon points="50,0 60,35 100,40 70,60 80,100 50,75 20,100 30,60 0,40 40,35" />
+  </svg>
+
+  <!-- Vertical Japanese kana on left edge -->
+  <div class="absolute top-32 left-3 hidden md:block">
+    <VertKana text="怪盗団" color="red" />
+  </div>
+  <!-- Vertical kana on right -->
+  <div class="absolute top-32 right-3 hidden md:block">
+    <VertKana text="予告状" color="yellow" />
+  </div>
+
+  <!-- Tiny scattered stars -->
+  <svg
+    class="absolute top-1/3 right-[8%] w-6 h-6 text-p5-yellow opacity-70"
+    viewBox="0 0 100 100"
+    fill="currentColor"
+    aria-hidden="true"
+  >
+    <polygon points="50,0 60,35 100,40 70,60 80,100 50,75 20,100 30,60 0,40 40,35" />
+  </svg>
+  <svg
+    class="absolute bottom-[20%] left-[10%] w-8 h-8 text-p5-red opacity-80"
+    viewBox="0 0 100 100"
+    fill="currentColor"
+    aria-hidden="true"
+  >
+    <polygon points="50,0 60,35 100,40 70,60 80,100 50,75 20,100 30,60 0,40 40,35" />
+  </svg>
+
+  <!-- Huge background "P5" letterform -->
+  <div
+    class="absolute -bottom-20 right-4 text-[28rem] leading-none p5-headline text-p5-red/10 select-none"
+  >
+    P5
+  </div>
+</div>

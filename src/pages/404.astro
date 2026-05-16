@@ -1,0 +1,28 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="404 · NOT FOUND" description="Page not found">
+  <section class="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
+    <div class="absolute inset-0 bg-halftone-red opacity-50 pointer-events-none"></div>
+    <div class="absolute inset-0 pointer-events-none">
+      <div class="absolute -top-20 left-0 w-full h-32 bg-p5-red" style="transform: rotate(-12deg);"></div>
+      <div class="absolute -bottom-20 right-0 w-full h-24 bg-p5-yellow" style="transform: rotate(-8deg); opacity: 0.5;"></div>
+    </div>
+
+    <div class="relative z-10 text-center px-6">
+      <div class="p5-headline text-[10rem] sm:text-[16rem] leading-none text-p5-yellow" style="text-shadow: 8px 8px 0 var(--p5-red), 16px 16px 0 var(--p5-black);">
+        404
+      </div>
+      <p class="p5-headline text-2xl sm:text-3xl text-p5-white mt-6 tracking-wider">
+        DESTINATION UNKNOWN
+      </p>
+      <p class="text-p5-white/60 text-sm mt-2">这条路走不通。</p>
+      <a
+        href="/"
+        class="inline-block mt-8 px-6 py-3 bg-p5-red text-p5-white font-black tracking-widest p5-skew hover:bg-p5-yellow hover:text-p5-black transition-colors"
+      >
+        <span class="p5-skew-rev inline-block">← BACK TO START</span>
+      </a>
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,363 @@
+/* Persona 5 Royal style utilities */
+
+/* --- Halftone dot pattern --- */
+.bg-halftone {
+  background-image: radial-gradient(
+    circle at center,
+    rgba(245, 241, 232, 0.06) 1.5px,
+    transparent 1.5px
+  );
+  background-size: 14px 14px;
+}
+
+.bg-halftone-red {
+  background-image: radial-gradient(
+    circle at center,
+    rgba(230, 0, 18, 0.18) 2px,
+    transparent 2px
+  );
+  background-size: 16px 16px;
+}
+
+.bg-halftone-yellow {
+  background-image: radial-gradient(
+    circle at center,
+    rgba(255, 212, 0, 0.16) 2px,
+    transparent 2px
+  );
+  background-size: 18px 18px;
+}
+
+/* --- Diagonal stripes --- */
+.bg-stripes {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    var(--p5-black) 0,
+    var(--p5-black) 12px,
+    var(--p5-red) 12px,
+    var(--p5-red) 14px
+  );
+}
+
+/* --- Skewed (parallelogram) container --- */
+.p5-skew {
+  transform: skewX(-12deg);
+}
+.p5-skew-rev {
+  transform: skewX(12deg);
+}
+
+/* --- Clip-path angled card --- */
+.p5-clip-card {
+  clip-path: polygon(
+    0 8%,
+    96% 0,
+    100% 92%,
+    4% 100%
+  );
+}
+
+.p5-clip-button {
+  clip-path: polygon(
+    8% 0,
+    100% 0,
+    92% 100%,
+    0 100%
+  );
+}
+
+.p5-clip-tag {
+  clip-path: polygon(
+    10% 0,
+    100% 0,
+    90% 100%,
+    0 100%
+  );
+}
+
+/* --- Hard offset shadow (P5R signature) --- */
+.p5-shadow-yellow {
+  box-shadow:
+    6px 6px 0 var(--p5-yellow),
+    10px 10px 0 var(--p5-black);
+}
+.p5-shadow-red {
+  box-shadow:
+    6px 6px 0 var(--p5-red),
+    10px 10px 0 var(--p5-black);
+}
+.p5-shadow-white {
+  box-shadow: 5px 5px 0 var(--p5-white);
+}
+
+/* --- Burst/star title frame --- */
+.p5-burst {
+  position: relative;
+  display: inline-block;
+  padding: 0.5em 1.2em;
+}
+.p5-burst::before {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  background: var(--p5-yellow);
+  clip-path: polygon(
+    0% 50%, 8% 30%, 4% 15%, 22% 18%, 30% 0%, 50% 12%,
+    70% 0%, 78% 18%, 96% 15%, 92% 30%, 100% 50%,
+    92% 70%, 96% 85%, 78% 82%, 70% 100%, 50% 88%,
+    30% 100%, 22% 82%, 4% 85%, 8% 70%
+  );
+  z-index: -1;
+}
+
+/* --- Big bold P5R headline --- */
+.p5-headline {
+  font-family: 'Anton', 'Impact', sans-serif;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  line-height: 0.9;
+}
+
+/* --- Slash overlay (page transitions, hovers) --- */
+.p5-slash {
+  position: absolute;
+  inset: 0;
+  background: var(--p5-red);
+  transform-origin: top left;
+  pointer-events: none;
+}
+
+/* --- Type badge --- */
+.p5-type-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: var(--p5-red);
+  color: var(--p5-white);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  transform: skewX(-12deg);
+  text-transform: uppercase;
+  font-size: 0.75rem;
+}
+.p5-type-badge > * {
+  display: inline-block;
+  transform: skewX(12deg);
+}
+
+/* --- Glitch text effect on hover --- */
+.p5-hover-glitch {
+  transition: transform 120ms ease-out, color 120ms ease-out;
+}
+.p5-hover-glitch:hover {
+  transform: translate(-2px, -2px) skewX(-4deg);
+  color: var(--p5-yellow);
+  text-shadow:
+    2px 0 0 var(--p5-red),
+    -2px 0 0 #00BFFF;
+}
+
+/* --- Mask shape used as accent --- */
+.p5-mask-shape {
+  clip-path: polygon(
+    50% 0%,
+    100% 25%,
+    100% 75%,
+    50% 100%,
+    0 75%,
+    0 25%
+  );
+}
+
+/* --- Card hover lift --- */
+.p5-card-hover {
+  transition: transform 180ms ease-out, box-shadow 180ms ease-out;
+}
+.p5-card-hover:hover {
+  transform: translate(-4px, -4px);
+  box-shadow:
+    10px 10px 0 var(--p5-yellow),
+    14px 14px 0 var(--p5-black);
+}
+
+/* --- Section heading underline --- */
+.p5-heading-underline {
+  position: relative;
+  padding-bottom: 0.4em;
+}
+.p5-heading-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 4rem;
+  height: 6px;
+  background: var(--p5-red);
+  transform: skewX(-20deg);
+}
+
+/* --- High-density halftone for hero --- */
+.bg-halftone-dense {
+  background-image: radial-gradient(
+    circle at center,
+    rgba(245, 241, 232, 0.1) 1.6px,
+    transparent 1.6px
+  );
+  background-size: 10px 10px;
+}
+.bg-halftone-red-dense {
+  background-image: radial-gradient(
+    circle at center,
+    rgba(230, 0, 18, 0.32) 2.2px,
+    transparent 2.2px
+  );
+  background-size: 11px 11px;
+}
+
+/* --- Aggressive diagonal stripes --- */
+.bg-stripes-soft {
+  background-image: repeating-linear-gradient(
+    -22deg,
+    transparent 0, transparent 18px,
+    rgba(230, 0, 18, 0.08) 18px, rgba(230, 0, 18, 0.08) 20px
+  );
+}
+
+/* --- Bold ransom-note typography helpers --- */
+.p5-ransom {
+  display: inline-block;
+}
+.p5-ransom .word {
+  display: inline-block;
+}
+.p5-ransom .word-italic {
+  font-family: 'Playfair Display', 'Times New Roman', serif;
+  font-style: italic;
+  font-weight: 900;
+}
+.p5-ransom .word-condensed {
+  font-family: 'Bebas Neue', 'Anton', sans-serif;
+  letter-spacing: 0.02em;
+}
+.p5-ransom .word-block {
+  font-family: 'Anton', 'Impact', sans-serif;
+  letter-spacing: 0.03em;
+}
+
+/* --- Comic burst frame around an inline title --- */
+.p5-burst-frame {
+  position: relative;
+  display: inline-block;
+  padding: 0.3em 0.8em;
+  background: var(--p5-yellow);
+  color: var(--p5-black);
+  font-weight: 900;
+  letter-spacing: 0.05em;
+}
+.p5-burst-frame::before,
+.p5-burst-frame::after {
+  content: "";
+  position: absolute;
+  background: var(--p5-yellow);
+  inset: 0;
+  z-index: -1;
+  clip-path: polygon(
+    0% 50%, 6% 30%, 2% 12%, 20% 18%, 28% 0%, 50% 12%,
+    72% 0%, 80% 18%, 98% 12%, 94% 30%, 100% 50%,
+    94% 70%, 98% 88%, 80% 82%, 72% 100%, 50% 88%,
+    28% 100%, 20% 82%, 2% 88%, 6% 70%
+  );
+  transform: scale(1.18);
+}
+.p5-burst-frame::after {
+  background: var(--p5-red);
+  transform: scale(1.28) rotate(8deg);
+  z-index: -2;
+}
+
+/* --- Wedge section divider (P5R-style hard cut between sections) --- */
+.p5-wedge {
+  position: relative;
+  height: 80px;
+  margin-top: -40px;
+  z-index: 2;
+  pointer-events: none;
+}
+.p5-wedge::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--p5-red);
+  clip-path: polygon(0 60%, 100% 0, 100% 100%, 0 100%);
+}
+.p5-wedge::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--p5-black);
+  clip-path: polygon(0 70%, 100% 12%, 100% 100%, 0 100%);
+}
+
+/* --- Spinning arcana wheel decoration --- */
+.p5-arcana-wheel {
+  position: absolute;
+  border-radius: 50%;
+  border: 4px dashed var(--p5-red);
+  animation: arcanaSpin 60s linear infinite;
+  opacity: 0.15;
+  pointer-events: none;
+}
+@keyframes arcanaSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* --- P5R starting-menu font + wavy underline (selected item style) --- */
+.p5-menu-font {
+  font-family: 'Bungee', 'Anton', 'Impact', sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.p5-menu-inline {
+  font-family: 'Bungee Inline', 'Bungee', 'Anton', sans-serif;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Wavy hand-drawn red underline (decorative state — used on hover/active menu items) */
+.p5-menu-wave {
+  position: relative;
+}
+.p5-menu-wave::after {
+  content: '';
+  position: absolute;
+  left: -2%;
+  right: -2%;
+  bottom: -10px;
+  height: 8px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 8' preserveAspectRatio='none'><path d='M0 4 Q 3 0, 6 4 T 12 4 T 18 4 T 24 4' fill='none' stroke='%23E60012' stroke-width='2.4' stroke-linecap='round'/></svg>");
+  background-repeat: repeat-x;
+  background-size: 24px 8px;
+  opacity: 0;
+  transform: scaleX(0.85);
+  transform-origin: left;
+  transition: opacity 180ms ease-out, transform 220ms ease-out;
+  pointer-events: none;
+}
+.p5-menu-wave.is-active::after,
+.p5-menu-wave:hover::after,
+.group:hover .p5-menu-wave::after {
+  opacity: 1;
+  transform: scaleX(1);
+}
+.p5-text-stack-yellow {
+  text-shadow:
+    5px 5px 0 var(--p5-yellow),
+    10px 10px 0 var(--p5-black);
+}
+.p5-text-outline {
+  -webkit-text-stroke: 2px var(--p5-white);
+  color: transparent;
+}

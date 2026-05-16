@@ -1,0 +1,63 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import TopNav from '../../components/nav/TopNav.astro';
+import PostCard from '../../components/blog/PostCard.astro';
+import BlogFilter from '../../components/blog/BlogFilter.svelte';
+
+const all = await getCollection('blog', ({ data }) => !data.draft);
+const posts = all.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const types = Array.from(new Set(posts.map((p) => p.data.type)));
+const tagCounts = new Map<string, number>();
+for (const p of posts) {
+  for (const t of p.data.tags) tagCounts.set(t, (tagCounts.get(t) || 0) + 1);
+}
+const tags = Array.from(tagCounts.entries())
+  .sort((a, b) => b[1] - a[1])
+  .map(([t]) => t);
+---
+<BaseLayout title="BLOG · PUSIDUN" description="技术博客文章列表">
+  <TopNav current="blog" />
+
+  <main class="relative max-w-6xl mx-auto px-4 sm:px-10 py-8 sm:py-12">
+    <!-- Header -->
+    <div class="mb-8 sm:mb-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+      <div>
+        <span class="p5-type-badge"><span>ARTICLES / {posts.length}</span></span>
+        <h1 class="p5-headline text-5xl sm:text-7xl text-p5-white mt-3 p5-heading-underline">
+          BLOG
+        </h1>
+      </div>
+      <p class="text-xs sm:text-sm text-p5-white/60 max-w-sm">
+        按 <span class="text-p5-red font-black">类型</span> 与
+        <span class="text-p5-yellow font-black">标签</span> 双维度筛选
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-5 lg:gap-8">
+      <!-- Sidebar: filters -->
+      <aside class="lg:sticky lg:top-6 lg:self-start bg-p5-gray/60 border-2 border-p5-red p-4 sm:p-5">
+        <BlogFilter client:load types={types} tags={tags} />
+      </aside>
+
+      <!-- Posts -->
+      <section class="space-y-5">
+        {posts.map((p) => (
+          <PostCard
+            href={`/blog/${p.slug}/`}
+            title={p.data.title}
+            date={p.data.date}
+            type={p.data.type}
+            tags={p.data.tags}
+            summary={p.data.summary}
+          />
+        ))}
+        <div id="post-empty" class="hidden bg-p5-gray border-2 border-dashed border-p5-red p-10 text-center">
+          <p class="p5-headline text-3xl text-p5-red">NO MATCH</p>
+          <p class="mt-2 text-p5-white/60 text-sm">该组合下没有文章。试试别的筛选。</p>
+        </div>
+      </section>
+    </div>
+  </main>
+</BaseLayout>

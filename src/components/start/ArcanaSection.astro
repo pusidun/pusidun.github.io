@@ -1,0 +1,108 @@
+---
+import ArcanaCard from './ArcanaCard.astro';
+import Mask from '../shared/Mask.astro';
+import VertKana from '../shared/VertKana.astro';
+
+const cards = [
+  { numeral: '0', name: 'THE FOOL', subtitle: 'ABOUT', href: '/about', icon: 'fool' as const },
+  { numeral: 'I', name: 'THE MAGICIAN', subtitle: 'BLOG', href: '/blog', icon: 'magician' as const },
+  { numeral: 'IV', name: 'THE EMPEROR', subtitle: 'CV', href: '/cv', icon: 'emperor' as const },
+  { numeral: 'VII', name: 'THE CHARIOT', subtitle: 'PROJECTS', href: '/projects', icon: 'chariot' as const },
+];
+---
+
+<!-- Wedge divider between hero and arcana -->
+<div class="p5-wedge"></div>
+
+<section
+  id="arcana-section"
+  class="relative min-h-screen lg:h-screen overflow-hidden bg-p5-black flex flex-col justify-center py-10 sm:py-12 lg:py-10"
+  data-section="arcana"
+>
+  <!-- Background decoration -->
+  <div class="absolute inset-0 pointer-events-none">
+    <div class="absolute inset-0 bg-halftone-dense opacity-50"></div>
+    <div class="absolute inset-0 bg-stripes-soft"></div>
+
+    <!-- Top yellow stripe -->
+    <div
+      class="absolute -top-10 left-0 w-[140%] h-3 bg-p5-yellow opacity-60"
+      style="transform: rotate(-5deg);"
+    ></div>
+    <div
+      class="absolute -top-6 left-0 w-[140%] h-28 bg-p5-red opacity-95"
+      style="transform: rotate(-5deg);"
+    ></div>
+
+    <!-- Bottom strip -->
+    <div
+      class="absolute -bottom-12 right-0 w-[140%] h-24 bg-p5-yellow/30"
+      style="transform: rotate(-5deg);"
+    ></div>
+
+    <!-- Giant arcana wheel -->
+    <div class="p5-arcana-wheel w-[90vmin] h-[90vmin] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 hidden lg:block"></div>
+    <div
+      class="p5-arcana-wheel w-[50vmin] h-[50vmin] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 hidden lg:block"
+      style="animation-direction: reverse; animation-duration: 40s; border-style: dotted; border-color: var(--p5-yellow);"
+    ></div>
+
+    <!-- Mask silhouette behind cards -->
+    <Mask
+      class="absolute -bottom-32 right-[-8%] w-[60vmin] text-p5-red/12 hidden lg:block"
+      eyeColor="#0A0A0A"
+    />
+
+    <!-- Vertical kana -->
+    <div class="absolute top-32 left-3 hidden md:block">
+      <VertKana text="運命の輪" color="yellow" />
+    </div>
+    <div class="absolute top-32 right-3 hidden md:block">
+      <VertKana text="ARCANA" color="red" />
+    </div>
+
+    <!-- Giant background number -->
+    <div
+      class="absolute right-4 top-1/2 -translate-y-1/2 text-[18rem] leading-none p5-headline text-p5-red/8 select-none hidden lg:block"
+    >
+      02
+    </div>
+  </div>
+
+  <div class="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 w-full">
+    <!-- Section header -->
+    <div class="mb-5 sm:mb-8 text-center" data-arcana-header>
+      <div class="inline-block mb-2">
+        <span class="p5-burst-frame text-xs">STARS &amp; ARCANA</span>
+      </div>
+      <h2 class="p5-headline text-3xl sm:text-5xl lg:text-6xl text-p5-white leading-[0.95]">
+        CHOOSE YOUR
+        <span class="text-p5-red p5-text-stack-yellow inline-block ml-2" style="transform: skewX(-4deg);">ARCANA.</span>
+      </h2>
+      <p class="mt-2 text-p5-white/60 text-xs tracking-widest font-bold">
+        — 每张牌指引一个方向 · TAROT GUIDES THE WAY —
+      </p>
+    </div>
+
+    <!-- 4 cards row -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 justify-items-center">
+      {cards.map((c, i) => (
+        <ArcanaCard
+          numeral={c.numeral}
+          name={c.name}
+          subtitle={c.subtitle}
+          href={c.href}
+          icon={c.icon}
+          index={i}
+        />
+      ))}
+    </div>
+
+    <!-- Footer hint -->
+    <div class="mt-5 sm:mt-8 flex items-center justify-center gap-3 text-p5-white/50 text-[10px] sm:text-xs font-bold tracking-widest">
+      <span class="block w-8 h-[2px] bg-p5-red"></span>
+      点击卡牌进入对应模块
+      <span class="block w-8 h-[2px] bg-p5-red"></span>
+    </div>
+  </div>
+</section>

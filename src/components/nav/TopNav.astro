@@ -1,0 +1,45 @@
+---
+import Mask from '../shared/Mask.astro';
+
+export interface Props {
+  current?: 'cv' | 'blog' | 'projects' | 'about';
+}
+const { current } = Astro.props;
+const links = [
+  { href: '/cv', label: 'CV', key: 'cv' as const },
+  { href: '/blog', label: 'BLOG', key: 'blog' as const },
+  { href: '/projects', label: 'PROJECTS', key: 'projects' as const },
+  { href: '/about', label: 'ABOUT', key: 'about' as const },
+];
+---
+<header class="relative z-30 bg-p5-black border-b-4 border-p5-red">
+  <!-- Yellow trim line below -->
+  <div class="absolute left-0 right-0 -bottom-[7px] h-[2px] bg-p5-yellow opacity-80"></div>
+
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-2 sm:py-3 flex items-center justify-between gap-2">
+    <a href="/" class="flex items-center gap-2 group shrink-0">
+      <Mask
+        class="w-8 h-4 sm:w-10 sm:h-5 text-p5-red transition-transform group-hover:text-p5-yellow group-hover:rotate-[-6deg]"
+        eyeColor="#0A0A0A"
+      />
+      <span class="p5-headline text-base sm:text-2xl text-p5-white group-hover:text-p5-yellow transition-colors tracking-wider">
+        PUSIDUN
+      </span>
+    </a>
+    <nav class="flex items-center gap-0.5 sm:gap-2">
+      {links.map((link, i) => (
+        <a
+          href={link.href}
+          class:list={[
+            'p5-skew px-2 sm:px-3 py-1 text-[11px] sm:text-base font-black tracking-wider transition-all border-2',
+            current === link.key
+              ? 'bg-p5-red text-p5-white border-p5-red shadow-[3px_3px_0_var(--p5-yellow)]'
+              : 'text-p5-white border-transparent hover:bg-p5-yellow hover:text-p5-black hover:border-p5-black hover:shadow-[3px_3px_0_var(--p5-red)]',
+          ]}
+        >
+          <span class="p5-skew-rev inline-block">{link.label}</span>
+        </a>
+      ))}
+    </nav>
+  </div>
+</header>

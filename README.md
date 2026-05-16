@@ -1,90 +1,148 @@
-# pusidun's Blog
+# pusidun.github.io
 
-个人技术博客，基于 Jekyll 构建，部署在 GitHub Pages。
+> Persona 5 Royal 风格的个人作品集站点 · CV · Blog · Projects · About
 
-## 功能特性
+基于 [Astro](https://astro.build/) 构建的静态站点，视觉参考 *Persona 5 Royal* 的高反差、动感、漫画式 UI。
 
-- 顶部导航栏 + Banner + 双栏布局（文章列表 + 侧边栏）
-- **专题下拉菜单**：按主题分类浏览文章（Muduo / Linux / C++ / Java / Redis / 设计模式）
-- **站内搜索**：按标题和标签模糊匹配，快捷键 `S` 聚焦
-- 侧边栏：个人信息卡片 + 标签分类统计
-- 黑猫主题鼠标指针
-- Valine 评论系统
-- 百度统计 + 不蒜子访问计数
-- 响应式设计，适配移动端
+## 技术栈
 
-## 目录结构
+| 项 | 选择 |
+| --- | --- |
+| SSG | Astro 4.x |
+| UI 组件 | Astro `.astro` + Svelte（用于客户端交互岛屿） |
+| 样式 | Tailwind CSS 3 + 自定义 P5R 主题 CSS |
+| 字体 | Anton / Bebas Neue / Playfair Display Italic / Noto Sans SC |
+| 滚动动画 | GSAP + ScrollTrigger |
+| 路由切换 | Astro View Transitions |
+| Markdown | Astro Content Collections (类型安全 frontmatter) |
+| 代码高亮 | Shiki |
+| 部署 | Render.com Static Site |
+
+## 站点结构
 
 ```
-_posts/
-  muduo/           # Muduo 源码分析 (6篇)
-  linux/           # Linux 系统编程 (5篇)
-  cpp/             # C++ 进阶 (2篇)
-  java/            # Java (2篇)
-  redis/           # Redis (1篇)
-  design-pattern/  # 设计模式 (1篇)
-_data/
-  topics.yml       # 专题导航下拉菜单配置
-_layouts/
-  default.html     # 基础布局：navbar + banner + 双栏 + footer
-  post.html        # 文章详情页
-  page.html        # 静态页面
-  topic.html       # 专题列表页
-_includes/
-  navbar.html      # 顶部导航栏（含搜索框、专题下拉）
-  sidebar.html     # 右侧边栏（个人卡片 + 标签）
-  footer.html      # 页脚
-topics/            # 各专题入口页
-css/main.css       # 全局样式
-js/main.js         # 搜索、移动端菜单等交互逻辑
-search.json        # 构建时自动生成的文章索引
+src/
+├── pages/
+│   ├── index.astro                 # 主页：Start Screen + Arcana + Latest
+│   ├── cv.astro                    # 工作时间轴
+│   ├── projects.astro              # GitHub Pinned 项目占位
+│   ├── about.astro                 # 联系方式 + 开源项目
+│   ├── 404.astro
+│   └── blog/
+│       ├── index.astro             # type/tag 双维度筛选列表
+│       └── [...slug].astro         # 单篇文章动态路由
+├── content/
+│   ├── config.ts                   # Content Collections schema
+│   └── blog/*.md                   # 17 篇博客文章
+├── layouts/
+│   ├── BaseLayout.astro            # <html> + meta + View Transitions
+│   └── PostLayout.astro            # 单篇博文壳
+├── components/
+│   ├── start/
+│   │   ├── StartScreen.astro       # 主页 hero
+│   │   ├── MenuButton.astro        # 4 个斜切菜单按钮
+│   │   ├── BgPattern.astro         # 背景：halftone + 斜条 + 大面具
+│   │   ├── CharacterSilhouette.astro  # 手绘 SVG 战士剪影
+│   │   ├── Preloader.svelte        # 予告状（Calling Card）加载器
+│   │   ├── ArcanaSection.astro     # 4 张塔罗牌区
+│   │   ├── ArcanaCard.astro        # 单张塔罗牌（带 SVG 符号）
+│   │   └── LatestPosts.astro       # 最新 3 篇文章
+│   ├── nav/TopNav.astro            # 内页顶栏（含面具 logo）
+│   ├── cv/Timeline.astro           # 工作时间轴
+│   ├── blog/
+│   │   ├── BlogFilter.svelte       # 客户端筛选器（type + tag）
+│   │   └── PostCard.astro
+│   └── shared/
+│       ├── Mask.astro              # 怪盗团面具 SVG
+│       └── VertKana.astro          # 竖排日文装饰
+├── data/cv.ts                      # CV 数据（公司 + 年份）
+├── scripts/scroll-anim.ts          # GSAP ScrollTrigger 初始化
+└── styles/
+    ├── global.css                  # 重置 + Tailwind + CSS 变量
+    ├── persona.css                 # P5R 工具类（halftone/wedge/burst/...）
+    └── markdown.css                # 博文正文排版
+public/
+├── images/, assets/                # 博文中引用的图片
+└── favicon.svg
+scripts/migrate-posts.mjs           # 一次性 Jekyll → Astro 迁移脚本
 ```
 
 ## 本地开发
 
-### 环境准备
+需要 Node.js 18+。
 
 ```bash
-# macOS 使用 Homebrew 安装 Ruby
-brew install ruby
-export PATH="/opt/homebrew/opt/ruby/bin:/opt/homebrew/lib/ruby/gems/4.0.0/bin:$PATH"
-
-# 安装依赖
-gem install jekyll jekyll-paginate jekyll-sitemap kramdown-parser-gfm redcarpet
+npm install            # 安装依赖
+npm run dev            # 启动 dev server → http://localhost:4321
+npm run build          # 构建到 dist/
+npm run preview        # 预览构建产物
 ```
 
-### 启动开发服务器
+## 新增博文
 
-```bash
-jekyll serve
-# 访问 http://localhost:4000/
-```
-
-## 新增文章
-
-在对应专题目录下创建 Markdown 文件：
-
-```bash
-_posts/muduo/2026-04-26-new-post.md
-```
-
-Front matter 模板：
+在 `src/content/blog/` 下新建 `.md` 文件。文件名建议 `YYYY-MM-DD-slug.md`。Frontmatter：
 
 ```yaml
 ---
-layout: post
-categories: muduo
-title: 文章标题
-date: 2026-04-26
-tags: 标签1 标签2
+title: "文章标题"
+date: 2026-05-16
+type: 技术             # 技术 / 生活 / 读书 / 随笔
+tags: [cpp, muduo]     # 自由标签
+summary: 可选的简短摘要
+draft: false           # 设 true 不会被发布
 ---
 ```
 
-`categories` 字段需与 `_data/topics.yml` 中的 `category` 值一致，文章才会出现在对应专题页。
+Schema 在 [`src/content/config.ts`](src/content/config.ts)。`type` 限定枚举，编译时校验。
 
-## 新增专题
+## 自定义
 
-1. 在 `_data/topics.yml` 中添加一项
-2. 在 `topics/` 下创建对应入口页（参考已有文件）
-3. 在 `_posts/` 下创建对应子目录
+| 想改 | 改哪里 |
+| --- | --- |
+| 工作经历（公司/年份） | [`src/data/cv.ts`](src/data/cv.ts) |
+| 主页 4 个菜单按钮 | [`src/components/start/StartScreen.astro`](src/components/start/StartScreen.astro) → `menu` 数组 |
+| 塔罗牌的对应模块 | [`src/components/start/ArcanaSection.astro`](src/components/start/ArcanaSection.astro) → `cards` 数组 |
+| 关于页内容（联系方式 / 开源项目） | [`src/pages/about.astro`](src/pages/about.astro) |
+| 颜色 / 字体 | [`tailwind.config.mjs`](tailwind.config.mjs) + [`src/styles/global.css`](src/styles/global.css) |
+| Persona 工具类（斜切 / 阴影 / halftone） | [`src/styles/persona.css`](src/styles/persona.css) |
+| 滚动动画时序 | [`src/scripts/scroll-anim.ts`](src/scripts/scroll-anim.ts) |
+| Preloader 时序 / 文案 / 震动幅度 | [`src/components/start/Preloader.svelte`](src/components/start/Preloader.svelte) |
+| 人物剪影姿势 | [`src/components/start/CharacterSilhouette.astro`](src/components/start/CharacterSilhouette.astro) (SVG bezier paths) |
 
+## 关键特性
+
+### 1. 予告状（Calling Card）Preloader
+首屏右下角的小卡片，承担页面加载进度指示。0% → 100% 期间锁定滚动条；到 100% 后晃动 3 次（每次中间缩到 90% 停顿）然后淡出消失。给 GSAP ScrollTrigger 留出充足的加载与初始化时间。
+
+### 2. 塔罗牌「逐张展示」
+**桌面端**（≥ 1024px）：Arcana 区被 pin 到视口顶，4 张牌随滚动条进度依次翻入（GSAP scrub 模式）。
+**移动端**：不 pin，每张牌单独的 ScrollTrigger，进入视口即触发。
+
+### 3. Blog 双维度筛选
+type（技术/生活/读书/随笔）+ tag（自由标签）双维度。Svelte 岛屿做客户端筛选，URL 参数同步（`/blog?type=技术&tag=cpp`）。
+
+### 4. 容错滚动动画
+所有元素默认 CSS 可见。GSAP 初始化时检测元素位置：
+- 已在视口 / 已滚过 → 直接设为最终态
+- 仍在下方 → 隐藏并附加 ScrollTrigger
+
+即便 GSAP 加载失败、preloader 卡死，**内容永远不会消失**。
+
+## 部署
+
+仓库根目录的 [`render.yaml`](render.yaml) 已配置好 Render.com Static Site：
+
+```yaml
+buildCommand: npm ci && npm run build
+staticPublishPath: ./dist
+```
+
+Render Dashboard 连接 GitHub 仓库即可自动构建。每次 push 到 `master` 都会重新部署。
+
+## 历史
+
+本仓库前身是 Jekyll 博客（2018-2026），2026 年 5 月迁移到 Astro 并加入作品集功能。原有 17 篇文章通过 [`scripts/migrate-posts.mjs`](scripts/migrate-posts.mjs) 一次性转换。
+
+## License
+
+MIT

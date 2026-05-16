@@ -1,0 +1,129 @@
+---
+import { getCollection } from 'astro:content';
+import VertKana from '../shared/VertKana.astro';
+
+const all = await getCollection('blog', ({ data }) => !data.draft);
+const latest = all
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 3);
+
+function fmt(d: Date) {
+  return new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: '2-digit',
+  }).format(d);
+}
+---
+
+<!-- Wedge divider -->
+<div class="p5-wedge"></div>
+
+<section
+  id="latest-section"
+  class="relative min-h-screen overflow-hidden bg-p5-black py-20 sm:py-28"
+  data-section="latest"
+>
+  <!-- Background -->
+  <div class="absolute inset-0 pointer-events-none">
+    <div class="absolute inset-0 bg-halftone-red-dense opacity-50"></div>
+    <div class="absolute inset-0 bg-stripes-soft"></div>
+
+    <!-- Side diagonals -->
+    <div
+      class="absolute -top-12 -right-40 w-[140%] h-32 bg-p5-yellow opacity-30"
+      style="transform: rotate(-5deg);"
+    ></div>
+
+    <!-- Vertical kana -->
+    <div class="absolute top-32 left-3 hidden md:block">
+      <VertKana text="最新記事" color="red" />
+    </div>
+
+    <!-- Giant background number -->
+    <div
+      class="absolute -bottom-32 -left-12 text-[32rem] leading-none p5-headline text-p5-yellow/8 select-none"
+    >
+      03
+    </div>
+    <!-- Decorative star -->
+    <svg
+      class="absolute top-20 right-[15%] w-12 h-12 text-p5-red opacity-70"
+      viewBox="0 0 100 100"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <polygon points="50,0 60,35 100,40 70,60 80,100 50,75 20,100 30,60 0,40 40,35" />
+    </svg>
+  </div>
+
+  <div class="relative z-10 max-w-6xl mx-auto px-6 sm:px-10">
+    <!-- Header -->
+    <div class="mb-12 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4" data-latest-header>
+      <div>
+        <div class="inline-block mb-3">
+          <span class="p5-burst-frame text-sm">LATEST / 03</span>
+        </div>
+        <h2 class="p5-headline text-5xl sm:text-7xl lg:text-8xl text-p5-white mt-2 leading-[0.9]">
+          NEW <span class="text-p5-red p5-text-stack-yellow inline-block" style="transform: skewX(-4deg);">DROPS</span><span class="text-p5-yellow">.</span>
+        </h2>
+      </div>
+      <a
+        href="/blog"
+        class="self-start sm:self-end inline-flex items-center gap-2 px-4 py-2 bg-p5-yellow text-p5-black font-black tracking-widest p5-skew hover:bg-p5-white transition-colors"
+      >
+        <span class="p5-skew-rev inline-block">ALL POSTS →</span>
+      </a>
+    </div>
+
+    <!-- Posts -->
+    <ol class="space-y-5">
+      {latest.map((post, i) => (
+        <li data-latest-item style={`--idx: ${i}`}>
+          <a
+            href={`/blog/${post.slug}/`}
+            class="group relative block bg-p5-gray border-l-8 border-p5-red p5-card-hover"
+          >
+            <div class="grid grid-cols-[80px_1fr_auto] gap-4 sm:gap-6 items-center p-5 sm:p-6">
+              <div class="text-center">
+                <div class="p5-headline text-4xl sm:text-5xl text-p5-yellow leading-none">
+                  {String(i + 1).padStart(2, '0')}
+                </div>
+                <div class="text-[10px] font-bold tracking-widest text-p5-red mt-1">
+                  ENTRY
+                </div>
+              </div>
+              <div>
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="p5-type-badge"><span>{post.data.type}</span></span>
+                  <span class="text-xs text-p5-white/50 font-bold tracking-wider">{fmt(post.data.date)}</span>
+                </div>
+                <h3 class="p5-headline text-xl sm:text-2xl text-p5-white group-hover:text-p5-yellow transition-colors leading-tight">
+                  {post.data.title}
+                </h3>
+                {post.data.tags.length > 0 && (
+                  <div class="flex flex-wrap gap-1.5 mt-2">
+                    {post.data.tags.slice(0, 4).map((tag) => (
+                      <span class="text-[10px] font-black tracking-wider text-p5-red bg-p5-black px-2 py-0.5 border border-p5-red">
+                        #{tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div class="hidden sm:flex items-center text-p5-red text-3xl font-black opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all">
+                →
+              </div>
+            </div>
+          </a>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  [data-latest-item] {
+    will-change: opacity, transform;
+  }
+</style>

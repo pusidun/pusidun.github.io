@@ -1,0 +1,72 @@
+---
+import { career } from '../../data/cv';
+---
+<div class="relative">
+  <!-- Vertical line -->
+  <div class="absolute left-1/2 top-0 bottom-0 w-1 bg-p5-red -translate-x-1/2 hidden md:block"></div>
+  <div class="absolute left-[26px] top-0 bottom-0 w-1 bg-p5-red md:hidden"></div>
+
+  <ol class="space-y-12">
+    {career.map((entry, idx) => {
+      const isLeft = idx % 2 === 0;
+      return (
+        <li
+          class="relative md:grid md:grid-cols-2 md:gap-12 pl-14 md:pl-0"
+          data-cv-entry
+          style={`animation-delay: ${idx * 120}ms`}
+        >
+          <!-- Marker (stamp) -->
+          <div class="absolute left-2 md:left-1/2 top-4 md:-translate-x-1/2 z-10">
+            <div class="relative w-10 h-10 md:w-12 md:h-12">
+              <div class="absolute inset-0 bg-p5-yellow rotate-45 border-4 border-p5-black"></div>
+              <div class="absolute inset-2 bg-p5-red rotate-45"></div>
+              {entry.current && (
+                <div class="absolute -top-1 -right-6 px-1.5 py-0.5 bg-p5-yellow text-p5-black text-[9px] font-black tracking-wider whitespace-nowrap">NOW</div>
+              )}
+            </div>
+          </div>
+
+          {/* Empty filler for alignment */}
+          {isLeft ? null : <div class="hidden md:block"></div>}
+
+          <!-- Card -->
+          <div class:list={[
+            'relative bg-p5-gray border-l-8 border-p5-red p-4 sm:p-6 p5-card-hover',
+            isLeft ? 'md:mr-12 md:text-right' : 'md:ml-12'
+          ]}>
+            <!-- Year band -->
+            <div class:list={['flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3', isLeft ? 'md:justify-end' : '']}>
+              <span class="p5-headline text-2xl sm:text-3xl text-p5-yellow">{entry.start}</span>
+              <span class="text-p5-red font-black text-lg sm:text-xl">→</span>
+              <span class="p5-headline text-2xl sm:text-3xl text-p5-white">{entry.end}</span>
+            </div>
+            <!-- Company -->
+            <h3 class="p5-headline text-lg sm:text-2xl text-p5-white leading-tight">{entry.company}</h3>
+            {entry.companyZh && (
+              <p class="text-p5-white/70 mt-1 text-xs sm:text-sm tracking-wider">{entry.companyZh}</p>
+            )}
+          </div>
+
+          {isLeft ? <div class="hidden md:block"></div> : null}
+        </li>
+      );
+    })}
+  </ol>
+</div>
+
+<style>
+  [data-cv-entry] {
+    opacity: 0;
+    animation: cvIn 500ms cubic-bezier(0.5, 0, 0.2, 1) forwards;
+  }
+  @keyframes cvIn {
+    from {
+      opacity: 0;
+      transform: translateX(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+</style>

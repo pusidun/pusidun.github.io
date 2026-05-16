@@ -1,0 +1,65 @@
+---
+import { ViewTransitions } from 'astro:transitions';
+import '../styles/global.css';
+import '../styles/persona.css';
+
+export interface Props {
+  title: string;
+  description?: string;
+  ogImage?: string;
+}
+
+const {
+  title,
+  description = 'pusidun — engineer · blog · projects',
+  ogImage = '/og/default.png',
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+---
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL(ogImage, Astro.site)} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Bungee&family=Bungee+Inline&family=Noto+Sans+SC:wght@400;700;900&family=Playfair+Display:ital,wght@1,800;1,900&family=JetBrains+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <ViewTransitions />
+  </head>
+  <body class="bg-p5-black text-p5-white font-body">
+    <slot />
+  </body>
+</html>
+
+<style is:global>
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 400ms;
+  }
+
+  /* While preloader is showing, lock scroll */
+  html.preloading,
+  html.preloading body {
+    overflow: hidden;
+    height: 100%;
+  }
+</style>

@@ -1,0 +1,115 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TopNav from '../components/nav/TopNav.astro';
+
+const contacts = [
+  { label: 'Email', value: 'pusidun@126.com', href: 'mailto:pusidun@126.com' },
+  { label: 'QQ', value: 'NDA4MDUxNzQ3 (base64)' },
+  { label: 'WeChat', value: 'pusden' },
+  { label: 'cnblogs', value: "pusidun's cnblogs", href: 'https://www.cnblogs.com/pusidun/' },
+  { label: 'GitHub', value: 'github.com/pusidun', href: 'https://github.com/pusidun' },
+];
+
+const projects = [
+  {
+    name: 'swallow',
+    href: 'https://github.com/pusidun/swallow',
+    desc: '基于 C++14 标准的开源库。日志模块 / 配置模块 / 协程模块。travis-ci 自动化测试，gtest 单元测试。',
+    lang: 'C++14',
+  },
+  {
+    name: 'IM-Golang',
+    href: 'https://github.com/pusidun/IM-Golang',
+    desc: '基于 Gin 网络框架开发的 IM 系统。完成鉴权、ORM、用户管理。[未完成]',
+    lang: 'Go',
+  },
+];
+
+const friends = [
+  { name: 'try1024', href: 'https://blog.csdn.net/qq_34863439' },
+];
+---
+<BaseLayout title="ABOUT · PUSIDUN" description="关于我">
+  <TopNav current="about" />
+
+  <main class="relative max-w-4xl mx-auto px-4 sm:px-10 py-8 sm:py-12">
+    <div class="mb-8 sm:mb-12">
+      <span class="p5-type-badge"><span>PROFILE / ME</span></span>
+      <h1 class="p5-headline text-5xl sm:text-7xl text-p5-white mt-3 p5-heading-underline">
+        ABOUT
+      </h1>
+    </div>
+
+    <!-- Contact -->
+    <section class="mb-12">
+      <h2 class="p5-headline text-2xl text-p5-yellow mb-4 inline-block border-b-4 border-p5-red pb-1" style="transform: skewX(-6deg);">
+        CONTACT
+      </h2>
+      <div class="bg-p5-gray border-l-8 border-p5-red p-5">
+        <dl class="grid grid-cols-1 sm:grid-cols-[120px_1fr] gap-y-3 gap-x-4">
+          {contacts.map((c) => (
+            <>
+              <dt class="text-xs font-black tracking-widest text-p5-red uppercase">{c.label}</dt>
+              <dd class="text-p5-white">
+                {c.href ? (
+                  <a href={c.href} target="_blank" rel="noopener" class="hover:text-p5-yellow underline decoration-p5-red decoration-2 underline-offset-4">{c.value}</a>
+                ) : (
+                  <span>{c.value}</span>
+                )}
+              </dd>
+            </>
+          ))}
+        </dl>
+      </div>
+    </section>
+
+    <!-- Projects -->
+    <section class="mb-12">
+      <h2 class="p5-headline text-2xl text-p5-yellow mb-4 inline-block border-b-4 border-p5-red pb-1" style="transform: skewX(-6deg);">
+        OPEN SOURCE
+      </h2>
+      <div class="space-y-4">
+        {projects.map((p) => (
+          <a
+            href={p.href}
+            target="_blank"
+            rel="noopener"
+            class="block bg-p5-gray border-l-8 border-p5-yellow p-5 p5-card-hover"
+          >
+            <div class="flex items-center gap-3 mb-2">
+              <span class="p5-headline text-2xl text-p5-white">{p.name}</span>
+              <span class="text-[10px] font-black tracking-widest text-p5-red bg-p5-black px-2 py-0.5 border border-p5-red">{p.lang}</span>
+            </div>
+            <p class="text-sm text-p5-white/70">{p.desc}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <!-- QR -->
+    <section class="mb-12">
+      <h2 class="p5-headline text-2xl text-p5-yellow mb-4 inline-block border-b-4 border-p5-red pb-1" style="transform: skewX(-6deg);">
+        公众号
+      </h2>
+      <div class="inline-block border-4 border-p5-white p-2 bg-p5-white" style="box-shadow: 6px 6px 0 var(--p5-red);">
+        <img src="/assets/images/GongZhongHao.jpg" alt="公众号二维码" class="block max-w-[200px]" />
+      </div>
+    </section>
+
+    <!-- Friend links -->
+    <section>
+      <h2 class="p5-headline text-2xl text-p5-yellow mb-4 inline-block border-b-4 border-p5-red pb-1" style="transform: skewX(-6deg);">
+        友情链接
+      </h2>
+      <ul class="space-y-2">
+        {friends.map((f) => (
+          <li>
+            <a href={f.href} target="_blank" rel="noopener" class="text-p5-red hover:text-p5-yellow font-bold underline decoration-2 underline-offset-4">
+              → {f.name}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  </main>
+</BaseLayout>

@@ -1,0 +1,11 @@
+---
+export interface Props {
+  variant?: 'red' | 'yellow' | 'default';
+  class?: string;
+}
+const { variant = 'default', class: className = '' } = Astro.props;
+const variantClass =
+  variant === 'red' ? 'bg-halftone-red' :
+  variant === 'yellow' ? 'bg-halftone-yellow' : 'bg-halftone';
+---
+<div class={`pointer-events-none absolute inset-0 ${variantClass} ${className}`}></div>

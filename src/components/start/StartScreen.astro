@@ -1,0 +1,205 @@
+---
+import MenuButton from './MenuButton.astro';
+import BgPattern from './BgPattern.astro';
+import Preloader from './Preloader.svelte';
+
+const menu = [
+  { href: '/cv', label: 'CV', subtitle: 'CAREER' },
+  { href: '/blog', label: 'BLOG', subtitle: 'WRITING' },
+  { href: '/projects', label: 'PROJECTS', subtitle: 'WORK' },
+  { href: '/about', label: 'ABOUT', subtitle: 'ME' },
+];
+---
+<section class="relative min-h-screen overflow-hidden bg-p5-black flex">
+  <BgPattern />
+
+
+  <div class="relative z-10 flex flex-col lg:flex-row w-full max-w-7xl mx-auto px-6 sm:px-10 py-12">
+    <!-- Left: Brand block -->
+    <div class="flex-1 flex flex-col justify-center pt-16 lg:pt-0">
+      <!-- Stacked badges -->
+      <div class="mb-6 flex flex-wrap items-center gap-2">
+        <span class="p5-type-badge"><span>PORTFOLIO</span></span>
+        <span class="text-xs font-black tracking-widest text-p5-yellow">/</span>
+        <span class="px-2 py-0.5 bg-p5-yellow text-p5-black text-xs font-black tracking-widest" style="transform: skewX(-12deg);">
+          <span style="transform: skewX(12deg); display: inline-block;">2026</span>
+        </span>
+        <span class="text-xs font-black tracking-widest text-p5-white/50">VOL.01</span>
+      </div>
+
+      <!-- Ransom-note headline: 3 lines, 3 different font treatments -->
+      <h1 class="p5-ransom" data-hero-text>
+        <span class="line line-build">
+          <span class="word word-italic">Build.</span>
+        </span>
+        <span class="line line-break">
+          <span class="word word-condensed">BREAK.</span>
+        </span>
+        <span class="line line-repeat">
+          <span class="word word-block">REPEAT.</span>
+        </span>
+      </h1>
+
+      <p class="mt-6 max-w-md text-p5-white/75 text-base leading-relaxed">
+        WELCOME TO <span class="text-p5-red font-black">PUSIDUN</span>'S DOMAIN.
+        <br/>
+        <span class="text-p5-yellow font-black">怪盗団</span> 工程师 · 博客 · 项目
+      </p>
+
+      <div class="mt-8 hidden lg:flex items-center gap-3 text-p5-white/50 text-xs font-bold tracking-widest">
+        <span class="block w-12 h-[3px] bg-p5-red transform -skew-x-12"></span>
+        SELECT A DESTINATION
+        <span class="block w-6 h-[3px] bg-p5-yellow transform -skew-x-12"></span>
+      </div>
+    </div>
+
+    <!-- Right: Menu -->
+    <div class="flex-1 flex flex-col justify-center gap-4 mt-12 lg:mt-0 lg:max-w-md lg:ml-auto">
+      {menu.map((item, i) => (
+        <MenuButton
+          href={item.href}
+          label={item.label}
+          subtitle={item.subtitle}
+          index={i}
+        />
+      ))}
+
+      <div class="mt-6 flex items-center gap-3 text-p5-white/40 text-xs font-bold tracking-widest">
+        <span>PRESS</span>
+        <kbd class="px-2 py-1 bg-p5-gray text-p5-yellow border border-p5-yellow font-black">↵</kbd>
+        <span>TO SELECT</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Calling Card preloader (bottom-right) -->
+  <Preloader client:load />
+
+  <!-- Scroll-down indicator -->
+  <a
+    href="#arcana-section"
+    class="scroll-cue group"
+    aria-label="向下滚动查看更多"
+  >
+    <span class="cue-label">SCROLL</span>
+    <span class="cue-arrow" aria-hidden="true">▼</span>
+  </a>
+
+  <!-- Footer -->
+  <footer class="absolute bottom-3 left-0 right-0 z-10 px-6 sm:px-10 flex justify-between items-center text-xs text-p5-white/40 font-bold tracking-widest">
+    <span>© 2026 PUSIDUN</span>
+    <a
+      href="https://github.com/pusidun"
+      target="_blank"
+      rel="noopener"
+      class="hover:text-p5-yellow transition-colors"
+    >
+      GITHUB ↗
+    </a>
+  </footer>
+</section>
+
+<style>
+  /* ---- Ransom-note hero headline ---- */
+  [data-hero-text] {
+    display: block;
+    line-height: 0.9;
+    margin-bottom: 0.5rem;
+  }
+  [data-hero-text] .line {
+    display: block;
+  }
+  [data-hero-text] .word {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  /* Hero is a P5R-style "menu screen" ransom-note. Mix of Bungee (the menu-font
+     base) with Playfair italic for variety. */
+  [data-hero-text] .word-italic {
+    font-family: 'Playfair Display', 'Times New Roman', serif;
+    font-style: italic;
+    font-weight: 900;
+    font-size: clamp(2.5rem, 9vw, 7rem);
+    color: var(--p5-white);
+    text-shadow:
+      3px 3px 0 var(--p5-red),
+      6px 6px 0 var(--p5-black);
+    transform: translateY(30px) rotate(-2deg);
+    animation: heroIn 700ms cubic-bezier(0.2, 0, 0.2, 1.1) 150ms forwards;
+  }
+  [data-hero-text] .word-condensed {
+    font-family: 'Bungee', 'Bebas Neue', sans-serif;
+    font-weight: 400;
+    font-size: clamp(3.4rem, 12vw, 9.5rem);
+    letter-spacing: 0.02em;
+    color: var(--p5-red);
+    transform: translateY(30px) skewX(-6deg);
+    text-shadow:
+      4px 4px 0 var(--p5-black),
+      8px 8px 0 var(--p5-yellow);
+    margin-left: -0.05em;
+    animation: heroIn 700ms cubic-bezier(0.2, 0, 0.2, 1.1) 280ms forwards;
+  }
+  [data-hero-text] .word-block {
+    font-family: 'Bungee', 'Anton', 'Impact', sans-serif;
+    font-size: clamp(3rem, 11vw, 8.5rem);
+    letter-spacing: 0.03em;
+    color: var(--p5-white);
+    background: var(--p5-black);
+    padding: 0 0.15em;
+    text-shadow:
+      4px 4px 0 var(--p5-red),
+      8px 8px 0 transparent;
+    transform: translateY(30px) skewX(2deg);
+    animation: heroIn 700ms cubic-bezier(0.2, 0, 0.2, 1.1) 420ms forwards;
+  }
+  @keyframes heroIn {
+    to {
+      opacity: 1;
+      transform: translateY(0) skewX(var(--final-skew, 0deg)) rotate(var(--final-rot, 0deg));
+    }
+  }
+  /* Per-word final transform overrides */
+  [data-hero-text] .word-italic    { --final-rot: -2deg; }
+  [data-hero-text] .word-condensed { --final-skew: -6deg; }
+  [data-hero-text] .word-block     { --final-skew: 2deg; }
+
+
+  .scroll-cue {
+    position: absolute;
+    bottom: 1.8rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    text-decoration: none;
+    color: var(--p5-white);
+    opacity: 0.6;
+    transition: opacity 200ms;
+  }
+  .scroll-cue:hover { opacity: 1; }
+
+  .cue-label {
+    font-family: 'Anton', 'Impact', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    color: var(--p5-yellow);
+  }
+  .cue-arrow {
+    color: var(--p5-red);
+    font-size: 1.1rem;
+    animation: cueBounce 1.4s ease-in-out infinite;
+  }
+  @keyframes cueBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(8px); }
+  }
+
+  @media (max-width: 640px) {
+    .scroll-cue { bottom: 3.2rem; }
+  }
+</style>
