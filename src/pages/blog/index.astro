@@ -45,7 +45,7 @@ const tags = Array.from(tagCounts.entries())
       <section class="space-y-5">
         {posts.map((p) => (
           <PostCard
-            href={`/blog/${p.slug}/`}
+            href={`/blog/${p.id}/`}
             title={p.data.title}
             date={p.data.date}
             type={p.data.type}
