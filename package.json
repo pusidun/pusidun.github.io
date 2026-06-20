@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@astrojs/svelte": "^8.1.1",
-    "astro": "^6.1.10",
+    "astro": "^6.4.8",
     "autoprefixer": "^10.4.20",
     "gsap": "^3.12.5",
     "postcss": "^8.4.49",
