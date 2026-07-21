@@ -11,8 +11,8 @@
     "migrate": "node scripts/migrate-posts.mjs"
   },
   "dependencies": {
-    "@astrojs/svelte": "^8.1.1",
-    "astro": "^6.1.10",
+    "@astrojs/svelte": "^9.0.1",
+    "astro": "^7.1.3",
     "autoprefixer": "^10.4.20",
     "gsap": "^3.12.5",
     "postcss": "^8.4.49",
