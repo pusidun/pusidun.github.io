@@ -1,24 +1,13 @@
 ---
+import I18n from "../components/shared/I18n.astro";
 import BaseLayout from '../layouts/BaseLayout.astro';
-import TopNav from '../components/nav/TopNav.astro';
+import PageHeading from '../components/shared/PageHeading.astro';
 import Timeline from '../components/cv/Timeline.astro';
 ---
-<BaseLayout title="CV · PUSIDUN" description="工作经历时间轴">
-  <TopNav current="cv" />
-
-  <main class="relative max-w-5xl mx-auto px-4 sm:px-10 py-8 sm:py-12">
-    <div class="mb-8 sm:mb-12">
-      <span class="p5-type-badge"><span>CAREER / 2016-NOW</span></span>
-      <h1 class="p5-headline text-5xl sm:text-7xl text-p5-white mt-3 p5-heading-underline">
-        CAREER
-      </h1>
-    </div>
-
+<BaseLayout title="履历 · pusidun" description="pusidun 的工作经历。" current="cv">
+  <main id="main-content" class="container site-main">
+    <PageHeading eyebrow="Career / 工作经历" title="一路走来的工作经历" description="在不同的团队里，持续积累软件工程的实践经验。" />
     <Timeline />
-
-    <div class="mt-16 text-center text-xs font-bold tracking-widest text-p5-white/40">
-      <span class="block w-12 h-[2px] bg-p5-red mx-auto mb-2"></span>
-      END OF CAREER
-    </div>
+    <div class="section dark-card feature-band"><div><p class="eyebrow">Beyond the timeline</p><h2><I18n text="经历之外，还有记录。" /></h2></div><div><p><I18n text="把工作与学习中的思考整理成文章，也把一些想法留在开源项目里。" /></p><div class="actions"><a href="/blog" class="button button-dark"><I18n text="阅读文章 →" /></a><a href="/projects" class="button button-dark"><I18n text="查看项目 →" /></a></div></div></div>
   </main>
 </BaseLayout>

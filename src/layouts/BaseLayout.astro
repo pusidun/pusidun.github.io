@@ -1,36 +1,44 @@
 ---
-import { ClientRouter } from 'astro:transitions';
+import { translate } from '../i18n';
+import I18n from '../components/shared/I18n.astro';
+import TopNav from '../components/nav/TopNav.astro';
+import Footer from '../components/shared/Footer.astro';
 import '../styles/global.css';
-import '../styles/persona.css';
+
 
 export interface Props {
   title: string;
   description?: string;
   ogImage?: string;
+  current?: 'home' | 'cv' | 'blog' | 'projects' | 'about';
 }
 
 const {
   title,
   description = 'pusidun — engineer · blog · projects',
   ogImage = '/og/default.png',
+  current,
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 ---
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <script is:inline>
+      try { document.documentElement.lang = localStorage.getItem('pusidun-language') === 'zh' ? 'zh-CN' : 'en'; } catch { /* English remains the default. */ }
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
 
-    <title>{title}</title>
-    <meta name="description" content={description} />
+    <title data-i18n={title}>{translate(title)}</title>
+    <meta name="description" content={translate(description)} data-i18n-content={description} />
     <link rel="canonical" href={canonicalURL} />
 
     <meta property="og:type" content="website" />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
+    <meta property="og:title" content={translate(title)} data-i18n-content={title} />
+    <meta property="og:description" content={translate(description)} data-i18n-content={description} />
     <meta property="og:image" content={new URL(ogImage, Astro.site)} />
     <meta property="og:url" content={canonicalURL} />
     <meta name="twitter:card" content="summary_large_image" />
@@ -40,27 +48,17 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Bungee&family=Bungee+Inline&family=Noto+Sans+SC:wght@400;700;900&family=Playfair+Display:ital,wght@1,800;1,900&family=JetBrains+Mono:wght@400;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400&family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@400&display=swap"
       rel="stylesheet"
     />
 
-    <ClientRouter />
+
   </head>
-  <body class="bg-p5-black text-p5-white font-body">
+  <body>
+    <a href="#main-content" class="skip-link"><I18n text="跳转到正文" /></a>
+    <TopNav current={current} />
     <slot />
+    <Footer />
+    <script>import "../scripts/language";</script>
   </body>
 </html>
-
-<style is:global>
-  ::view-transition-old(root),
-  ::view-transition-new(root) {
-    animation-duration: 400ms;
-  }
-
-  /* While preloader is showing, lock scroll */
-  html.preloading,
-  html.preloading body {
-    overflow: hidden;
-    height: 100%;
-  }
-</style>

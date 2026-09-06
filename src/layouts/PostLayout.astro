@@ -1,71 +1,26 @@
 ---
+import { translate, formatDate } from "../i18n";
+import I18n from "../components/shared/I18n.astro";
 import BaseLayout from './BaseLayout.astro';
-import TopNav from '../components/nav/TopNav.astro';
 import '../styles/markdown.css';
-
-export interface Props {
-  title: string;
-  date: Date;
-  type: string;
-  tags: string[];
-  prev?: { slug: string; title: string } | null;
-  next?: { slug: string; title: string } | null;
-}
-const { title, date, type, tags, prev, next } = Astro.props;
-const formattedDate = new Intl.DateTimeFormat('zh-CN', {
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric',
-}).format(date);
+export interface Props { title: string; date: Date; type: string; tags: string[]; summary?: string; prev?: { slug: string; title: string } | null; next?: { slug: string; title: string } | null; }
+const { title, date, type, tags, summary, prev, next } = Astro.props;
+const formattedDate = formatDate(date);
 ---
-<BaseLayout title={`${title} · BLOG`}>
-  <TopNav current="blog" />
-
-  <article class="relative max-w-3xl mx-auto px-4 sm:px-10 py-8 sm:py-10">
-    <a href="/blog" class="inline-flex items-center gap-2 text-xs font-black tracking-widest text-p5-red hover:text-p5-yellow mb-6">
-      ← BACK TO BLOG
-    </a>
-
-    <header class="mb-8 border-b-4 border-p5-red pb-6">
-      <div class="flex flex-wrap items-center gap-3 mb-4">
-        <span class="p5-type-badge"><span>{type}</span></span>
-        <span class="text-xs font-bold tracking-wider text-p5-white/60">{formattedDate}</span>
-      </div>
-      <h1 class="p5-headline text-4xl sm:text-5xl text-p5-white leading-tight">
-        {title}
-      </h1>
-      {tags.length > 0 && (
-        <div class="flex flex-wrap gap-1.5 mt-4">
-          {tags.map((tag) => (
-            <a
-              href={`/blog?tags=${encodeURIComponent(tag)}`}
-              class="text-[11px] font-bold tracking-wider text-p5-red bg-p5-black px-2 py-0.5 border border-p5-red hover:bg-p5-red hover:text-p5-white transition-colors"
-            >
-              #{tag}
-            </a>
-          ))}
-        </div>
-      )}
-    </header>
-
-    <div class="prose-p5">
-      <slot />
-    </div>
-
-    <!-- Prev / Next -->
-    <nav class="mt-12 pt-8 border-t-4 border-p5-red grid grid-cols-1 sm:grid-cols-2 gap-4">
-      {prev && (
-        <a href={`/blog/${prev.slug}/`} class="group block bg-p5-gray p-4 border-l-4 border-p5-yellow hover:bg-p5-red transition-colors">
-          <div class="text-[10px] font-black tracking-widest text-p5-yellow group-hover:text-p5-white mb-1">← PREV</div>
-          <div class="text-sm font-bold text-p5-white line-clamp-2">{prev.title}</div>
-        </a>
-      )}
-      {next && (
-        <a href={`/blog/${next.slug}/`} class="group block bg-p5-gray p-4 border-r-4 border-p5-yellow hover:bg-p5-red transition-colors sm:text-right sm:col-start-2">
-          <div class="text-[10px] font-black tracking-widest text-p5-yellow group-hover:text-p5-white mb-1">NEXT →</div>
-          <div class="text-sm font-bold text-p5-white line-clamp-2">{next.title}</div>
-        </a>
-      )}
+<BaseLayout title={`${title} · pusidun`} description={summary || title} current="blog">
+  <main id="main-content" class="container site-main article">
+    <a class="text-link" href="/blog"><I18n text="← 全部文章" /></a>
+    <article>
+      <header class="article-header">
+        <div class="post-meta"><span class="badge"><I18n text={type} /></span><time data-localized-date datetime={date.toISOString()}>{formattedDate}</time></div>
+        <h1>{title}</h1>
+        <div class="tags">{tags.map(tag => <a href={`/blog?tags=${encodeURIComponent(tag)}`} class="text-link">#<I18n text={tag} /></a>)}</div>
+      </header>
+      <div class="prose" lang="zh-CN"><slot /></div>
+    </article>
+    <nav class="article-nav" aria-label={translate("前后篇文章")} data-i18n-aria-label="前后篇文章">
+      {prev && <a href={`/blog/${prev.slug}/`}><span><I18n text="← 上一篇" /></span>{prev.title}</a>}
+      {next && <a href={`/blog/${next.slug}/`}><span><I18n text="下一篇 →" /></span>{next.title}</a>}
     </nav>
-  </article>
+  </main>
 </BaseLayout>

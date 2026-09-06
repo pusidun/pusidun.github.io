@@ -1,0 +1,64 @@
+---
+import I18n from "./I18n.astro";
+interface Props { kind: 'contacts' | 'career' | 'qr'; }
+const { kind } = Astro.props;
+---
+<private-profile class="private-panel" data-kind={kind} aria-busy="true">
+  <p data-private-status role="status" class="muted"></p>
+  <div data-private-content></div>
+  <noscript><p class="muted"><I18n text="请启用 JavaScript 以显示此内容。" /></p></noscript>
+</private-profile>
+<script>
+  import { currentLanguage, translate } from '../../i18n';
+  import { renderPrivateProfile, type PrivateKind } from '../../scripts/private-profile';
+
+  class PrivateProfile extends HTMLElement {
+    private clear?: () => void;
+    private generation = 0;
+
+    connectedCallback() {
+      void this.render();
+    }
+
+    private async render() {
+      const generation = ++this.generation;
+      const content = this.querySelector<HTMLElement>('[data-private-content]')!;
+      const status = this.querySelector<HTMLElement>('[data-private-status]')!;
+      this.setAttribute('aria-busy', 'true');
+      status.dataset.i18n = '正在加载…';
+      status.textContent = translate('正在加载…', currentLanguage());
+      try {
+        const clear = await renderPrivateProfile(this.dataset.kind as PrivateKind, content);
+        if (!this.isConnected || generation !== this.generation) {
+          clear();
+          return;
+        }
+        this.clear = clear;
+        status.textContent = '';
+        delete status.dataset.i18n;
+      } catch {
+        if (this.isConnected && generation === this.generation) {
+          status.dataset.i18n = '暂时无法显示，请刷新页面重试。';
+          status.textContent = translate('暂时无法显示，请刷新页面重试。', currentLanguage());
+        }
+      } finally {
+        if (generation === this.generation) this.setAttribute('aria-busy', 'false');
+      }
+    }
+
+    disconnectedCallback() {
+      this.generation++;
+      this.clear?.();
+      this.clear = undefined;
+    }
+  }
+
+  if (!customElements.get('private-profile')) {
+    customElements.define('private-profile', PrivateProfile);
+  }
+</script>
+<style>
+  .private-panel { display: block; margin-top: 24px; }
+  [data-private-status]:empty { display: none; }
+  [data-private-status] { margin-block: 12px; font-size: 14px; }
+</style>

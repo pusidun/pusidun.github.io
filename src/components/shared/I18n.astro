@@ -1,0 +1,6 @@
+---
+import { translate } from '../../i18n';
+interface Props { text: string; }
+const { text } = Astro.props;
+---
+<span data-i18n={text}>{translate(text)}</span>

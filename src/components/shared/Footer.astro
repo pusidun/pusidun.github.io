@@ -1,0 +1,15 @@
+---
+import { translate } from "../../i18n";
+import I18n from "./I18n.astro";
+---
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div><a href="/" class="wordmark"><span class="diamond" aria-hidden="true"></span>pusidun</a><p><I18n text="关于软件、系统与工程实践的记录。" /></p></div>
+      <nav aria-label={translate("文章链接")} data-i18n-aria-label="文章链接"><span class="footer-label"><I18n text="Writing / 文字" /></span><a href="/blog"><I18n text="全部文章" /></a><a href="/blog?tags=智能体安全"><I18n text="智能体安全" /></a><a href="/blog?tags=linux"><I18n text="Linux 笔记" /></a></nav>
+      <nav aria-label={translate("个人链接")} data-i18n-aria-label="个人链接"><span class="footer-label"><I18n text="Profile / 个人" /></span><a href="/projects"><I18n text="开源项目" /></a><a href="/cv"><I18n text="工作履历" /></a><a href="/about"><I18n text="关于我" /></a></nav>
+      <nav aria-label={translate("站外链接")} data-i18n-aria-label="站外链接"><span class="footer-label"><I18n text="Elsewhere / 别处" /></span><a href="https://github.com/pusidun" target="_blank" rel="noopener noreferrer">GitHub ↗</a><a href="https://www.cnblogs.com/pusidun/" target="_blank" rel="noopener noreferrer"><I18n text="博客园 ↗" /></a><a href="/about#contact"><I18n text="联系方式" /></a></nav>
+    </div>
+    <div class="footer-bottom"><span>© {new Date().getFullYear()} pusidun</span><span><I18n text="记录思考，持续构建。" /></span></div>
+  </div>
+</footer>

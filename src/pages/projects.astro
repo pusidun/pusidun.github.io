@@ -1,60 +1,16 @@
 ---
+import I18n from "../components/shared/I18n.astro";
 import BaseLayout from '../layouts/BaseLayout.astro';
-import TopNav from '../components/nav/TopNav.astro';
-
-const placeholders = Array.from({ length: 4 });
+import PageHeading from '../components/shared/PageHeading.astro';
+import { projects } from '../data/projects';
 ---
-<BaseLayout title="PROJECTS · PUSIDUN" description="GitHub pinned projects 即将上线">
-  <TopNav current="projects" />
-
-  <main class="relative max-w-6xl mx-auto px-4 sm:px-10 py-8 sm:py-12">
-    <div class="mb-8 sm:mb-12 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
-      <div>
-        <span class="p5-type-badge"><span>WORK / SHOWCASE</span></span>
-        <h1 class="p5-headline text-5xl sm:text-7xl text-p5-white mt-3 p5-heading-underline">
-          PROJECTS
-        </h1>
-      </div>
-      <p class="text-sm text-p5-white/60 max-w-sm">
-        即将展示 GitHub Pinned 项目。
-      </p>
-    </div>
-
-    <!-- Coming soon hero -->
-    <div class="relative bg-p5-gray border-4 border-p5-red p-10 sm:p-16 mb-10 overflow-hidden">
-      <div class="absolute inset-0 bg-halftone-red opacity-30"></div>
-      <div class="relative">
-        <p class="p5-headline text-5xl sm:text-7xl text-p5-yellow leading-none">
-          COMING
-          <br />
-          <span class="text-p5-red">SOON</span>
-        </p>
-        <p class="mt-6 text-p5-white/70 text-sm max-w-md">
-          这里将集中展示 GitHub 上 Pinned 的几个项目。先放几个占位卡片，后续接入。
-        </p>
-        <a
-          href="https://github.com/pusidun"
-          target="_blank"
-          rel="noopener"
-          class="inline-block mt-6 px-5 py-2 bg-p5-red text-p5-white font-black tracking-widest p5-skew hover:bg-p5-yellow hover:text-p5-black transition-colors"
-        >
-          <span class="p5-skew-rev inline-block">VISIT GITHUB ↗</span>
-        </a>
-      </div>
-    </div>
-
-    <!-- Placeholder grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-      {placeholders.map((_, i) => (
-        <div class="relative bg-p5-gray/50 border-2 border-dashed border-p5-red/60 p-6 min-h-[180px] flex flex-col">
-          <div class="flex items-center gap-2 mb-2">
-            <span class="text-[10px] font-black tracking-widest text-p5-red">SLOT {String(i + 1).padStart(2, '0')}</span>
-          </div>
-          <div class="p5-headline text-3xl text-p5-white/30">???</div>
-          <div class="text-xs text-p5-white/30 mt-2">repo title</div>
-          <div class="text-xs text-p5-white/20 mt-auto">— description —</div>
-        </div>
-      ))}
-    </div>
+<BaseLayout title="项目 · pusidun" description="pusidun 的开源项目：C++ 基础库与 Go 即时通信系统。" current="projects">
+  <main id="main-content" class="container site-main">
+    <PageHeading eyebrow="Projects / 开源实践" title="把想法写成代码。" description="从基础库到应用系统，在具体的问题中探索、实现和积累。" />
+    <div class="project-list">{projects.map((project, i) => <article class:list={['project-card', { 'dark-card': i === 1 }]}>
+      <div class="post-meta"><span class="badge">{project.language}</span><span><I18n text={project.status} /></span></div>
+      <h2>{project.name}</h2><p><I18n text={project.description} /></p><a class="text-link" href={project.href} target="_blank" rel="noopener noreferrer" aria-label={`GitHub: ${project.name}`}><I18n text="查看源码 ↗" /></a>
+    </article>)}</div>
+    <div class="section"><h2><I18n text="更多代码与探索" /></h2><p class="lead"><I18n text="其他仓库与更新记录，可以在 GitHub 找到。" /></p><div class="actions"><a href="https://github.com/pusidun" class="button button-primary" target="_blank" rel="noopener noreferrer"><I18n text="访问 GitHub ↗" /></a></div></div>
   </main>
 </BaseLayout>

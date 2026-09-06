@@ -1,39 +1,14 @@
 ---
-export interface Props {
-  href: string;
-  title: string;
-  date: Date;
-  type: string;
-  tags: string[];
-  summary?: string;
-}
+import I18n from "../shared/I18n.astro";
+import { formatDate } from "../../i18n";
+export interface Props { href: string; title: string; date: Date; type: string; tags: string[]; summary?: string; }
 const { href, title, date, type, tags, summary } = Astro.props;
-const formattedDate = new Intl.DateTimeFormat('en-US', {
-  year: 'numeric',
-  month: 'short',
-  day: '2-digit',
-}).format(date);
+const formattedDate = formatDate(date);
 ---
-<a
-  href={href}
-  class="group block bg-p5-gray border-l-8 border-p5-red p-5 p5-card-hover"
-  data-post-card
-  data-type={type}
-  data-tags={tags.join(',')}
->
-  <div class="flex items-center gap-3 mb-3">
-    <span class="p5-type-badge"><span>{type}</span></span>
-    <span class="text-xs text-p5-white/50 font-bold tracking-wider">{formattedDate}</span>
-  </div>
-  <h3 class="p5-headline text-2xl text-p5-white group-hover:text-p5-yellow transition-colors leading-tight mb-2">
-    {title}
-  </h3>
-  {summary && <p class="text-sm text-p5-white/70 line-clamp-2 mb-3">{summary}</p>}
-  <div class="flex flex-wrap gap-1.5 mt-3">
-    {tags.map((tag) => (
-      <span class="text-[10px] font-black tracking-wider text-p5-red bg-p5-black px-2 py-0.5 border border-p5-red">
-        #{tag}
-      </span>
-    ))}
-  </div>
+<a href={href} class="post-card" data-post-card data-post-id={decodeURIComponent(href.replace(/^\/blog\//, '').replace(/\/$/, ''))} data-type={type} data-tags={tags.join(',')}>
+  <span class="post-category"><I18n text={type} /> / <I18n text={tags[0] || '工程笔记'} /></span>
+  <h3>{title}</h3>
+  {summary && <p class="excerpt">{summary}</p>}
+  <div class="tags">{tags.map(tag => <span>#<I18n text={tag} /></span>)}</div>
+  <div class="post-meta"><time data-localized-date datetime={date.toISOString()}>{formattedDate}</time><span aria-hidden="true" style="margin-left:auto">↗</span></div>
 </a>
