@@ -10,15 +10,19 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort((a,b
 const types = Array.from(new Set(posts.map(p => p.data.type)));
 const tagCounts = new Map<string, number>();
 for (const p of posts) for (const tag of p.data.tags) tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
-const tags = Array.from(tagCounts.entries()).sort((a,b) => b[1] - a[1]).map(([tag]) => tag);
+const rankedTags = Array.from(tagCounts.entries()).sort((a,b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+// Tags that only ever match one post make a 20-button row that is taller than the
+// results it filters. Show the shared ones; the long tail sits behind a disclosure.
+const tags = rankedTags.filter(([, n]) => n >= 2).map(([tag]) => tag);
+const moreTags = rankedTags.filter(([, n]) => n < 2).map(([tag]) => tag);
 ---
 <BaseLayout title="文章 · pusidun" description="关于系统编程、终端安全与工程实践的文章和学习笔记。" current="blog">
   <main id="main-content" class="container site-main">
-    <PageHeading eyebrow={`Writing / ${posts.length} 篇文章`} title="思考，写下来。" description="关于软件、系统与安全的学习笔记，和工程实践中值得留下的细节。" />
-    <BlogFilter client:load types={types} tags={tags} posts={posts.map(p => ({ id: p.id, title: p.data.title, summary: p.data.summary || '', body: p.body || '', type: p.data.type, tags: p.data.tags }))} />
+    <PageHeading eyebrow={`Writing / ${posts.length} 篇文章`} title="把思考写下来。" description="记录软件、系统与安全的学习笔记，以及工程实践中值得分享的细节。" />
+    <BlogFilter client:load types={types} tags={tags} moreTags={moreTags} posts={posts.map(p => ({ id: p.id, title: p.data.title, summary: p.data.summary || '', type: p.data.type, tags: p.data.tags }))} />
     <section id="post-list" class="post-grid" aria-label={translate("文章列表")} data-i18n-aria-label="文章列表">
       {posts.map(p => <PostCard href={`/blog/${p.id}/`} {...p.data} />)}
-      <div id="post-empty" class="empty-state" style="display:none" role="status"><h2><I18n text="没有匹配的文章" /></h2><p><I18n text="试试其他标签，或清除筛选查看全部文章。" /></p></div>
+      <div id="post-empty" class="empty-state" style="display:none" role="status"><h2><I18n text="没有匹配的文章" /></h2><p><I18n text="换个关键词或标签，或重置搜索与筛选。" /></p></div>
     </section>
   </main>
 </BaseLayout>

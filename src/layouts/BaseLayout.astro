@@ -1,5 +1,5 @@
 ---
-import { translate } from '../i18n';
+import { translate, translateContent } from '../i18n';
 import I18n from '../components/shared/I18n.astro';
 import TopNav from '../components/nav/TopNav.astro';
 import Footer from '../components/shared/Footer.astro';
@@ -11,6 +11,9 @@ export interface Props {
   description?: string;
   ogImage?: string;
   current?: 'home' | 'cv' | 'blog' | 'projects' | 'about';
+  /** Set on article pages: the title and description come from post frontmatter,
+   *  which is authored in Chinese and is not expected to have a translation. */
+  content?: boolean;
 }
 
 const {
@@ -18,7 +21,9 @@ const {
   description = 'pusidun — engineer · blog · projects',
   ogImage = '/og/default.png',
   current,
+  content = false,
 } = Astro.props;
+const localize = content ? translateContent : translate;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 ---
@@ -32,13 +37,13 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
 
-    <title data-i18n={title}>{translate(title)}</title>
-    <meta name="description" content={translate(description)} data-i18n-content={description} />
+    <title data-i18n={title} data-i18n-kind={content ? 'content' : undefined}>{localize(title)}</title>
+    <meta name="description" content={localize(description)} data-i18n-content={description} data-i18n-kind={content ? 'content' : undefined} />
     <link rel="canonical" href={canonicalURL} />
 
     <meta property="og:type" content="website" />
-    <meta property="og:title" content={translate(title)} data-i18n-content={title} />
-    <meta property="og:description" content={translate(description)} data-i18n-content={description} />
+    <meta property="og:title" content={localize(title)} data-i18n-content={title} data-i18n-kind={content ? 'content' : undefined} />
+    <meta property="og:description" content={localize(description)} data-i18n-content={description} data-i18n-kind={content ? 'content' : undefined} />
     <meta property="og:image" content={new URL(ogImage, Astro.site)} />
     <meta property="og:url" content={canonicalURL} />
     <meta name="twitter:card" content="summary_large_image" />

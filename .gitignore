@@ -26,3 +26,6 @@ Gemfile.lock
 # Env
 .env
 .env.production
+
+# Plaintext input for the profile encoder
+/private/

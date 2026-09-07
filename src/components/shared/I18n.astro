@@ -1,6 +1,6 @@
 ---
-import { translate } from '../../i18n';
-interface Props { text: string; }
-const { text } = Astro.props;
+import { translate, translateContent } from '../../i18n';
+interface Props { text: string; content?: boolean; }
+const { text, content = false } = Astro.props;
 ---
-<span data-i18n={text}>{translate(text)}</span>
+<span data-i18n={text} data-i18n-kind={content ? 'content' : undefined}>{content ? translateContent(text) : translate(text)}</span>

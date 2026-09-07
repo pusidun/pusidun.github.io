@@ -6,9 +6,9 @@ const { href, title, date, type, tags, summary } = Astro.props;
 const formattedDate = formatDate(date);
 ---
 <a href={href} class="post-card" data-post-card data-post-id={decodeURIComponent(href.replace(/^\/blog\//, '').replace(/\/$/, ''))} data-type={type} data-tags={tags.join(',')}>
-  <span class="post-category"><I18n text={type} /> / <I18n text={tags[0] || '工程笔记'} /></span>
+  <span class="post-category"><I18n text={type} /> / <I18n text={tags[0] || '工程笔记'} content /></span>
   <h3>{title}</h3>
   {summary && <p class="excerpt">{summary}</p>}
-  <div class="tags">{tags.map(tag => <span>#<I18n text={tag} /></span>)}</div>
+  <div class="tags">{tags.map(tag => <span>#<I18n text={tag} content /></span>)}</div>
   <div class="post-meta"><time data-localized-date datetime={date.toISOString()}>{formattedDate}</time><span aria-hidden="true" style="margin-left:auto">↗</span></div>
 </a>

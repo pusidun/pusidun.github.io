@@ -7,14 +7,14 @@ export interface Props { title: string; date: Date; type: string; tags: string[]
 const { title, date, type, tags, summary, prev, next } = Astro.props;
 const formattedDate = formatDate(date);
 ---
-<BaseLayout title={`${title} · pusidun`} description={summary || title} current="blog">
+<BaseLayout title={`${title} · pusidun`} description={summary || title} current="blog" content>
   <main id="main-content" class="container site-main article">
     <a class="text-link" href="/blog"><I18n text="← 全部文章" /></a>
     <article>
       <header class="article-header">
         <div class="post-meta"><span class="badge"><I18n text={type} /></span><time data-localized-date datetime={date.toISOString()}>{formattedDate}</time></div>
         <h1>{title}</h1>
-        <div class="tags">{tags.map(tag => <a href={`/blog?tags=${encodeURIComponent(tag)}`} class="text-link">#<I18n text={tag} /></a>)}</div>
+        <div class="tags">{tags.map(tag => <a href={`/blog?tags=${encodeURIComponent(tag)}`} class="text-link">#<I18n text={tag} content /></a>)}</div>
       </header>
       <div class="prose" lang="zh-CN"><slot /></div>
     </article>

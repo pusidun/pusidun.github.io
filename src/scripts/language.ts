@@ -1,4 +1,4 @@
-import { currentLanguage, formatDate, storageKey, translate, type Language } from '../i18n';
+import { currentLanguage, formatDate, storageKey, translate, translateContent, type Language } from '../i18n';
 
 export function applyLanguage(language: Language, persist = false) {
   document.documentElement.lang = language === 'zh' ? 'zh-CN' : 'en';
@@ -6,11 +6,13 @@ export function applyLanguage(language: Language, persist = false) {
     try { localStorage.setItem(storageKey, language); } catch { /* Storage can be disabled. */ }
   }
   document.querySelectorAll<HTMLElement>('[data-i18n]').forEach(node => {
-    node.textContent = translate(node.dataset.i18n || '', language);
+    const localize = node.dataset.i18nKind === 'content' ? translateContent : translate;
+    node.textContent = localize(node.dataset.i18n || '', language);
   });
   for (const attribute of ['aria-label', 'placeholder', 'alt', 'content']) {
     document.querySelectorAll<HTMLElement>(`[data-i18n-${attribute}]`).forEach(node => {
-      node.setAttribute(attribute, translate(node.getAttribute(`data-i18n-${attribute}`) || '', language));
+      const localize = node.dataset.i18nKind === 'content' ? translateContent : translate;
+      node.setAttribute(attribute, localize(node.getAttribute(`data-i18n-${attribute}`) || '', language));
     });
   }
   document.querySelectorAll<HTMLElement>('[data-localized-en]').forEach(node => {

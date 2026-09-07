@@ -2,10 +2,30 @@
 import I18n from "./I18n.astro";
 interface Props { kind: 'contacts' | 'career' | 'qr'; }
 const { kind } = Astro.props;
+// The payload decodes in the browser, so the server has nothing to render. Emit a
+// skeleton at the real dimensions instead: /cv used to be a heading over 55vh of
+// empty cream until four timeline rows appeared at once and shoved the page down.
+const skeletonRows = { career: 4, contacts: 4, qr: 1 }[kind];
 ---
 <private-profile class="private-panel" data-kind={kind} aria-busy="true">
   <p data-private-status role="status" class="muted"></p>
-  <div data-private-content></div>
+  <div data-private-content>
+    {kind === 'career' && (
+      <ol class="timeline skeleton" aria-hidden="true">
+        {Array.from({ length: skeletonRows }).map(() => (
+          <li><div class="period"><span class="skeleton-line" style="width:70%"></span></div><div><h2><span class="skeleton-line" style="width:45%"></span></h2><p><span class="skeleton-line" style="width:60%"></span></p></div></li>
+        ))}
+      </ol>
+    )}
+    {kind === 'contacts' && (
+      <dl class="contact-list skeleton" aria-hidden="true">
+        {Array.from({ length: skeletonRows }).map(() => (
+          <><dt><span class="skeleton-line" style="width:70%"></span></dt><dd><span class="skeleton-line" style="width:80%"></span></dd></>
+        ))}
+      </dl>
+    )}
+    {kind === 'qr' && <span class="skeleton skeleton-qr" aria-hidden="true"></span>}
+  </div>
   <noscript><p class="muted"><I18n text="请启用 JavaScript 以显示此内容。" /></p></noscript>
 </private-profile>
 <script>
@@ -25,8 +45,6 @@ const { kind } = Astro.props;
       const content = this.querySelector<HTMLElement>('[data-private-content]')!;
       const status = this.querySelector<HTMLElement>('[data-private-status]')!;
       this.setAttribute('aria-busy', 'true');
-      status.dataset.i18n = '正在加载…';
-      status.textContent = translate('正在加载…', currentLanguage());
       try {
         const clear = await renderPrivateProfile(this.dataset.kind as PrivateKind, content);
         if (!this.isConnected || generation !== this.generation) {
@@ -61,4 +79,11 @@ const { kind } = Astro.props;
   .private-panel { display: block; margin-top: 24px; }
   [data-private-status]:empty { display: none; }
   [data-private-status] { margin-block: 12px; font-size: 14px; }
+  .skeleton-line { display: block; height: 1em; border-radius: var(--radius-xs); background: var(--surface-cream-strong); }
+  .skeleton-qr { display: block; width: 160px; height: 160px; border-radius: var(--radius-md); background: var(--surface-cream-strong); }
+  .skeleton h2 .skeleton-line { height: .8em; }
+  @media (prefers-reduced-motion: no-preference) {
+    .skeleton-line, .skeleton-qr { animation: skeleton-pulse 1.4s ease-in-out infinite; }
+    @keyframes skeleton-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .55; } }
+  }
 </style>

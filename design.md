@@ -11,7 +11,6 @@ colors:
   body: "#3d3d3a"
   body-strong: "#252523"
   muted: "#6c6a64"
-  muted-soft: "#8e8b82"
   hairline: "#e6dfd8"
   hairline-soft: "#ebe6df"
   canvas: "#faf9f5"
@@ -22,6 +21,8 @@ colors:
   surface-dark-elevated: "#252320"
   surface-dark-soft: "#1f1e1b"
   on-primary: "#ffffff"
+  on-coral: "#141413"
+  on-coral-soft: "#36231e"
   on-dark: "#faf9f5"
   on-dark-soft: "#a09d96"
   accent-teal: "#5db8a6"
@@ -168,14 +169,9 @@ components:
     backgroundColor: transparent
     textColor: "{colors.ink}"
     typography: "{typography.button}"
-  button-icon-circular:
-    backgroundColor: "{colors.canvas}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.full}"
-    size: 36px
   text-link:
     backgroundColor: transparent
-    textColor: "{colors.primary}"
+    textColor: "{colors.primary-active}"
     typography: "{typography.body-md}"
   top-nav:
     backgroundColor: "{colors.canvas}"
@@ -187,10 +183,6 @@ components:
     textColor: "{colors.ink}"
     typography: "{typography.display-xl}"
     padding: 96px
-  hero-illustration-card:
-    backgroundColor: "{colors.canvas}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.xl}"
   post-card:
     backgroundColor: "{colors.surface-card}"
     textColor: "{colors.ink}"
@@ -209,36 +201,12 @@ components:
     typography: "{typography.code}"
     rounded: "{rounded.lg}"
     padding: 24px
-  series-card:
-    backgroundColor: "{colors.canvas}"
-    textColor: "{colors.ink}"
-    typography: "{typography.title-md}"
-    rounded: "{rounded.lg}"
-    padding: 32px
-  membership-tier-card:
-    backgroundColor: "{colors.canvas}"
-    textColor: "{colors.ink}"
-    typography: "{typography.title-lg}"
-    rounded: "{rounded.lg}"
-    padding: 32px
-  membership-tier-card-featured:
-    backgroundColor: "{colors.surface-dark}"
-    textColor: "{colors.on-dark}"
-    typography: "{typography.title-lg}"
-    rounded: "{rounded.lg}"
-    padding: 32px
   callout-card-coral:
     backgroundColor: "{colors.primary}"
-    textColor: "{colors.on-primary}"
+    textColor: "{colors.on-coral}"
     typography: "{typography.title-md}"
     rounded: "{rounded.lg}"
-    padding: 32px
-  topic-tile:
-    backgroundColor: "{colors.canvas}"
-    textColor: "{colors.ink}"
-    typography: "{typography.title-sm}"
-    rounded: "{rounded.lg}"
-    padding: 20px
+    padding: 48px
   text-input:
     backgroundColor: "{colors.canvas}"
     textColor: "{colors.ink}"
@@ -250,12 +218,6 @@ components:
     backgroundColor: "{colors.canvas}"
     textColor: "{colors.ink}"
     rounded: "{rounded.md}"
-  consent-card:
-    backgroundColor: "{colors.surface-dark}"
-    textColor: "{colors.on-dark}"
-    typography: "{typography.body-sm}"
-    rounded: "{rounded.lg}"
-    padding: 24px
   category-tab:
     backgroundColor: transparent
     textColor: "{colors.muted}"
@@ -273,15 +235,9 @@ components:
     typography: "{typography.caption}"
     rounded: "{rounded.pill}"
     padding: 4px 12px
-  badge-coral:
-    backgroundColor: "{colors.primary}"
-    textColor: "{colors.on-primary}"
-    typography: "{typography.caption-uppercase}"
-    rounded: "{rounded.pill}"
-    padding: 4px 12px
   cta-band-coral:
     backgroundColor: "{colors.primary}"
-    textColor: "{colors.on-primary}"
+    textColor: "{colors.on-coral}"
     typography: "{typography.display-sm}"
     rounded: "{rounded.lg}"
     padding: 64px
@@ -302,7 +258,7 @@ components:
 
 This is a warm, editorial reading surface for a personal blog about software, infrastructure, and tooling. The base atmosphere is a **tinted cream canvas** (`{colors.canvas}` — #faf9f5) — distinctly warm, deliberately not the cool gray-white that most developer sites default to. Headlines run an **open-licensed transitional serif** (Newsreader / Source Serif 4) at weight 400 with negative letter-spacing, paired with **Inter** body sans. The combination should feel like a literary publication, not a SaaS marketing page.
 
-Visual voltage comes from the **cream + coral pairing** — coral (`{colors.primary}` — #cc785c) is the site's single accent, used on every primary CTA, on the wordmark, and on full-bleed callout cards. The coral is warm and slightly muted, never cyan or blue: a deliberate step away from the cool slate and saturated blue that dominate technical writing sites.
+Visual voltage comes from the **cream + coral pairing** — coral (`{colors.primary}` — #cc785c) is the site's single accent, used on every primary CTA, on the diamond mark, and on full-bleed callout cards and CTA bands. The coral is warm and slightly muted, never cyan or blue: a deliberate step away from the cool slate and saturated blue that dominate technical writing sites.
 
 The system has three surface modes that alternate down the page:
 1. **Cream canvas** (`{colors.canvas}`) — default body floor
@@ -318,14 +274,15 @@ The dark surfaces are where the blog shows real material — code blocks, termin
 - Dark demo cards (`{colors.surface-dark}` — #181715) carrying code blocks, terminal panels, and comparison data — the blog shows the actual artifact rather than abstract illustration.
 - Light cream post cards (`{colors.surface-card}` — #efe9de) — slightly darker than canvas, used for article listings and content-driven explanations.
 - A small diamond mark (a filled square rotated 45°) sits before the wordmark and doubles as an inline section marker.
-- Border radius is hierarchical: `{rounded.md}` (8px) for buttons + inputs, `{rounded.lg}` (12px) for content + demo cards, `{rounded.xl}` (16px) for the hero illustration container, `{rounded.pill}` for badges.
+- Border radius is hierarchical: `{rounded.md}` (8px) for buttons + inputs, `{rounded.lg}` (12px) for content + demo cards, `{rounded.xl}` (16px) for the hero code window, `{rounded.pill}` for badges.
 - Section rhythm `{spacing.section}` (96px). Internal card padding stays generous at `{spacing.xl}` (32px).
 
 ## Colors
 
 ### Brand & Accent
-- **Coral / Primary** (`{colors.primary}` — #cc785c): The site's warm coral. Used on every primary CTA background, on full-bleed coral callout cards, and on the wordmark accent. The single recognizable accent of the whole system.
-- **Coral Active** (`{colors.primary-active}` — #a9583e): The press / active darker variant.
+- **Coral / Primary** (`{colors.primary}` — #cc785c): The site's warm coral. Primary CTA backgrounds, the `callout-card-coral` and `cta-band-coral` surfaces, the diamond mark, the nav underline and the focus ring. The single recognizable accent of the whole system.
+  Coral is a **surface and a marker colour, not a text colour**: at 3.11:1 on canvas it clears the 3:1 bar for focus rings and borders but fails the 4.5:1 bar for body text. Text links therefore use `{colors.primary-active}` (4.80:1).
+- **Coral Active** (`{colors.primary-active}` — #a9583e): The press / active darker variant, and the colour of every coral *text* element — links, `.clear-filter`, the hero's emphasised phrase, in-article links.
 - **Coral Disabled** (`{colors.primary-disabled}` — #e6dfd8): A desaturated cream-tinted disabled state.
 - **Accent Teal** (`{colors.accent-teal}` — #5db8a6): Used sparingly on dark surfaces (terminal status indicators, "live" dots on the projects page).
 - **Accent Amber** (`{colors.accent-amber}` — #e8a55a): A small companion warm-tone used on category badges and inline highlights.
@@ -346,8 +303,9 @@ The dark surfaces are where the blog shows real material — code blocks, termin
 - **Body Strong** (`{colors.body-strong}` — #252523): Emphasized paragraphs, article lead text.
 - **Body** (`{colors.body}` — #3d3d3a): Default running-text color.
 - **Muted** (`{colors.muted}` — #6c6a64): Sub-headings, breadcrumbs, post dates, footer-adjacent secondary text.
-- **Muted Soft** (`{colors.muted-soft}` — #8e8b82): Captions, fine-print, license lines.
-- **On Primary** (`{colors.on-primary}` — #ffffff): Text on coral buttons.
+- **On Primary** (`{colors.on-primary}` — #ffffff): Text on coral buttons. **Known contrast gap:** white on coral is 3.28:1, under the 4.5:1 AA threshold for the 14px button label. Left as-is because it is the signature button; fix by darkening the coral or switching the label to `{colors.on-coral}`.
+- **On Coral** (`{colors.on-coral}` — #141413): Text on coral *surfaces* (callout cards, CTA bands) — 5.63:1. Cream on coral is only 3.11:1, so coral surfaces take ink, not cream.
+- **On Coral Soft** (`{colors.on-coral-soft}` — #36231e): Secondary paragraphs on coral surfaces — 4.53:1, the lightest warm tone that still clears AA.
 - **On Dark** (`{colors.on-dark}` — #faf9f5): Cream-tinted white used on dark surfaces (echoes the canvas tone).
 - **On Dark Soft** (`{colors.on-dark-soft}` — #a09d96): Footer body text, secondary labels in dark cards.
 
@@ -373,10 +331,11 @@ The display/body split is editorial:
 | `{typography.display-xl}` | 64px | 400 | 1.05 | -1.5px | Home h1 ("Notes on building things") — serif |
 | `{typography.display-lg}` | 48px | 400 | 1.1 | -1px | Article titles, section heads — serif |
 | `{typography.display-md}` | 36px | 400 | 1.15 | -0.5px | In-article h2, sub-section heads — serif |
-| `{typography.display-sm}` | 28px | 400 | 1.2 | -0.3px | Tier names, callout headlines — serif |
-| `{typography.title-lg}` | 22px | 500 | 1.3 | 0 | Membership plan labels — Inter |
+| `{typography.display-sm}` | 28px | 400 | 1.2 | -0.3px | Callout headlines, in-article h3 — serif |
+| `{typography.display-xs}` | 32px | 400 | 1.2 | -0.5px | Project + timeline card headings, and every display heading under 768px — serif |
+| `{typography.title-lg}` | 22px | 500 | 1.3 | 0 | In-article h4, list labels — Inter |
 | `{typography.title-md}` | 18px | 500 | 1.4 | 0 | Post card titles, intro paragraphs |
-| `{typography.title-sm}` | 16px | 500 | 1.4 | 0 | Topic tile titles, list labels |
+| `{typography.title-sm}` | 16px | 500 | 1.4 | 0 | List labels, small card titles |
 | `{typography.body-md}` | 16px | 400 | 1.55 | 0 | Default running-text — Inter |
 | `{typography.body-sm}` | 14px | 400 | 1.55 | 0 | Footer body, fine-print, post meta |
 | `{typography.caption}` | 13px | 500 | 1.4 | 0 | Badge labels, figure captions |
@@ -384,6 +343,16 @@ The display/body split is editorial:
 | `{typography.code}` | 14px | 400 | 1.6 | 0 | Code blocks — monospace |
 | `{typography.button}` | 14px | 500 | 1.0 | 0 | Standard button labels |
 | `{typography.nav-link}` | 14px | 500 | 1.4 | 0 | Top-nav menu items |
+
+### CJK Line Height
+The site is written in Chinese with an English translation layer, and CJK sets denser than Latin at the same leading — the `body-md` line-height of 1.55 reads cramped once a paragraph is mostly Han characters. Running text therefore uses two CJK-specific values, tokenised as `--lh-cjk-body` and `--lh-cjk-prose`:
+
+| Token | Value | Use |
+|---|---|---|
+| `--lh-cjk-body` | 1.8 | Standfirsts, card excerpts, project + band paragraphs |
+| `--lh-cjk-prose` | 1.9 | Long-form article body |
+
+Display headings keep the Latin scale's tighter leading (1.05–1.2) — the looser value is for paragraphs only. This is a deliberate departure from `{typography.body-md}`, not drift.
 
 ### Principles
 Display sizes use weight 400 (regular), never bold. Negative letter-spacing (-0.3 to -1.5px) is essential — the serif without it reads loose and off-system. The serif character is what gives the blog its considered, literary voice; a sans display would make it look like every other engineering site.
@@ -399,16 +368,16 @@ If Newsreader is unavailable, **Source Serif 4** is the closest match at weight 
 - **Base unit:** 4px.
 - **Tokens:** `{spacing.xxs}` 4px · `{spacing.xs}` 8px · `{spacing.sm}` 12px · `{spacing.md}` 16px · `{spacing.lg}` 24px · `{spacing.xl}` 32px · `{spacing.xxl}` 48px · `{spacing.section}` 96px.
 - **Section padding:** `{spacing.section}` (96px).
-- **Card internal padding:** `{spacing.xl}` (32px) for post cards, membership tier cards, series cards; `{spacing.lg}` (24px) for code-window cards and topic tiles.
-- **Callout / CTA bands:** `{spacing.xxl}` (48px) inside coral callout cards; 64px inside the larger dark CTA band.
+- **Card internal padding:** `{spacing.xl}` (32px) for post, project and content cards; `{spacing.lg}` (24px) for code-window cards.
+- **Callout / CTA bands:** `{spacing.xxl}` (48px) inside `callout-card-coral` and `cta-band-dark`; 64px inside `cta-band-coral`.
+- **Sticky-nav geometry:** the nav is 64px (`--nav-height`). Two derived values are 64 + 8: `--main-top` 72px, the top padding of `.site-main`, and `--scroll-offset` 88px, used for `scroll-padding-top` and heading `scroll-margin-top` so anchored headings clear the sticky bar. Both are real tokens, not stray numbers.
 
 ### Grid & Container
 - **Max content width:** ~1200px centered.
 - **Article body:** Single 12-column grid; the reading column occupies 8 of 12, with figures and code windows allowed to break out to the full 12.
-- **Home hero:** 6/6 split (h1 left, illustration or code window right).
+- **Home hero:** 6/6 split (h1 left, code window right).
 - **Post card grids:** 3-up at desktop, 2-up at tablet, 1-up at mobile.
-- **Topic tile grids:** 4-up or 6-up at desktop, 2-up at tablet, 1-up at mobile.
-- **Membership grid:** 3-up at desktop, 1-up at mobile.
+- **Project grid:** 2-up at desktop, 1-up at mobile.
 
 ### Whitespace Philosophy
 The cream canvas + serif display + generous internal padding create an editorial pacing — the blog should read like a long-form magazine column rather than a documentation template. Whitespace between bands stays uniform at 96px; whitespace inside cards is generous (32px), letting type breathe.
@@ -417,7 +386,8 @@ The cream canvas + serif display + generous internal padding create an editorial
 
 | Level | Treatment | Use |
 |---|---|---|
-| Flat | No shadow, no border | Body sections, top nav, hero bands |
+| Flat | No shadow, no border | Body sections, hero bands |
+| Sticky nav | `{colors.canvas}` background, 1px `{colors.hairline-soft}` bottom border, `z-index: 30` | Top nav. It stays put on a long-scrolling archive, and the hairline keeps it legible over cream cards. Consequence: `scroll-padding-top` and heading `scroll-margin-top` are 88px (the 64px nav + 8px), so anchor links do not land under it. |
 | Soft hairline | 1px `{colors.hairline}` border | Inputs, sub-nav, occasionally on cards |
 | Cream card | `{colors.surface-card}` background — no shadow | Post cards, content cards |
 | Dark surface card | `{colors.surface-dark}` background — no shadow | Code windows, demo cards |
@@ -427,37 +397,34 @@ The elevation philosophy is **color-block first, shadow rare**. Most depth comes
 
 ### Decorative Depth
 - The diamond mark (a filled square rotated 45°) appears in the wordmark and inline as a section marker.
-- Code windows carry their own internal depth: syntax-highlighted text in muted blues / oranges / grays, line numbers in `{colors.muted-soft}`, a status bar at the bottom in `{colors.surface-dark-elevated}`.
-- Hero illustrations use simple line-art with coral and dark-ink strokes on cream — minimal, hand-drawn-feeling, never photorealistic.
+- Code windows carry their own internal depth: syntax highlighting from the `--code-*` ramp (see Code & Syntax below), line numbers in `--code-linenum`, a status bar at the bottom in `{colors.surface-dark-elevated}`.
 
 ## Shapes
 
 ### Border Radius Scale
+
+`rounded.xs` (4px) is used by inline `<code>` spans; it exists as `--radius-xs` in `global.css`.
 
 | Token | Value | Use |
 |---|---|---|
 | `{rounded.xs}` | 4px | Reserved for badge accents and tiny dropdowns |
 | `{rounded.sm}` | 6px | Small inline buttons, dropdown items |
 | `{rounded.md}` | 8px | Standard CTA buttons, text inputs, category tabs |
-| `{rounded.lg}` | 12px | Content cards (post, membership, code-window, series) |
-| `{rounded.xl}` | 16px | Hero illustration container, larger marquee components |
+| `{rounded.lg}` | 12px | Content cards (post, project, code-window, coral callout) |
+| `{rounded.xl}` | 16px | Hero code window, larger marquee components |
 | `{rounded.pill}` | 9999px | Badge pills, "NEW" tags |
 | `{rounded.full}` | 9999px / 50% | Author avatar, icon buttons |
 
 ### Photography & Illustrations
-The hero rarely uses photography. Instead it uses:
-- Simple line-art illustrations with coral + dark-ink strokes on the cream canvas
-- Code editor mockups (the dominant hero treatment on engineering posts)
-- Terminal output mockups with monospace text on dark
-- Series cards with abstract geometric thumbnails
+The site uses no photography and no illustration. The hero's visual is a code window — monospace on `{colors.surface-dark}` with the `--code-*` ramp — and that is the only decorative artifact in the system. Article images come from post Markdown and take `{rounded.md}`.
 
-When photography is used (rare — the author avatar, conference photos), avatars crop to perfect circles at 40px diameter.
+The one raster asset is the WeChat QR on /about, at 160px with `{rounded.md}`; it is decoded in the browser from the private-profile payload rather than shipped as a static file.
 
 ## Components
 
 ### Top Navigation
 
-**`top-nav`** — Cream nav bar pinned to the top of every page. 64px tall, `{colors.canvas}` background. Carries the diamond mark + "pusidun" wordmark at left, primary horizontal menu (Writing, Notes, Projects, Topics, About) center-left, right-side cluster with an RSS text-link and a "Subscribe" `{component.button-primary}` (coral). Menu items in `{typography.nav-link}` (Inter 14px / 500).
+**`top-nav`** — Cream nav bar, `position: sticky` at the top of every page. 64px tall, `{colors.canvas}` background, 1px `{colors.hairline-soft}` bottom border. Carries the diamond mark + "pusidun" wordmark at left, the menu (文章 / 项目 / 履历 / 关于) at right, then the language toggle and a GitHub text-link. Menu items in `{typography.nav-link}` (Inter 14px / 500); the current page is underlined in coral at 8px offset. Collapses to a full-screen `dialog` sheet under 768px.
 
 ### Buttons
 
@@ -467,47 +434,50 @@ When photography is used (rare — the author avatar, conference photos), avatar
 
 **`button-secondary-on-dark`** — Used over `{colors.surface-dark}` cards. Background `{colors.surface-dark-elevated}` (#252320), text `{colors.on-dark}`. Stays dark — the system never inverts to a light secondary on dark surfaces.
 
-**`button-text-link`** — Inline text button, no background. Used for "RSS" in the top nav and inline CTA links.
+**`button-on-coral`** — The inverse case, used over `callout-card-coral` and `cta-band-coral`. Background `{colors.canvas}`, text `{colors.ink}`. Coral surfaces do invert their button, because a dark-on-coral button would disappear into the fill.
 
-**`button-icon-circular`** — 36px circular icon button. Background `{colors.canvas}`, hairline border, ink-color icon. Used for copy-code, share, and carousel arrows.
+**`button-text-link`** — Inline text button, no background. Used for the GitHub link in the top nav and inline CTA links.
 
-**`text-link`** — Inline body links in `{colors.primary}` (the coral). Underlined on press; the coral inline link is one of the system's most distinctive small details, and it does a lot of work inside long article text.
+**`text-link`** — Inline body links in `{colors.primary-active}` (#a9583e), underlined at 4px offset. Not `{colors.primary}`: the lighter coral is 3.11:1 on canvas and fails AA for text. The coral inline link is one of the system's most distinctive small details, and it does a lot of work inside long article text.
 
 ### Cards & Containers
 
-**`hero-band`** — Cream-canvas hero with a 6-6 grid: h1 + standfirst + button row on the left, hero illustration card or code window on the right. Vertical padding `{spacing.section}` (96px).
+**`hero-band`** — Cream-canvas hero with a 6-6 grid: h1 + standfirst + button row on the left, the code window on the right. Vertical padding `{spacing.section}` (96px).
 
-**`hero-illustration-card`** — A larger card holding the hero's right-side artifact — sometimes a coral-stroke line illustration on cream, sometimes a dark code window. Background `{colors.canvas}` or `{colors.surface-dark}` depending on context, rounded `{rounded.xl}` (16px).
-
-**`post-card`** — Used in 3-up article listing grids. Background `{colors.surface-card}` (#efe9de — slightly darker cream), rounded `{rounded.lg}` (12px), internal padding `{spacing.xl}` (32px). Carries a category badge at top, a `{typography.title-md}` post title, a two-line excerpt in `{typography.body-md}`, and a date + read-time line in `{typography.body-sm}` / `{colors.muted}`.
+**`post-card`** — Used in 3-up article listing grids. Background `{colors.surface-card}` (#efe9de — slightly darker cream), rounded `{rounded.lg}` (12px), internal padding `{spacing.xl}` (32px). Carries a type / tag line at top, a `{typography.title-md}` post title, a three-line excerpt, a tag row, and a date line in `{typography.body-sm}` / `{colors.muted}`. There is no read-time.
 
 **`demo-card-dark`** — Dark card showing a running artifact: a terminal session, a diff, a small interactive demo. Background `{colors.surface-dark}`, rounded `{rounded.lg}`, internal padding `{spacing.xl}` (32px). Labels in `{colors.on-dark}`, output fragments below.
 
-**`code-window-card`** — A specialized dark card showing a code editor with line numbers, syntax-highlighted code in `{typography.code}`, and sometimes a "Copy" button or terminal output panel below. Background `{colors.surface-dark}` with `{colors.surface-dark-soft}` for the inner code block, rounded `{rounded.lg}`, padding `{spacing.lg}` (24px). The signature visual element of the blog's engineering posts.
+**`code-window-card`** — A specialized dark card showing a code editor with line numbers, syntax-highlighted code in `{typography.code}`, and sometimes a terminal output panel below. Background `{colors.surface-dark}` with `{colors.surface-dark-soft}` for the inner code block, rounded `{rounded.lg}`, padding `{spacing.lg}` (24px). The signature visual element of the blog's engineering posts.
 
-**`series-card`** — Used on the writing index to group multi-part series. Background `{colors.canvas}` with hairline border, rounded `{rounded.lg}`, internal padding `{spacing.xl}` (32px). Carries the series name, a short blurb, a part count, and a `{component.text-link}` into part one.
+#### Code & Syntax
 
-**`membership-tier-card`** — Standard tier card for the newsletter support page. Background `{colors.canvas}` with hairline border, rounded `{rounded.lg}`, padding `{spacing.xl}` (32px). Carries the tier name in `{typography.title-lg}` (Inter), the amount in `{typography.display-sm}` (serif), a benefit checklist in `{typography.body-md}`, and a `{component.button-primary}` at the bottom.
+One warm-leaning ramp serves both the hero's hand-written code window and Shiki's output in articles, so the two are the same theme rather than two unrelated ones. The Shiki theme is defined in `astro.config.mjs` and mirrors these values; `{colors.accent-teal}` and `{colors.accent-amber}` are **not** used here — they are reserved for status dots and category badges.
 
-**`membership-tier-card-featured`** — The featured tier. Background flips to `{colors.surface-dark}`, text inverts to `{colors.on-dark}`. The dark surface IS the featured signal — no border, no badge, no scale-up needed.
+| Token | Value | Use |
+|---|---|---|
+| `--code-text` | #d6d3cb | Default code foreground |
+| `--code-comment` | #6f6b62 | Comments (italic) |
+| `--code-keyword` | #d68f6f | Keywords, storage, tags |
+| `--code-string` | #93b8a6 | Strings, character literals |
+| `--code-number` | #d9b168 | Numerics, constants, type names |
+| `--code-fn` | #9fb4c9 | Function names, attributes |
+| `--code-punct` | #8e8b82 | Punctuation, operators |
+| `--code-linenum` | #55524b | Line numbers |
 
-**`callout-card-coral`** — A full-bleed coral card carrying a major call-to-action or a pull quote. Background `{colors.primary}` (#cc785c), text `{colors.on-primary}` (white), rounded `{rounded.lg}`, padding `{spacing.xxl}` (48px). The coral surface IS the voltage; any CTA inside uses an inverted button style (cream button on coral).
-
-**`topic-tile`** — Used on the topics index. Background `{colors.canvas}` with hairline border, rounded `{rounded.lg}`, padding 20px. Each tile carries a small icon at top, a `{typography.title-sm}` topic name, and a post count.
+**`callout-card-coral`** — A full-bleed coral card carrying a major call-to-action. Background `{colors.primary}` (#cc785c), text `{colors.on-coral}` (ink — cream on coral fails contrast), rounded `{rounded.lg}`, padding `{spacing.xxl}` (48px). The coral surface IS the voltage; the CTA inside is `button-on-coral` (cream fill, ink label). Built: the "更多代码与探索" block on /projects.
 
 ### Inputs & Forms
 
-**`text-input`** — Standard text input, used for search and the subscribe field. Background `{colors.canvas}`, text `{colors.ink}`, type `{typography.body-md}`, rounded `{rounded.md}` (8px), padding 10px × 14px, height 40px. 1px hairline border in `{colors.hairline}`.
+**`text-input`** — Standard text input. Used for the article search field. Background `{colors.canvas}`, text `{colors.ink}`, type `{typography.body-md}`, rounded `{rounded.md}` (8px), padding 10px × 14px, height 40px. 1px hairline border in `{colors.hairline}`.
 
 **`text-input-focused`** — Focus state. Border shifts to `{colors.primary}` (coral) for emphasis, with a 3px coral-at-15%-alpha outer ring. The ring is the keyboard-focus indicator and is never removed.
 
-**`consent-card`** — Bottom-right floating dark analytics-consent banner. Background `{colors.surface-dark}`, text `{colors.on-dark}`, rounded `{rounded.lg}`, padding `{spacing.lg}` (24px). One of the few places dark surface appears at small scale on cream pages.
+**`blockquote`** — Article pull quote. `{colors.surface-soft}` fill with a 3px `{colors.primary}` left border, 8px × 24px padding, radius `0 {rounded.md} {rounded.md} 0`, 32px block margin. The one place the lighter coral is load-bearing at scale, and it works because it is a border, not text.
 
 ### Tags / Badges
 
 **`badge-pill`** — Small pill label used for post categories. Background `{colors.surface-card}`, text `{colors.ink}`, type `{typography.caption}` (13px / 500), rounded `{rounded.pill}`, padding 4px × 12px.
-
-**`badge-coral`** — Coral-fill badge for "NEW", "UPDATED", featured highlights. Background `{colors.primary}`, text `{colors.on-primary}`, type `{typography.caption-uppercase}` (12px / 500 / 1.5px tracking), rounded `{rounded.pill}`, padding 4px × 12px.
 
 ### Tab / Filter
 
@@ -515,9 +485,9 @@ When photography is used (rare — the author avatar, conference photos), avatar
 
 ### CTA / Footer
 
-**`cta-band-coral`** — A pre-footer subscribe card. Full-width coral fill, white type, rounded `{rounded.lg}`, padding 64px. Carries an h2 in `{typography.display-sm}` (still serif), a one-line promise, an email input, and a cream-button CTA.
+**`cta-band-coral`** — A full-width coral band closing a page. Coral fill, ink type, rounded `{rounded.lg}`, padding 64px (32px under 768px). Carries an eyebrow, an h2 in `{typography.display-sm}` (still serif), a short paragraph and a `button-on-coral`. Built: the "Open source" band on /about. Alternates with `cta-band-dark` so no two consecutive pages close on the same surface.
 
-**`cta-band-dark`** — Alternative pre-footer band on engineering posts. Background `{colors.surface-dark}`, text `{colors.on-dark}`, rounded `{rounded.lg}`, padding 64px. Often pairs with a code-window card.
+**`cta-band-dark`** — The dark counterpart, and the default. Background `{colors.surface-dark}`, text `{colors.on-dark}`, rounded `{rounded.lg}`, padding 48px. Implemented as `.feature-band.dark-card`; built on / and /cv.
 
 **`footer`** — Dark footer that closes every page. Background `{colors.surface-dark}` (#181715), text `{colors.on-dark-soft}`. 4-column link list at desktop covering Writing / Projects / Elsewhere / Meta. Vertical padding 64px. The diamond mark + "pusidun" wordmark sits at the top in `{colors.on-dark}`. The footer never inverts.
 
@@ -526,7 +496,7 @@ When photography is used (rare — the author avatar, conference photos), avatar
 ### Do
 - Anchor every page on the cream canvas. Pure white reads as a default template; the warm tint is the whole point.
 - Use the serif for every display headline. Pair with Inter body. Negative letter-spacing on display sizes is non-negotiable.
-- Reserve `{colors.primary}` (coral) for primary CTAs, inline links, and full-bleed `{component.callout-card-coral}` moments. Don't paint other accents coral.
+- Reserve coral for primary CTAs, the diamond mark, focus rings and full-bleed `{component.callout-card-coral}` / `{component.cta-band-coral}` moments. Inline links take `{colors.primary-active}`, the darker variant, for contrast. Don't paint other accents coral.
 - Use `{component.demo-card-dark}` and `{component.code-window-card}` to show real output. Don't illustrate code when you can show it.
 - Pair `{component.post-card}` (cream) with `{component.demo-card-dark}` (dark) in alternating bands. The cream-to-dark rhythm is the pacing mechanism.
 - Use the diamond mark as the wordmark prefix. Keep it a single flat shape at every size.
@@ -547,27 +517,26 @@ When photography is used (rare — the author avatar, conference photos), avatar
 
 | Name | Width | Key Changes |
 |---|---|---|
-| Mobile | < 768px | Hamburger nav; hero h1 64→32px; hero-illustration-card stacks below content; post grids 1-up; topic tiles 2-up; membership 1-up; footer 4 cols → 1 |
-| Tablet | 768–1024px | Top nav stays horizontal but tightens; post cards 2-up; topic tiles 3-up; membership 2-up |
-| Desktop | 1024–1440px | Full top-nav with all menu items; 3-up post cards; 4-up or 6-up topic tiles; 3-up membership tiers |
+| Mobile | < 768px | Hamburger nav; hero h1 64→32px; the code window stacks below content; post + project grids 1-up; footer 4 cols → 1 |
+| Tablet | 768–1024px | Top nav stays horizontal but tightens; post cards 2-up |
+| Desktop | 1024–1440px | Full top-nav with all menu items; 3-up post cards; 2-up project cards |
 | Wide | > 1440px | Same as desktop with more outer breathing room; max content width caps at 1200px |
 
 ### Touch Targets
 - `{component.button-primary}` at minimum 40 × 40px.
 - `{component.button-icon-circular}` at exactly 36 × 36 — slightly under the WCAG 44px guideline but visually centered; pad the surrounding hit area where it stands alone.
 - `{component.text-input}` height is 40px.
-- Topic tile entire card area is tappable; effective tap area >> 44px.
+- The whole post card is a link; effective tap area >> 44px.
 
 ### Collapsing Strategy
 - Top nav collapses to hamburger at < 768px; menu opens as a full-screen cream sheet.
-- Hero band's 6-6 grid collapses to single-column on mobile — h1 + standfirst + buttons first, then the illustration / code window below.
+- Hero band's 6-6 grid collapses to single-column on mobile — h1 + standfirst + buttons first, then the code window below.
 - Post grids reduce columns rather than scaling cards down.
-- Membership tier cards collapse 3 → 2 → 1; the featured dark surface stays visually distinct at every breakpoint.
+- Project cards collapse 2 → 1; the featured dark surface stays visually distinct at every breakpoint.
 - Code-window cards retain code legibility at every breakpoint by allowing horizontal scroll within the card rather than wrapping code lines.
 
 ### Image Behavior
 - Code blocks inside dark cards stay at fixed font-size; horizontal scroll on mobile rather than wrapping.
-- Hero illustrations scale proportionally; line-art strokes thin slightly on mobile.
 - Author avatar crops to a circle at every breakpoint.
 
 ## Iteration Guide
@@ -582,9 +551,8 @@ When photography is used (rare — the author avatar, conference photos), avatar
 
 ## Known Gaps
 
-- Syntax-highlighting token colors inside `{component.code-window-card}` are described qualitatively (muted blues / oranges / grays) but not enumerated as tokens. A full light + dark code theme would need its own token block.
 - The diamond mark is an inline SVG asset and is not formalized as a system token here.
 - Animation and transition timings (nav sheet open, code block copy confirmation, TOC scroll-spy highlighting) are not in scope.
-- Form validation states beyond `{component.text-input-focused}` are not extracted — error and success states would need the subscribe flow to be specified first.
-- Long-form article internals (footnotes, blockquotes, figure captions, inline math, table styling, the sticky table-of-contents rail) share the tokens above but need their own component entries.
+- Form validation states beyond `{component.text-input-focused}` are not extracted. The only form on the site is the article search field, which has no invalid state.
+- Long-form article internals (footnotes, figure captions, inline math, the sticky table-of-contents rail) share the tokens above but need their own component entries. Blockquotes, code blocks and tables are now specified.
 - Dark reading mode is not specified. The dark surface tones exist, but a full inverted reading surface would need its own text and hairline ramp.
