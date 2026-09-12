@@ -43,7 +43,7 @@ P1 的环境案例很具体：侯捷在 Dev-C++ 5.11 与 MinGW/GCC 4.9.2 环境�
 
 课堂打印 `__cplusplus`，观察 `199711L` 与 `201103L`，并用它解释标准库源码中的条件编译。这是建立语言模式意识的好入口。C++14 对应的常用值是 `201402L`。
 
-不过，P1 根据 Visual Studio 2012 仍输出旧值，推测也许需要类似开关，这里必须保留其推测性质。**现代修正**：MSVC 长期保留 `199711L` 以兼容旧代码；`/Zc:__cplusplus` 从 Visual Studio 2017 15.7 才提供，用于让宏反映选定标准模式。不能把这个后来的选项套回 VS2012，也不能单凭旧值断言完全不支持 C++11。[Microsoft 官方说明](https://learn.microsoft.com/en-us/cpp/build/reference/zc-cplusplus?view=msvc-170)明确区分了报告宏值与选择语言标准。
+课件本身已注明厂商可能提供不同宏值。不过，P1 口头根据 Visual Studio 2012 仍输出旧值，推测也许需要类似开关，这里必须保留其推测性质。**现代修正**：MSVC 长期保留 `199711L` 以兼容旧代码；`/Zc:__cplusplus` 从 Visual Studio 2017 15.7 才提供，用于让宏反映选定标准模式。不能把这个后来的选项套回 VS2012，也不能单凭旧值断言完全不支持 C++11。[Microsoft 官方说明](https://learn.microsoft.com/en-us/cpp/build/reference/zc-cplusplus?view=msvc-170)明确区分了报告宏值与选择语言标准。
 
 ## 读库源码时，先找职责，再找文件
 
