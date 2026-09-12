@@ -1,0 +1,4 @@
+interface:
+  display_name: "Vibe Watching"
+  short_description: "将视频课程整理为可定位回看、有概念联系与练习的技术学习笔记"
+  default_prompt: "使用 $vibe-watching 将这门视频课程转录、核对课件，并按知识结构整理成带时间点导读与思考题的文章。"

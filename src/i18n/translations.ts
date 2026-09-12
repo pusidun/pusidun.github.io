@@ -23,6 +23,8 @@ export const translations: Record<string, string> = {
   "// 用一个表达式，替代递归。": "// One expression instead of recursion.",
   "来自博客 · C++ 折叠表达式": "From the blog · C++ fold expressions",
   "最近的文字": "Recent writing",
+  "置顶与最近": "Pinned & recent",
+  "置顶": "Pinned",
   "In focus / 近期关注": "In focus",
   "终端安全": "Endpoint security",
   "从系统基础到智能体运行时，梳理权限、沙箱、插件供应链与行为审计之间的联系。": "From operating systems to agent runtimes: exploring the connections between permissions, sandboxes, plugin supply chains, and auditing.",

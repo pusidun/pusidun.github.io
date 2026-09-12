@@ -10,6 +10,15 @@ summary: "整理 Uncle Bob 关于 AI Agent、代码审查、架构与产品工�
 
 视频对应 Kent C. Dodds 与 Robert C. Martin（Uncle Bob）的访谈 *Architecture, AI agents, and product empathy with Robert C. Martin*。本文依据[官方文字稿](https://share.transistor.fm/s/7f2974b4/transcript.txt)整理，采用意译与归纳；下文时间均对应英文原版，与 B 站配音版可能有偏差。
 
+> **来源档案**
+>
+> 原节目：**Become an Epic Product Engineer**；本期完整标题：**Architecture, AI agents, and product empathy with Robert C. Martin**。主持人 **Kent C. Dodds**，嘉宾 **Robert C. Martin（Uncle Bob）**；[官方节目页](https://www.epicproduct.engineer/architecture-ai-agents-and-product-empathy-with-robert-c-martin~yr5vf)标注发布日期为 **2026-06-27**。
+>
+> 本次 B 站中文配音版由“全球AI科技不费眼”发布，标题《【真人感中配】〈代码整洁之道〉作者：我现在完全不读 AI 写的代码》，标识 **BV1Emgq6wEnw**；中文发布者并非原访谈作者。原版另有 [YouTube 视频 RxxxGkFIUJ0](https://www.youtube.com/watch?v=RxxxGkFIUJ0)和[节目文字稿](https://share.transistor.fm/s/7f2974b4/transcript.txt)。链接失效时，可用两位姓名与英文完整标题检索。
+>
+> **AI Agents for Clean Code with "Uncle Bob" Martin** 是另一项相关培训，由 Robert C. Martin 授课，O’Reilly 页面标注出版方为 Pearson；它不是这期访谈的节目名称或录像来源。[相关培训介绍](https://www.oreilly.com/live-events/ai-agents-for-clean-code-with-uncle-bob-martin/0642572376765/)
+
+
 ## 一、抽象层在上升，架构问题仍然存在
 
 在原版 **03:38–06:40**，Bob 从自己的编程经历谈起：工具和语言不断变化，但模块划分、依赖控制、信息封装等设计问题一直存在。
@@ -85,4 +94,4 @@ Bob 的观察是，Agent 在被要求评价设计时能够给出分析，却未�
 - [官方节目页面](https://www.epicproduct.engineer/architecture-ai-agents-and-product-empathy-with-robert-c-martin~yr5vf)与[完整文字稿](https://share.transistor.fm/s/7f2974b4/transcript.txt)
 - [O’Reilly：AI Agents for Clean Code with "Uncle Bob" Martin](https://www.oreilly.com/live-events/ai-agents-for-clean-code-with-uncle-bob-martin/0642572376765/)
 
-O’Reilly 链接是相关课程，不是这段访谈的课程录像。课程介绍包含验收测试、单元测试、变异测试及代码质量分析等主题，可以作为进一步学习 Agent 开发纪律的入口；本文没有将课程大纲当作视频中的实际演示。
+相关培训介绍包含验收测试、单元测试、变异测试及代码质量分析等主题，可以作为进一步学习 Agent 开发纪律的入口；本文没有将课程大纲当作视频中的实际演示。

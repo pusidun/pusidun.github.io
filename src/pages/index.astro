@@ -3,7 +3,8 @@ import I18n from "../components/shared/I18n.astro";
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PostCard from '../components/blog/PostCard.astro';
-const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort((a,b) => b.data.date.valueOf() - a.data.date.valueOf()).slice(0,3);
+import { comparePostsForListing } from '../utils/posts';
+const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(comparePostsForListing).slice(0,3);
 ---
 <BaseLayout title="pusidun · 工程与文字" description="pusidun 的个人博客，记录软件开发、系统安全与工程实践。" current="home">
   <main id="main-content" class="container home-main">
@@ -29,7 +30,7 @@ sum_folder(<span class="code-value">1, 2, 3</span>);
       </div>
     </section>
     <section aria-labelledby="latest-title">
-      <div class="section-heading"><h2 id="latest-title"><I18n text="最近的文字" /></h2><a class="text-link" href="/blog"><I18n text="全部文章 →" /></a></div>
+      <div class="section-heading"><h2 id="latest-title"><I18n text="置顶与最近" /></h2><a class="text-link" href="/blog"><I18n text="全部文章 →" /></a></div>
       <div class="post-grid">{posts.map(p => <PostCard href={`/blog/${p.id}/`} {...p.data} />)}</div>
     </section>
     <section class="section dark-card feature-band">

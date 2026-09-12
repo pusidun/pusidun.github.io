@@ -51,9 +51,12 @@ draft: false
 - `type` 可选：技术、生活、读书、随笔，默认为技术。仅有一种文章类型时隐藏类型筛选，出现多种类型后自动显示。
 - `tags` 默认为空数组，`summary` 可省略。标签会自动去重：大小写不同的同名标签（`Linux` 与 `linux`）合并为一个，纯 ASCII 标签统一转小写，含中文的标签保留原样（`macOS安全`）。低频标签收在「更多标签」中。自由标签无需补充英文翻译即可发布。
 - `draft: true` 表示草稿，不会出现在列表或生成文章页面；发布时改为 `false`。
+- `pinned: true` 将文章置顶到文章列表和首页文章区，默认为 `false`，不改变发表日期。
 - 图片放在 `public/assets/images/`，正文使用 `![说明](/assets/images/example.png)` 引用。
 
-文章按日期倒序展示，访问路径为 `/blog/2026-09-06-my-post/`。搜索覆盖标题、摘要和标签，不搜索正文。
+置顶文章优先，其余文章按日期倒序展示，访问路径为 `/blog/2026-09-06-my-post/`。搜索覆盖标题、摘要和标签，不搜索正文。
+
+新增文章后，同步更新 [Writing 导读](src/content/blog/2026-09-12-writing-roadmap.md) 中的阅读路线。视频学习笔记使用项目级 [vibe-watching skill](.agents/skills/vibe-watching/SKILL.md)，可在 Codex 中用 `$vibe-watching` 调用；按主题整理课程内容，并保留讲者、课程名和可回看的时间点。
 
 ### 新项目
 

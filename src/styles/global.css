@@ -83,6 +83,7 @@ h3 { font-size: 28px; line-height: 1.2; letter-spacing: -.3px; }
 .callout-card-coral :focus-visible, .cta-band-coral :focus-visible { outline-color: var(--ink); box-shadow: none; }
 .post-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
 .post-card { display: flex; flex-direction: column; gap: 20px; min-width: 0; padding: 32px; background: var(--surface-card); border-radius: var(--radius-lg); }
+.post-card-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .post-card h3 { font: 500 18px/1.6 var(--font-body); letter-spacing: 0; overflow-wrap: anywhere; }
 .post-card .excerpt { color: var(--muted); font-size: 14px; line-height: var(--lh-cjk-body); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .post-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; font-size: 13px; color: var(--muted); }
